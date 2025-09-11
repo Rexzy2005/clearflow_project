@@ -1,5 +1,5 @@
 // === Backend URL
-const backend_URL = "https://clearflow-backend.onrender.com";
+const backend_URL = "https://clearflow-project.onrender.com";
 
 // ======================== UTILITIES FUNCTIONS =========================
 // ======================== UTILITIES FUNCTIONS =========================
