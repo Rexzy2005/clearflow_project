@@ -306,12 +306,6 @@ body {
         font-weight: 300;
         outline: none;
 
-        /* &::-webkit-outer-spin-button,
-        &::-webkit-inner-spin-button {
-          -webkit-appearance: none;
-          margin: 0;
-        } */
-
         &:valid {
           border-color: #2b59ff9a;
           box-shadow: 0 10px -5px #2b59ff9a;
