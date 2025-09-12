@@ -3,6 +3,24 @@ const menuBtns = document.querySelectorAll("[data-target]");
 
 
 // show section on menu click
+const savedSection = localStorage.getItem("activeSection");
+if (savedSection) {
+  // hide all sections
+  sections.forEach(section => section.classList.remove("active-section"));
+  // show saved one
+  const activeSec = document.getElementById(savedSection);
+  if (activeSec) activeSec.classList.add("active-section");
+
+  // highlight correct menu button
+  menuBtns.forEach(btn => {
+    btn.classList.remove("active-link");
+    if (btn.dataset.target === savedSection) {
+      btn.classList.add("active-link");
+    }
+  });
+}
+
+
 menuBtns.forEach(btn => {
   btn.addEventListener('click', (e) => {
     e.preventDefault();
@@ -14,8 +32,11 @@ menuBtns.forEach(btn => {
     btn.classList.add('active-link');
 
 
+    // save active section
+    localStorage.setItem("activeSection", btn.dataset.target);
   })
 })
+
 
 function updateSlider(slider, valueDisplay) {
   const value = slider.value;
@@ -53,25 +74,3 @@ hambugerMenubtn.addEventListener('click', () => {
   hambugerMenubtn.classList.toggle('open');
   sidePanel.classList.toggle('open');
 })
-
-
-
-
-
-
-
-// import { showToast } from "./components/notification.js"
-
-// window.addEventListener("DOMContentLoaded", () => {
-//   // Check if login was successful
-//   if (localStorage.getItem("loginSuccess") === "true") {
-//     showToast("Login successful", "success");
-
-//     // Remove the flag so it only shows once
-//     localStorage.removeItem("loginSuccess");
-//     console.log("welcome user...")
-
-//   }
-// });
-
-
