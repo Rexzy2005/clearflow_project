@@ -66,23 +66,46 @@ function showModal(title, message, callback) {
 
 // Switch between forms
 function showSection(sectionId) {
+  const currentSection = document.querySelector(".form-section[style*='block']")?.id;
+  if (currentSection) localStorage.setItem("previousAuthSection", currentSection);
+
   document.querySelectorAll(".form-section").forEach(form => {
     form.style.display = "none";
   });
+
   const section = document.getElementById(sectionId);
   if (section) section.style.display = "block";
 
   // Save the current section to localStorage
   localStorage.setItem("currentAuthSection", sectionId);
+
+  // Toggle back button visibility
+  const backBtn = document.getElementById("back-btn");
+  if (backBtn) {
+    if (sectionId === "otp") {
+      backBtn.style.display = "none"; // hide back button on OTP screen
+    } else {
+      backBtn.style.display = "inline-block"; // show back button on other screens
+    }
+  }
 }
+
+
 
 
 
 
 // Toggle back button
-function goBack() {
-  showSection("login");
+const backBtn = document.getElementById("back-btn");
+if (backBtn) {
+  backBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    // Go back to previous section
+    const prevSection = localStorage.getItem("previousAuthSection") || "login";
+    showSection(prevSection);
+  });
 }
+
 
 // ======================== PASSWORD TOGGLE =========================
 document.querySelectorAll(".toggle-password").forEach(toggle => {
@@ -206,60 +229,80 @@ signupForm.addEventListener("submit", async (e) => {
 
 // ======================== OTP =========================
 const otpForm = document.getElementById("otp");
-// if(otpForm){
-//   document.getElementById('back-btn').display.display = "none"
-// }
+const otpInputs = document.querySelectorAll("#otp input");
 
-// ADDED: OTP auto-move and backspace
-document.querySelectorAll("#otp input").forEach((box, idx, arr) => {
+// Auto-move, backspace, and paste
+otpInputs.forEach((box, idx, arr) => {
+  // Auto-move to next input
   box.addEventListener("input", () => {
     if (box.value && idx < arr.length - 1) arr[idx + 1].focus();
+    box.style.border = ""; // remove red border on input
   });
+
+  // Backspace moves to previous input
   box.addEventListener("keydown", (e) => {
     if (e.key === "Backspace" && !box.value && idx > 0) arr[idx - 1].focus();
+  });
+
+  // Paste feature
+  box.addEventListener("paste", (e) => {
+    e.preventDefault();
+    const pasteData = e.clipboardData.getData("text").trim();
+    if (!/^\d+$/.test(pasteData)) return; // only digits
+    const digits = pasteData.split("").slice(0, arr.length); // max 4 digits
+    digits.forEach((digit, i) => {
+      arr[i].value = digit;
+    });
+    arr[digits.length - 1].focus(); // focus last filled input
   });
 });
 
 otpForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const btn = document.getElementById("otpBtn");
+
+  // Check if all inputs are filled
+  const otp = Array.from(otpInputs).map(i => i.value).join("");
+  let allFilled = Array.from(otpInputs).every(i => i.value !== "");
+
+  if (!allFilled) {
+    otpInputs.forEach(i => {
+      if (!i.value) i.style.border = "1px solid red";
+    });
+    setHint("otp-hint", "All fields must be filled");
+    return; // do not start loading
+  }
+
   setButtonLoading(btn, "set", "Processing...");
 
-  const otp = [
-    document.getElementById("otp1").value,
-    document.getElementById("otp2").value,
-    document.getElementById("otp3").value,
-    document.getElementById("otp4").value
-  ].join("");
-  const email = otpContext === "signup" ? document.getElementById("signupEmail").value.trim() : document.getElementById("femail").value.trim();
-  // const email = document.getElementById("signupEmail").value.trim();
-  
+  const email = otpContext === "signup"
+    ? document.getElementById("signupEmail").value.trim()
+    : document.getElementById("femail").value.trim();
 
   if (otp.length !== 4) {
     setHint("otp-hint", "Enter 4-digit OTP");
+    setButtonLoading(btn, "reset");
     return;
   }
-  
+
   try {
     const res = await fetch(`${backend_URL}/api/auth/verify-otp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, otp })
     });
-    
+
     const data = await res.json();
     if (res.ok) {
-      // modal on OTP success
+      otpInputs.forEach(i => i.style.border = "1px solid green");
       if (otpContext === "signup") {
         showModal("OTP Verified", "You can now login.", () => showSection("login"));
-        clearFormInputs(otpForm);
-        document.querySelectorAll("#otp input").forEach(i => i.style.borderColor = "green"); // green on correct
       } else if (otpContext === "forgot-password") {
         showModal("OTP Verified", "You can now reset your password.", () => showSection("resetpassword"));
-        document.querySelectorAll("#otp input").forEach(i => i.style.borderColor = "green"); // green on correct
       }
+      clearFormInputs(otpForm);
     } else {
-      document.querySelectorAll("#otp input").forEach(i => i.style.borderColor = "red"); // red on wrong
+      otpInputs.forEach(i => i.style.border = "1px solid red");
       setHint("otp-hint", data.message || "Invalid OTP");
     }
   } catch (err) {
@@ -267,23 +310,21 @@ otpForm.addEventListener("submit", async (e) => {
     setHint("otp-hint", "Error connecting to server");
   } finally {
     setButtonLoading(btn, "reset");
-    clearFormInputs(otpForm);
   }
 });
 
-// ADDED: OTP countdown + resend
+// OTP countdown + resend
 let otpInterval;
 function startOtpTimer() {
   let time = 60;
   const timerEl = document.getElementById("otp-countdown");
   const resendEl = document.getElementById("resend-otp");
   const resendText = document.querySelector('.send-again');
+
   resendText.style.display = "none";
+  timerEl.textContent = `${time}s`;
 
-  const signupEmail = document.getElementById("signupEmail").value.trim();
-  const forgotPassEmail = document.getElementById("femail").value.trim();
-  const email = otpContext === "signup" ? signupEmail : forgotPassEmail;
-
+  clearInterval(otpInterval); // clear previous interval if any
   otpInterval = setInterval(() => {
     if (time > 0) {
       timerEl.textContent = `${time--}s`;
@@ -294,26 +335,38 @@ function startOtpTimer() {
     }
   }, 1000);
 
-  resendEl.onclick = async (e) => {
+  // Remove previous click listeners to avoid duplicates
+  resendEl.replaceWith(resendEl.cloneNode(true));
+  const newResendEl = document.getElementById("resend-otp");
+
+  newResendEl.addEventListener("click", async (e) => {
     e.preventDefault();
-    resendEl.style.pointerEvents = "none";
-    resendEl.style.opacity = ".8";
+    resendText.style.display = "none"; // hide resend while waiting
+    newResendEl.style.pointerEvents = "none";
+    newResendEl.style.opacity = ".8";
+
+    const email = otpContext === "signup"
+      ? document.getElementById("signupEmail").value.trim()
+      : document.getElementById("femail").value.trim();
+
     try {
-      await fetch(`${backend_URL}/api/auth/resend-otp`, {
+      const res = await fetch(`${backend_URL}/api/auth/resend-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
       });
+
       showModal("Resent", "A new OTP has been sent.", startOtpTimer);
     } catch {
       showModal("Error", "Could not resend OTP");
-    } finally{
-      resendEl.style.pointerEvents = "all";
-      resendEl.style.cursor = "pointer";
-      resendEl.style.opacity = "1";
+    } finally {
+      newResendEl.style.pointerEvents = "all";
+      newResendEl.style.opacity = "1";
     }
-  };
+  });
 }
+
+
 
 // ======================== LOGIN =========================
 const loginForm = document.getElementById("login");
