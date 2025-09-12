@@ -130,22 +130,22 @@ signupForm.addEventListener("submit", async (e) => {
 
   let valid = true;
 
-  if (!fname) { setHint("fname-hint", "First name is required", false); valid = false; }
+  if (!fname) { setHint("fname-hint", "", false); valid = false; }
   else { setHint("fname-hint", "", true); }
 
-  if (!lname) { setHint("lname-hint", "Last name is required"); valid = false; }
+  if (!lname) { setHint("lname-hint", ""); valid = false; }
   else { setHint("lname-hint", "", true); }
 
-  if (!username) { setHint("uname-hint", "Username is required"); valid = false; }
+  if (!username) { setHint("uname-hint", ""); valid = false; }
   else { setHint("uname-hint", "", true); }
 
-  if (!/^\S+@\S+\.\S+$/.test(email)) { setHint("signUpEmail-hint", "Enter a valid email"); valid = false; }
+  if (!/^\S+@\S+\.\S+$/.test(email)) { setHint("signUpEmail-hint", ""); valid = false; }
   else { setHint("signUpEmail-hint", "", true); }
 
-  if (!password) { setHint("signUpPassword-hint", "Passwords is required"); valid = false; }
+  if (!password) { setHint("signUpPassword-hint", ""); valid = false; }
   else { setHint("uname-hint", "", true); }
 
-  if (!confirmPassword) { setHint("signupConfirmPassword-hint", "Passwords is required"); valid = false; }
+  if (!confirmPassword) { setHint("signupConfirmPassword-hint", ""); valid = false; }
   else { setHint("uname-hint", "", true); }
 
   if (password.length < 6 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
@@ -156,7 +156,7 @@ signupForm.addEventListener("submit", async (e) => {
   }
 
   if (password !== confirmPassword) {
-    setHint("signupConfirmPassword-hint", "Passwords do not match");
+    setHint("signupConfirmPassword-hint", "");
     valid = false;
   } else {
     setHint("signupConfirmPassword-hint", "", true);
@@ -199,6 +199,9 @@ signupForm.addEventListener("submit", async (e) => {
 
 // ======================== OTP =========================
 const otpForm = document.getElementById("otp");
+if(otpForm){
+  document.getElementById('back-btn').display.display = "none"
+}
 
 // ADDED: OTP auto-move and backspace
 document.querySelectorAll("#otp input").forEach((box, idx, arr) => {

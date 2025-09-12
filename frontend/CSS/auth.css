@@ -109,7 +109,6 @@ body {
     text-align: center;
     /* display: none; */
     flex-direction: column;
-    gap: 10px;
     width: 100%;
 
     & h1 {
@@ -124,7 +123,7 @@ body {
       align-items: center;
       justify-content: space-between;
       gap: 20px;
-      /* margin-bottom: 30px; */
+      margin-bottom: 10px;
     }
 
     & .input-group {
@@ -132,8 +131,9 @@ body {
       align-items: flex-start;
       justify-content: center;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       width: 100%;
+      margin-bottom: 10px;
       /* position: relative; */
 
       & label {
@@ -142,7 +142,7 @@ body {
         color: #000;
       }
 
-      & input:not([type="password"]) {
+      & input {
         width: 100%;
         background: #E2EFFE;
         border: none;
@@ -170,17 +170,15 @@ body {
       }
 
       & .password-input {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        position: relative;
         width: 100%;
         background: #E2EFFE;
         border-radius: 10px;
         height: 40px;
-        overflow: hidden;
-        padding: 10px;
 
         & input {
+          padding: 10px;
+          width: 100%;
           flex: 1;
           height: 100%;
           border-radius: 10px;
@@ -190,26 +188,21 @@ body {
           font-size: 1rem;
           opacity: .7;
 
-          &::placeholder {
-            font-size: 1rem;
-            color: #121212;
-            opacity: .5;
+          &:focus {
+            outline: 2px solid #2b59ff9a;
           }
 
-          &:has([type="text"]):focus {
-            outline: none;
-          }
 
         }
 
         & i {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
           opacity: .5;
           font-size: 14px;
-        }
-
-        &:has(input:focus) {
-          border: 2px solid #2b59ff9a;
-          outline-offset: 2px;
+          z-index: 1000;
+          right: 20px;
         }
       }
 
@@ -221,6 +214,7 @@ body {
       display: flex;
       align-items: center;
       gap: 14px;
+      margin-bottom: 10px;
 
       & input {
         width: 20px;
@@ -249,6 +243,7 @@ body {
       justify-content: center;
       flex-direction: row;
       gap: 15px;
+      margin-bottom: 10px;
     }
   }
 
@@ -360,12 +355,6 @@ body {
         flex-direction: row;
         gap: 15px;
       }
-
-      & .cancel {
-        background: transparent;
-        border: 1px solid var(--primary-color);
-        color: var(--primary-color);
-      }
     }
 
   }
@@ -423,18 +412,16 @@ body {
       }
 
       & .password-input {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        position: relative;
         width: 100%;
         background: #E2EFFE;
         border-radius: 10px;
         height: 40px;
-        overflow: hidden;
-        padding: 10px;
 
         & input {
+          padding: 10px;
           flex: 1;
+          width: 100%;
           height: 100%;
           border-radius: 10px;
           background: transparent;
@@ -443,22 +430,19 @@ body {
           font-size: 1rem;
           opacity: .7;
 
-          &::placeholder {
-            font-size: 1rem;
-            color: #121212;
-            opacity: .5;
+          &:focus {
+            outline: 2px solid #2b59ff9a;
           }
 
         }
 
         & i {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          right: 20px;
           opacity: .5;
           font-size: 14px;
-        }
-
-        &:has(input:focus) {
-          border: 2px solid #2b59ff9a;
-          outline-offset: 2px;
         }
       }
 
@@ -468,6 +452,7 @@ body {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      margin-bottom: 10px;
 
       & .remember {
         gap: 14px;
@@ -503,6 +488,7 @@ body {
       justify-content: center;
       flex-direction: row;
       gap: 15px;
+      margin-bottom: 10px;
     }
   }
 
@@ -621,8 +607,11 @@ body {
       outline: none;
       cursor: pointer;
       margin-bottom: 18px;
-      display: grid;
-      place-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: row;
+      gap: 15px;
     }
 
     & a {
