@@ -2,8 +2,6 @@
 const backend_URL = "https://clearflow-project.onrender.com";
 
 // ======================== UTILITIES FUNCTIONS =========================
-// ======================== UTILITIES FUNCTIONS =========================
-// Show hints under inputs
 function setHint(id, message, success = false) {
   const hint = document.getElementById(id);
   if (!hint) return;
@@ -12,11 +10,9 @@ function setHint(id, message, success = false) {
   hint.style.color = success ? "green" : "red";
   hint.style.display = "block";
 
-  // find input
   const inputGroup = hint.closest(".input-group");
   let target = inputGroup ? inputGroup.querySelector("input") : null;
 
-  // if inside password wrapper, use the wrapper div instead
   if (target && target.parentElement.classList.contains("password-input")) {
     target = target.parentElement;
   }
@@ -25,26 +21,20 @@ function setHint(id, message, success = false) {
     target.style.border = success ? "1px solid green" : "1px solid red";
   }
 
-  // clear after 1s
   setTimeout(() => {
     if (target) target.style.border = "";
     hint.style.display = "none";
   }, 1500);
 }
 
-
-
-// clear form input
 function clearFormInputs(form) {
   const inputs = form.querySelectorAll("input[type='text'],[type='email'],[type='password'], [type='number']");
-
   inputs.forEach(input => {
     input.value = "";
     input.style.border = "";
   });
 }
 
-// custom modal
 function showModal(title, message, callback) {
   const modal = document.createElement("div");
   modal.className = "modal-overlay ";
@@ -64,48 +54,47 @@ function showModal(title, message, callback) {
   };
 }
 
-// Switch between forms
+// ======================== AUTH STATE MANAGEMENT =========================
+function saveAuthState(sectionId, expirySeconds = 60) {
+  const expiryTime = Date.now() + expirySeconds * 1000;
+  localStorage.setItem("authState", JSON.stringify({ section: sectionId, expires: expiryTime }));
+}
+
+function getAuthState() {
+  const state = localStorage.getItem("authState");
+  if (!state) return null;
+  const { section, expires } = JSON.parse(state);
+  if (Date.now() > expires) {
+    localStorage.removeItem("authState");
+    return null;
+  }
+  return section;
+}
+
+// ======================== SWITCH SECTIONS =========================
 function showSection(sectionId) {
   const currentSection = document.querySelector(".form-section[style*='block']")?.id;
   if (currentSection) localStorage.setItem("previousAuthSection", currentSection);
 
-  document.querySelectorAll(".form-section").forEach(form => {
-    form.style.display = "none";
-  });
-
+  document.querySelectorAll(".form-section").forEach(f => f.style.display = "none");
   const section = document.getElementById(sectionId);
   if (section) section.style.display = "block";
 
-  // Save the current section to localStorage
-  localStorage.setItem("currentAuthSection", sectionId);
+  saveAuthState(sectionId, 60);
 
-  // Toggle back button visibility
   const backBtn = document.getElementById("back-btn");
-  if (backBtn) {
-    if (sectionId === "otp") {
-      backBtn.style.display = "none"; // hide back button on OTP screen
-    } else {
-      backBtn.style.display = "inline-block"; // show back button on other screens
-    }
-  }
+  if (backBtn) backBtn.style.display = sectionId === "otp" ? "none" : "grid";
 }
 
-
-
-
-
-
-// Toggle back button
+// ======================== BACK BUTTON =========================
 const backBtn = document.getElementById("back-btn");
 if (backBtn) {
   backBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    // Go back to previous section
     const prevSection = localStorage.getItem("previousAuthSection") || "login";
     showSection(prevSection);
   });
 }
-
 
 // ======================== PASSWORD TOGGLE =========================
 document.querySelectorAll(".toggle-password").forEach(toggle => {
@@ -116,16 +105,10 @@ document.querySelectorAll(".toggle-password").forEach(toggle => {
   });
 });
 
-// Show signup form by default on first load
-document.addEventListener("DOMContentLoaded", () => {
-  const lastSection = localStorage.getItem("currentAuthSection") || "signup";
-  showSection(lastSection);
-});
-
-// loading button
+// ======================== BUTTON LOADING =========================
 function setButtonLoading(btn, action = "set", text = "Processing...") {
   if (action === "set") {
-    btn.dataset.originalText = btn.textContent; // store old text
+    btn.dataset.originalText = btn.textContent;
     btn.disabled = true;
     btn.classList.add("loading");
     btn.innerHTML = `<div class="spinner"></div><span>${text}</span>`;
@@ -136,13 +119,9 @@ function setButtonLoading(btn, action = "set", text = "Processing...") {
   }
 }
 
-
-// ======================== UTILITIES FUNCTIONS END =========================
-// ======================== UTILITIES FUNCTIONS END =========================
-
-
-
+// ======================== OTP CONTEXT =========================
 let otpContext = "";
+
 // ======================== SIGNUP =========================
 const signupForm = document.getElementById("signup");
 signupForm.addEventListener("submit", async (e) => {
@@ -159,46 +138,21 @@ signupForm.addEventListener("submit", async (e) => {
   const accept = document.getElementById("accept").checked;
 
   let valid = true;
-
-  if (!fname) { setHint("fname-hint", "", false); valid = false; }
-  else { setHint("fname-hint", "", true); }
-
-  if (!lname) { setHint("lname-hint", ""); valid = false; }
-  else { setHint("lname-hint", "", true); }
-
-  if (!username) { setHint("uname-hint", ""); valid = false; }
-  else { setHint("uname-hint", "", true); }
-
-  if (!/^\S+@\S+\.\S+$/.test(email)) { setHint("signUpEmail-hint", ""); valid = false; }
-  else { setHint("signUpEmail-hint", "", true); }
-
-  if (!password) { setHint("signUpPassword-hint", ""); valid = false; }
-  else { setHint("uname-hint", "", true); }
-
-  if (!confirmPassword) { setHint("signupConfirmPassword-hint", ""); valid = false; }
-  else { setHint("uname-hint", "", true); }
+  if (!fname) { setHint("fname-hint", ""); valid = false; } else { setHint("fname-hint", "", true); }
+  if (!lname) { setHint("lname-hint", ""); valid = false; } else { setHint("lname-hint", "", true); }
+  if (!username) { setHint("uname-hint", ""); valid = false; } else { setHint("uname-hint", "", true); }
+  if (!/^\S+@\S+\.\S+$/.test(email)) { setHint("signUpEmail-hint", ""); valid = false; } else { setHint("signUpEmail-hint", "", true); }
+  if (!password) { setHint("signUpPassword-hint", ""); valid = false; } else { setHint("signUpPassword-hint", "", true); }
+  if (!confirmPassword) { setHint("signupConfirmPassword-hint", ""); valid = false; } else { setHint("signupConfirmPassword-hint", "", true); }
 
   if (password.length < 6 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
-    setHint("signUpPassword-hint", "Password must be 6+ chars, include uppercase & number");
-    valid = false;
-  } else {
-    setHint("signUpPassword-hint", "", true);
-  }
+    setHint("signUpPassword-hint", "Password must be 6+ chars, include uppercase & number"); valid = false;
+  } else { setHint("signUpPassword-hint", "", true); }
 
-  if (password !== confirmPassword) {
-    setHint("signupConfirmPassword-hint", "");
-    valid = false;
-  } else {
-    setHint("signupConfirmPassword-hint", "", true);
-  }
+  if (password !== confirmPassword) { setHint("signupConfirmPassword-hint", ""); valid = false; } else { setHint("signupConfirmPassword-hint", "", true); }
+  if (!accept) { setHint("accept-hint", "You must agree to terms"); valid = false; } else { setHint("accept-hint", "", true); }
 
-  if (!accept) { setHint("accept-hint", "You must agree to terms"); valid = false; }
-  else { setHint("accept-hint", "", true); }
-
-  if (!valid) {
-    setButtonLoading(btn, "reset");
-    return;
-  }
+  if (!valid) { setButtonLoading(btn, "reset"); return; }
 
   try {
     const res = await fetch(`${backend_URL}/api/auth/signup`, {
@@ -210,11 +164,15 @@ signupForm.addEventListener("submit", async (e) => {
     const data = await res.json();
     if (res.ok) {
       otpContext = "signup";
-      // ADDED: modal instead of alert
       showModal("Signup Successful", "OTP sent to your email.", () => {
         showSection("otp");
         startOtpTimer();
-        // clearFormInputs(signupForm);
+      });
+    } else if (data.message && data.message.includes("already registered but not verified")) {
+      otpContext = "signup";
+      showModal("Email Not Verified", "OTP sent to your email.", () => {
+        showSection("otp");
+        startOtpTimer();
       });
     } else {
       showModal("Error", data.message || "Signup failed");
@@ -227,52 +185,41 @@ signupForm.addEventListener("submit", async (e) => {
   }
 });
 
-// ======================== OTP =========================
+// ======================== OTP LOGIC =========================
 const otpForm = document.getElementById("otp");
 const otpInputs = document.querySelectorAll("#otp input");
-document.querySelectorAll("#otp input").forEach((box, idx, arr) => {
-  // Allow only one character per box
-  box.addEventListener("input", (e) => {
-    if (box.value.length > 1) {
-      box.value = box.value.charAt(0); // keep only the first character
-    }
 
+otpInputs.forEach((box, idx, arr) => {
+  box.setAttribute("maxlength", 1);
+
+  box.addEventListener("input", () => {
+    if (box.value.length > 1) box.value = box.value.slice(-1);
     if (box.value && idx < arr.length - 1) arr[idx + 1].focus();
   });
 
-  box.addEventListener("keydown", (e) => {
+  box.addEventListener("keydown", e => {
     if (e.key === "Backspace" && !box.value && idx > 0) arr[idx - 1].focus();
   });
 
-  // Handle paste
-  box.addEventListener("paste", (e) => {
+  box.addEventListener("paste", e => {
     e.preventDefault();
-    const pasteData = e.clipboardData.getData("text").replace(/\D/g, ""); // only digits
-    pasteData.split("").forEach((char, i) => {
-      if (idx + i < arr.length) {
-        arr[idx + i].value = char;
-      }
-    });
-    const nextIdx = idx + pasteData.length < arr.length ? idx + pasteData.length : arr.length - 1;
-    arr[nextIdx].focus();
+    const pasteData = e.clipboardData.getData("text").replace(/\s/g, '').slice(0, arr.length);
+    pasteData.split('').forEach((char, i) => { if (arr[i]) arr[i].value = char; });
+    for (let i = 0; i < arr.length; i++) {
+      if (!arr[i].value) { arr[i].focus(); return; }
+    }
+    arr[arr.length - 1].focus();
   });
 });
-
 
 otpForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const btn = document.getElementById("otpBtn");
 
-  // Check if all inputs are filled
   const otp = Array.from(otpInputs).map(i => i.value).join("");
-  let allFilled = Array.from(otpInputs).every(i => i.value !== "");
-
-  if (!allFilled) {
-    otpInputs.forEach(i => {
-      if (!i.value) i.style.border = "1px solid red";
-    });
-    setHint("otp-hint", "All fields must be filled");
-    return; // do not start loading
+  if (otp.length !== otpInputs.length) {
+    otpInputs.forEach(i => { if (!i.value) i.style.border = "1px solid red"; });
+    return;
   }
 
   setButtonLoading(btn, "set", "Processing...");
@@ -280,12 +227,6 @@ otpForm.addEventListener("submit", async (e) => {
   const email = otpContext === "signup"
     ? document.getElementById("signupEmail").value.trim()
     : document.getElementById("femail").value.trim();
-
-  if (otp.length !== 4) {
-    setHint("otp-hint", "Enter 4-digit OTP");
-    setButtonLoading(btn, "reset");
-    return;
-  }
 
   try {
     const res = await fetch(`${backend_URL}/api/auth/verify-otp`, {
@@ -303,6 +244,7 @@ otpForm.addEventListener("submit", async (e) => {
         showModal("OTP Verified", "You can now reset your password.", () => showSection("resetpassword"));
       }
       clearFormInputs(otpForm);
+      sessionStorage.removeItem("otpTimeLeft");
     } else {
       otpInputs.forEach(i => i.style.border = "1px solid red");
       setHint("otp-hint", data.message || "Invalid OTP");
@@ -315,60 +257,51 @@ otpForm.addEventListener("submit", async (e) => {
   }
 });
 
-// OTP countdown + resend
+// ======================== OTP TIMER =========================
 let otpInterval;
 function startOtpTimer() {
   let time = 60;
+  const savedTime = sessionStorage.getItem("otpTimeLeft");
+  if (savedTime) time = parseInt(savedTime, 10);
+
   const timerEl = document.getElementById("otp-countdown");
   const resendEl = document.getElementById("resend-otp");
   const resendText = document.querySelector('.send-again');
-
   resendText.style.display = "none";
-  timerEl.textContent = `${time}s`;
 
-  clearInterval(otpInterval); // clear previous interval if any
+  const signupEmail = document.getElementById("signupEmail").value.trim();
+  const forgotPassEmail = document.getElementById("femail").value.trim();
+  const email = otpContext === "signup" ? signupEmail : forgotPassEmail;
+
+  if (otpInterval) clearInterval(otpInterval);
+
   otpInterval = setInterval(() => {
     if (time > 0) {
       timerEl.textContent = `${time--}s`;
+      sessionStorage.setItem("otpTimeLeft", time);
     } else {
       clearInterval(otpInterval);
       timerEl.textContent = "Expired";
       resendText.style.display = "block";
+      sessionStorage.removeItem("otpTimeLeft");
     }
   }, 1000);
 
-  // Remove previous click listeners to avoid duplicates
-  resendEl.replaceWith(resendEl.cloneNode(true));
-  const newResendEl = document.getElementById("resend-otp");
-
-  newResendEl.addEventListener("click", async (e) => {
+  resendEl.onclick = async (e) => {
     e.preventDefault();
-    resendText.style.display = "none"; // hide resend while waiting
-    newResendEl.style.pointerEvents = "none";
-    newResendEl.style.opacity = ".8";
-
-    const email = otpContext === "signup"
-      ? document.getElementById("signupEmail").value.trim()
-      : document.getElementById("femail").value.trim();
-
+    resendText.style.display = "block";
     try {
-      const res = await fetch(`${backend_URL}/api/auth/resend-otp`, {
+      await fetch(`${backend_URL}/api/auth/resend-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
       });
-
       showModal("Resent", "A new OTP has been sent.", startOtpTimer);
     } catch {
       showModal("Error", "Could not resend OTP");
-    } finally {
-      newResendEl.style.pointerEvents = "all";
-      newResendEl.style.opacity = "1";
     }
-  });
+  };
 }
-
-
 
 // ======================== LOGIN =========================
 const loginForm = document.getElementById("login");
@@ -377,12 +310,11 @@ loginForm.addEventListener("submit", async (e) => {
   const btn = document.getElementById("siginBtn");
   setButtonLoading(btn, "set", "Logging in...");
 
-
   const email = document.getElementById("lemail").value.trim();
   const password = document.getElementById("lpassword").value;
 
-  if (!/^\S+@\S+\.\S+$/.test(email)) { setHint("loginEmail-hint", "Enter a valid email"); return; }
-  if (!password) { setHint("loginPass-hint", "Password required"); return; }
+  if (!/^\S+@\S+\.\S+$/.test(email)) { setHint("loginEmail-hint", "Enter a valid email"); setButtonLoading(btn, "reset"); return; }
+  if (!password) { setHint("loginPass-hint", "Password required"); setButtonLoading(btn, "reset"); return; }
 
   try {
     const res = await fetch(`${backend_URL}/api/auth/login`, {
@@ -393,9 +325,8 @@ loginForm.addEventListener("submit", async (e) => {
 
     const data = await res.json();
     if (res.ok) {
-      // ADDED: redirect after modal
       showModal("Login Successful", "Redirecting to dashboard...", () => {
-        window.location.href = "/dashboard.html";
+        window.location.href = "dashboard.html";
       });
       clearFormInputs(loginForm);
     } else {
@@ -413,14 +344,13 @@ loginForm.addEventListener("submit", async (e) => {
 const forgotForm = document.getElementById("fogottenpassword");
 forgotForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-
   const btn = document.getElementById("resetPassBtn");
   setButtonLoading(btn, "set", "Processing...");
-
 
   const email = document.getElementById("femail").value.trim();
   if (!/^\S+@\S+\.\S+$/.test(email)) {
     setHint("femail-hint", "Enter a valid email");
+    setButtonLoading(btn, "reset");
     return;
   }
 
@@ -433,11 +363,9 @@ forgotForm.addEventListener("submit", async (e) => {
 
     const data = await res.json();
     if (res.ok) {
-      otpContext = "forgot-password"
-      // ADDED: modal then redirect to OTP section
+      otpContext = "forgot-password";
       showModal("OTP Sent", "Check your email for the code.", () => showSection("otp"));
       startOtpTimer();
-      // clearFormInputs(forgotForm);
     } else {
       setHint("femail-hint", data.message || "Failed to send reset link");
     }
@@ -456,25 +384,25 @@ resetForm.addEventListener("submit", async (e) => {
   const btn = document.getElementById("newPassBtn");
   setButtonLoading(btn, "set", "Processing...");
 
-
-
   const email = document.getElementById("femail").value.trim();
   const newPassword = document.getElementById("npassword").value;
   const confirmPassword = document.getElementById("cnpassword").value;
 
-  if (newPassword.length < 6) { setHint("npass-hint", "Password too short"); return; }
-  if (newPassword !== confirmPassword) { setHint("cnpass-hint", "Passwords do not match"); return; }
+  if (newPassword.length < 6) { setHint("npass-hint", "Password too short"); setButtonLoading(btn, "reset"); return; }
+  if (newPassword !== confirmPassword) { setHint("cnpass-hint", "Passwords do not match"); setButtonLoading(btn, "reset"); return; }
 
   try {
     const res = await fetch(`${backend_URL}/api/auth/reset-password`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("token")}` },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
+      },
       body: JSON.stringify({ email, newPassword })
     });
 
     const data = await res.json();
     if (res.ok) {
-      // ADDED: modal then redirect
       showModal("Password Reset", "Please login with your new password.", () => showSection("login"));
       clearFormInputs(resetForm);
     } else {
@@ -488,4 +416,12 @@ resetForm.addEventListener("submit", async (e) => {
   }
 });
 
+// ======================== PAGE LOAD =========================
+document.addEventListener("DOMContentLoaded", () => {
+  const section = getAuthState() || "signup";
+  showSection(section);
 
+  if (document.getElementById("otp").style.display !== "none") {
+    startOtpTimer();
+  }
+});
