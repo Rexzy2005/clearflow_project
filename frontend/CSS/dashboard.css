@@ -156,6 +156,9 @@ body {
 
 
       & .dashboard-section {
+        max-height: 90vh;
+        scrollbar-width: none;
+        overflow-y: auto;
         & .dashboard-section-top {
           margin-bottom: 20px;
 
@@ -166,11 +169,7 @@ body {
         }
 
         & .kpis-container {
-          max-height: 60vh;
-          overflow-y: auto;
           width: 100%;
-          overflow-y: auto;
-          scrollbar-width: none;
 
           & .kpis-row {
             display: grid;
