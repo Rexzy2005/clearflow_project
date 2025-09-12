@@ -109,7 +109,7 @@
           }
 
           & .kpis-container {
-            
+
             & .kpis-row {
               grid-template-columns: repeat(1, 1fr);
               gap: 20px;
@@ -620,10 +620,11 @@
           }
 
           & .maintenance-section-top {
-            display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
+            flex-direction: column;
             margin-bottom: 20px;
+            gap: 1rem;
 
             & h1 {
               font-size: 18px;
@@ -642,39 +643,225 @@
             }
           }
 
-          /* & .maintenance-section-container {
-                width: 100%;
-                overflow: auto;
-                height: 78.85vh;
-                box-sizing: border-box;
-                padding-bottom: 40px;
-                scrollbar-width: none;
-      
-                & .add-devices-wrapper {
-                  padding: 100px 0px;
-                  display: none;
-                  align-items: center;
-                  justify-content: center;
-                  flex-direction: column;
-                  gap: 13px;
-      
-                  & img {
-                    width: 44px;
-                    height: 44px;
-                  }
-      
-                  & h2 {
-                    font-size: 1rem;
-                    font-weight: 400;
-                  }
-      
-                  & p {
-                    font-size: 12px;
-                    color: var(--gray-color);
+          & .maintenance-section-content {
+            width: 100%;
+            overflow: auto;
+            height: 90vh;
+            box-sizing: border-box;
+            padding-bottom: 100px;
+            scrollbar-width: none;
+
+            & .view-for {
+              width: 100%;
+              background: var(--white-bg);
+              border-radius: 8px;
+              display: flex;
+              align-items: center;
+              justify-content: flex-start;
+              gap: 11px;
+              padding: 20px;
+
+              & p {
+                font-size: 12px;
+              }
+
+              & select {
+                border: 1px solid #d9d9d9;
+                border-radius: 3px;
+                padding: 9px 10px;
+                outline: none;
+
+                & option {
+                  font-size: 12px;
+                }
+              }
+            }
+
+            & .component-status-container {
+              & h2 {
+                font-size: 18px;
+                margin-top: 1rem;
+                margin-bottom: 1rem;
+                font-weight: 300;
+              }
+
+              & .component-status-card {
+                border-radius: 8px;
+                padding: 1rem;
+                gap: 1rem;
+                margin-bottom: 20px;
+
+                & .card-left {
+                  & .icon-box {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 8px;
+                    & img {
+                      width: 20px;
+                      height: 20px;
+                    }
                   }
                 }
-      
+
+                & .card-right {
+                  flex: 1;
+
+                  & .card-right-top {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+
+                    & .group1 {
+                      & .card-title {
+                        font-size: 15px;
+                        font-family: "Nunito", sans-serif;
+                        font-weight: 600;
+                        color: #000;
+                        margin-bottom: 7px;
+                      }
+
+                      & .card-desc {
+                        font-family: "Nunito", sans-serif;
+                        font-size: 12px;
+                        font-weight: 500;
+                        color: #000;
+                        opacity: .75;
+                        margin-bottom: 10px;
+                      }
+
+                      & .component-health {
+                        font-size: 10px;
+                        color: #000;
+                        opacity: .8;
+                        margin-bottom: 3px;
+                        font-family: "Nunito", sans-serif;
+                      }
+                    }
+
+                    & .group2 {
+                      display: flex;
+                      flex-direction: column;
+                      height: 100%;
+                      justify-content: space-between;
+                      align-items: flex-end;
+                      gap: 20px;
+
+                      & .card-attention {
+                        font-size: 8px;
+                        padding: 5px 10px;
+                        background: var(--attention-normal-bg);
+                        border: 1px solid var(--attention-normal-border);
+                        color: var(--attention-normal-text);
+                        border-radius: 50px;
+                        font-family: "Nunito", sans-serif;
+                      }
+
+                      & .card-percent {
+                        font-size: 12px;
+                        opacity: .8;
+                        font-weight: bold;
+                        font-family: "Nunito", sans-serif;
+                      }
+                    }
+                  }
+
+                  & .card-right-bottom {
+                    width: 100%;
+
+                    & .due-time {
+                      width: 100%;
+                      display: flex;
+                      align-items: center;
+                      gap: 6px;
+                      font-size: 10px;
+                      font-weight: regular;
+                      opacity: .8;
+                      font-family: "Nunito", sans-serif;
+
+                      & img {
+                        width: 12px;
+                        height: 12px;
+                      }
+                    }
+                  }
+                }
+              }
+
+              /* & .ai-prediction-container {
+                margin-top: 40px;
+                width: 100%;
+
+                & h2 {
+                  font-size: 18px;
+                  font-weight: 400;
+                  margin-bottom: 8px;
+                }
+
+                & .prediction-box {
+                  background-color: var(--white-bg);
+                  border-radius: 5px;
+                  padding: 20px;
+
+                  & .prediction-card {
+                    width: 100%;
+                    border: 1px solid #0000001a;
+                    border-radius: 5px;
+                    padding: 19px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+
+                    & .card-left {
+                      flex: 1;
+
+                      & .card-title {
+                        font-size: 13px;
+                        font-family: "Nunito", sans-serif;
+                        font-weight: 600;
+                        margin-bottom: 1rem;
+                      }
+
+                      & .message {
+                        font-family: "Nunito", sans-serif;
+                        font-size: 12px;
+                        font-weight: 600;
+                        margin-bottom: 12px;
+                      }
+
+                      & .card-btns {
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                        flex-direction: row;
+
+                        & button {
+                          font-family: "Nunito", sans-serif;
+                          border-radius: 3px;
+                          padding: 5px 10px;
+                          font-size: 11px;
+                          background: transparent;
+                          border: none;
+                          color: #fff;
+                          cursor: pointer;
+
+                          &.schedule {
+                            background: var(--gradient-blue);
+                          }
+
+                          &.remind {
+                            color: #000000;
+                            border: 1px solid #D9D9D9;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
               } */
+            }
+          }
+
         }
       }
     }
