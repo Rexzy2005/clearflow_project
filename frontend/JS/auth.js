@@ -71,7 +71,13 @@ function showSection(sectionId) {
   });
   const section = document.getElementById(sectionId);
   if (section) section.style.display = "block";
+
+  // Save the current section to localStorage
+  localStorage.setItem("currentAuthSection", sectionId);
 }
+
+
+
 
 // Toggle back button
 function goBack() {
@@ -89,7 +95,8 @@ document.querySelectorAll(".toggle-password").forEach(toggle => {
 
 // Show signup form by default on first load
 document.addEventListener("DOMContentLoaded", () => {
-  showSection("signup");
+  const lastSection = localStorage.getItem("currentAuthSection") || "signup";
+  showSection(lastSection);
 });
 
 // loading button
