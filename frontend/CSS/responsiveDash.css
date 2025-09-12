@@ -657,7 +657,8 @@
               border-radius: 8px;
               display: flex;
               align-items: center;
-              justify-content: flex-start;
+              justify-content: space-between;
+              
               gap: 11px;
               padding: 20px;
 
@@ -711,79 +712,6 @@
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-
-                    & .group1 {
-                      & .card-title {
-                        font-size: 15px;
-                        font-family: "Nunito", sans-serif;
-                        font-weight: 600;
-                        color: #000;
-                        margin-bottom: 7px;
-                      }
-
-                      & .card-desc {
-                        font-family: "Nunito", sans-serif;
-                        font-size: 12px;
-                        font-weight: 500;
-                        color: #000;
-                        opacity: .75;
-                        margin-bottom: 10px;
-                      }
-
-                      & .component-health {
-                        font-size: 10px;
-                        color: #000;
-                        opacity: .8;
-                        margin-bottom: 3px;
-                        font-family: "Nunito", sans-serif;
-                      }
-                    }
-
-                    & .group2 {
-                      display: flex;
-                      flex-direction: column;
-                      height: 100%;
-                      justify-content: space-between;
-                      align-items: flex-end;
-                      gap: 20px;
-
-                      & .card-attention {
-                        font-size: 8px;
-                        padding: 5px 10px;
-                        background: var(--attention-normal-bg);
-                        border: 1px solid var(--attention-normal-border);
-                        color: var(--attention-normal-text);
-                        border-radius: 50px;
-                        font-family: "Nunito", sans-serif;
-                      }
-
-                      & .card-percent {
-                        font-size: 12px;
-                        opacity: .8;
-                        font-weight: bold;
-                        font-family: "Nunito", sans-serif;
-                      }
-                    }
-                  }
-
-                  & .card-right-bottom {
-                    width: 100%;
-
-                    & .due-time {
-                      width: 100%;
-                      display: flex;
-                      align-items: center;
-                      gap: 6px;
-                      font-size: 10px;
-                      font-weight: regular;
-                      opacity: .8;
-                      font-family: "Nunito", sans-serif;
-
-                      & img {
-                        width: 12px;
-                        height: 12px;
-                      }
-                    }
                   }
                 }
               }
