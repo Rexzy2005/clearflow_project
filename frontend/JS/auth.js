@@ -199,9 +199,9 @@ signupForm.addEventListener("submit", async (e) => {
 
 // ======================== OTP =========================
 const otpForm = document.getElementById("otp");
-if(otpForm){
-  document.getElementById('back-btn').display.display = "none"
-}
+// if(otpForm){
+//   document.getElementById('back-btn').display.display = "none"
+// }
 
 // ADDED: OTP auto-move and backspace
 document.querySelectorAll("#otp input").forEach((box, idx, arr) => {
