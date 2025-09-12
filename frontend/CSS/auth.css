@@ -290,7 +290,7 @@ body {
     & .otp-code-group {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       gap: 20px;
       width: 100%;
       margin-bottom: 30px;

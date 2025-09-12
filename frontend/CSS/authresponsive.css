@@ -36,8 +36,6 @@
         gap: 5px;
         width: 100%;
         margin-bottom: 30px;
-        /* overflow-x: auto; */
-        /* max-width: 100vw; */
 
         & input {
           caret-color: transparent;
