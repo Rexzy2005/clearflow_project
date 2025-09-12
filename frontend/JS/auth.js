@@ -230,32 +230,34 @@ signupForm.addEventListener("submit", async (e) => {
 // ======================== OTP =========================
 const otpForm = document.getElementById("otp");
 const otpInputs = document.querySelectorAll("#otp input");
+document.querySelectorAll("#otp input").forEach((box, idx, arr) => {
+  // Allow only one character per box
+  box.addEventListener("input", (e) => {
+    if (box.value.length > 1) {
+      box.value = box.value.charAt(0); // keep only the first character
+    }
 
-// Auto-move, backspace, and paste
-otpInputs.forEach((box, idx, arr) => {
-  // Auto-move to next input
-  box.addEventListener("input", () => {
     if (box.value && idx < arr.length - 1) arr[idx + 1].focus();
-    box.style.border = ""; // remove red border on input
   });
 
-  // Backspace moves to previous input
   box.addEventListener("keydown", (e) => {
     if (e.key === "Backspace" && !box.value && idx > 0) arr[idx - 1].focus();
   });
 
-  // Paste feature
+  // Handle paste
   box.addEventListener("paste", (e) => {
     e.preventDefault();
-    const pasteData = e.clipboardData.getData("text").trim();
-    if (!/^\d+$/.test(pasteData)) return; // only digits
-    const digits = pasteData.split("").slice(0, arr.length); // max 4 digits
-    digits.forEach((digit, i) => {
-      arr[i].value = digit;
+    const pasteData = e.clipboardData.getData("text").replace(/\D/g, ""); // only digits
+    pasteData.split("").forEach((char, i) => {
+      if (idx + i < arr.length) {
+        arr[idx + i].value = char;
+      }
     });
-    arr[digits.length - 1].focus(); // focus last filled input
+    const nextIdx = idx + pasteData.length < arr.length ? idx + pasteData.length : arr.length - 1;
+    arr[nextIdx].focus();
   });
 });
+
 
 otpForm.addEventListener("submit", async (e) => {
   e.preventDefault();
