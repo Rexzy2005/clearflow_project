@@ -159,6 +159,7 @@ body {
         max-height: 90vh;
         scrollbar-width: none;
         overflow-y: auto;
+        padding-bottom: 70px;
         & .dashboard-section-top {
           margin-bottom: 20px;
 
