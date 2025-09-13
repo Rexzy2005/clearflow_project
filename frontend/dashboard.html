@@ -405,26 +405,24 @@
                 </div>
                 <h2>Add New Device</h2>
                 <p>Configure a new water System</p>
-                <div class="form-group">
-                  <label for="deviceName">Name of Device</label>
-                  <input type="text" id="deviceName" name="deviceName" placeholder="e.g Borehole filter" required>
+                <!-- <div class="form-group"></div> -->
+                <label for="deviceName">Name of Device</label>
+                <input type="text" id="deviceName" name="deviceName" placeholder="e.g Borehole filter" required>
 
-                  <label for="deviceId">Device ID</label>
-                  <input type="text" id="deviceId" name="deviceId" placeholder="e.g 2345-SF-44" required>
+                <label for="deviceId">Device ID</label>
+                <input type="text" id="deviceId" name="deviceId" placeholder="e.g 2345-SF-44" required>
 
-                  <label for="location">Location</label>
-                  <input type="text" id="location" name="location" placeholder="e.g Front Yard" required>
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" placeholder="e.g Front Yard" required>
 
-                  <label for="model">Model</label>
-                  <input list="models" id="model" name="model" placeholder="Select Model" required>
-
-                  <datalist id="models">
-                    <option value="CLEARFLOW-lite-2025">
-                    <option value="CLEARFLOW-pro-2025">
-                    <option value="CLEARFLOW-premium-2025">
-                  </datalist>
-
-                  <button type="submit">Add Device</button>
+                <label for="model">Model</label>
+                <input list="models" id="model" name="model" placeholder="Select Model" required>
+                <datalist id="models">
+                  <option value="CLEARFLOW-lite-2025">
+                  <option value="CLEARFLOW-pro-2025">
+                  <option value="CLEARFLOW-premium-2025">
+                </datalist>
+                <button type="submit">Add Device</button>
               </form>
             </div>
           </div>
@@ -555,6 +553,7 @@
 
 
             </div>
+
             <div class="delete-device">
               <div class="delete-text">
                 <p class="title">Delete Device</p>
@@ -563,11 +562,7 @@
               <button id="delete-device">Delete Device</button>
             </div>
           </div>
-
-
-
         </div>
-
 
         <!-- maintenance section -->
         <div class="maintenance-section section" id="maintenance">
@@ -587,10 +582,10 @@
                 <option value="">Borehole Device</option>
               </select>
             </div>
-    
+
             <div class="component-status-container">
               <h2>Component Status</h2>
-    
+
               <!-- card 1 -->
               <div class="component-status-card">
                 <div class="card-left">
@@ -691,7 +686,7 @@
                   </div>
                 </div>
               </div>
-  
+
               <!-- <div class="ai-prediction-container">
                 <h2>AI Predictive Maintenance</h2>
                 <div class="prediction-box">
@@ -712,16 +707,19 @@
               </div> -->
             </div>
           </div>
-  
-  
-  
-          
+
+
+
+
         </div>
-  
+
         <!-- settings section -->
         <div class="settings-section section" id="settings">
           <h1>settings</h1>
         </div>
+
+
+
       </div>
     </div>
 

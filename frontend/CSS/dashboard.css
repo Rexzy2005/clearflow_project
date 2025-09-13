@@ -1041,7 +1041,7 @@ body {
 
               & button {
                 background: var(--attention-needed-bg);
-                border:1px solid var(--attention-needed-border);
+                border: 1px solid var(--attention-needed-border);
                 color: var(--attention-needed-text);
                 border-radius: 3px;
                 font-size: 11px;
@@ -1270,7 +1270,6 @@ body {
       }
 
       & .maintenance-section {
-
         & .btn {
           padding: 8px;
           display: flex;

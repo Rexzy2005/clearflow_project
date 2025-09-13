@@ -795,3 +795,9 @@
     }
   }
 }
+.section {
+  display: none;
+}
+.section.active-section {
+  display: block !important;
+}
