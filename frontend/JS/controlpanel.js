@@ -46,11 +46,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const diffMinutes = Math.floor(diffMs / 60000);
 
     if (diffMinutes < 1) return "Last seen: just now";
-    if (diffMinutes === 1) return "Last seen: 1 minute ago";
-    if (diffMinutes < 60) return `Last seen: ${diffMinutes} minutes ago`;
+    if (diffMinutes === 1) return "Last seen: 1 min ago";
+    if (diffMinutes < 60) return `Last seen: ${diffMinutes} mins ago`;
 
     const diffHours = Math.floor(diffMinutes / 60);
-    return `Last seen: ${diffHours} hour(s) ago`;
+    return `Last seen: ${diffHours} hr(s) ago`;
   }
 
   function getStatus(timestamp, onlineFlag = false) {
