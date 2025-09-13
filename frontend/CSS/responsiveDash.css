@@ -493,19 +493,19 @@
                   flex: 1;
 
                   & .device-name {
-                    font-size: 1rem;
+                    font-size: .9rem;
                     font-weight: 300;
                   }
 
                   & .location-model {
-                    font-size: 12px;
+                    font-size: 10px;
                     font-weight: 300;
                     color: var(--gray-color);
                   }
 
                   & .status-bar {
-                    gap: 12px;
-                    font-size: 8px;
+                    gap: 10px;
+                    font-size: 9px;
 
                     & span {
                       gap: 2px;
@@ -525,8 +525,8 @@
                 width: 100%;
 
                 & button {
-                  padding: 10px;
-                  font-size: 12px;
+                  padding: 9px 10px;
+                  font-size: 10px;
                   border-radius: 6px;
                   font-weight: 400;
                 }
