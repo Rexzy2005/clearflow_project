@@ -47,6 +47,7 @@ body {
   --attention-normal-bg: #F6FDE6;
 }
 
+
 .screen-wrapper {
   max-width: 1440px;
   width: 100%;
@@ -160,6 +161,7 @@ body {
         scrollbar-width: none;
         overflow-y: auto;
         padding-bottom: 70px;
+
         & .dashboard-section-top {
           margin-bottom: 20px;
 
@@ -905,12 +907,18 @@ body {
 
               & .device-stats {
                 padding: 6px 8px;
-                color: #28AD26;
-                background: #ECFCCB;
-                border: 1px solid #B6E492;
+                color: var(--attention-normal-text);
+                background: var(--attention-normal-bg);
+                border: 1px solid var(--attention-normal-border);
                 border-radius: 50px;
                 font-size: 10px;
                 font-weight: 300;
+
+                &.offline {
+                  background: var(--attention-needed-bg);
+                  border-color: var(--attention-needed-border);
+                  color: var(--attention-needed-text);
+                }
               }
 
               & button {
@@ -1032,13 +1040,22 @@ body {
               }
 
               & button {
-                border: 1px solid #D9D9D9;
+                background: var(--attention-needed-bg);
+                border:1px solid var(--attention-needed-border);
+                color: var(--attention-needed-text);
                 border-radius: 3px;
                 font-size: 11px;
                 padding: 6px 10px;
-                background: transparent;
                 cursor: pointer;
+                /* transition: 0.3s; */
+
+                &.off {
+                  background: var(--attention-normal-bg);
+                  border-color: var(--attention-normal-border);
+                  color: var(--attention-normal-text);
+                }
               }
+
             }
 
             & .control-btn-card {

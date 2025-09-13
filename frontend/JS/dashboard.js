@@ -1,7 +1,6 @@
 const sections = document.querySelectorAll(".section");
 const menuBtns = document.querySelectorAll("[data-target]");
 
-
 // show section on menu click
 const savedSection = localStorage.getItem("activeSection");
 if (savedSection) {

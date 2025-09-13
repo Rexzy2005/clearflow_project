@@ -441,8 +441,8 @@
                 <i class="fa-solid fa-arrow-left"></i>
               </div>
               <div>
-                <h1 class="selected-device-name">Borehole Device</h1>
-                <p class="selected-device-model">Front Yard  SAK-Pro-2024</p>
+                <h1 class="selected-device-name"></h1>
+                <p class="selected-device-model"></p>
               </div>
             </div>
 
@@ -569,160 +569,159 @@
         </div>
 
 
-        
-      </div>
-      <!-- maintenance section -->
-      <div class="maintenance-section section" id="maintenance">
-        <div class="maintenance-section-top">
-          <div class="top-text">
-            <h1>Maintenance & Alerts</h1>
-            <p>Track component health and maintenance schedule</p>
+        <!-- maintenance section -->
+        <div class="maintenance-section section" id="maintenance">
+          <div class="maintenance-section-top">
+            <div class="top-text">
+              <h1>Maintenance & Alerts</h1>
+              <p>Track component health and maintenance schedule</p>
+            </div>
+            <button class="btn"><img src="assets/icons/dashboard/add.svg" alt=""> Schedule Maintenance</button>
           </div>
-          <button class="btn"><img src="assets/icons/dashboard/add.svg" alt=""> Schedule Maintenance</button>
-        </div>
-        <div class="maintenance-section-content">
-          <div class="view-for">
-            <p>View maintenance for:</p>
-            <select name="" id="">
-              <option value="">Borehole Device</option>
-              <option value="">Borehole Device</option>
-              <option value="">Borehole Device</option>
-            </select>
-          </div>
-  
-          <div class="component-status-container">
-            <h2>Component Status</h2>
-  
-            <!-- card 1 -->
-            <div class="component-status-card">
-              <div class="card-left">
-                <div class="icon-box">
-                  <img src="assets/icons/dashboard/funnel-thin.svg" alt="">
-                </div>
-              </div>
-              <div class="card-right">
-                <div class="card-right-top">
-                  <div class="group1">
-                    <p class="card-title">Primary Filter</p>
-                    <p class="card-desc">Sediment and carbon filtration system</p>
-                    <p class="component-health">Component Health</p>
-                  </div>
-                  <div class="group2">
-                    <span class="card-attention">excellent</span>
-                    <span class="card-percent" id="pfValue">55%</span>
-                  </div>
-                </div>
-                <div class="card-right-bottom">
-                  <input type="range" name="" id="pfRate">
-                  <p class="due-time"><img src="assets/icons/dashboard/calendar.svg" alt="">Next due in - 185 days</p>
-                </div>
-              </div>
+          <div class="maintenance-section-content">
+            <div class="view-for">
+              <p>View maintenance for:</p>
+              <select name="" id="">
+                <option value="">Borehole Device</option>
+                <option value="">Borehole Device</option>
+                <option value="">Borehole Device</option>
+              </select>
             </div>
-            <!-- card 2 -->
-            <div class="component-status-card">
-              <div class="card-left">
-                <div class="icon-box">
-                  <img src="assets/icons/dashboard/light-bulb.svg" alt="">
-                </div>
-              </div>
-              <div class="card-right">
-                <div class="card-right-top">
-                  <div class="group1">
-                    <p class="card-title">UV Sterilization Lamp</p>
-                    <p class="card-desc">Ultraviolet water steriliazationsystem</p>
-                    <p class="component-health">Component Health</p>
-                  </div>
-                  <div class="group2">
-                    <span class="card-attention">attention</span>
-                    <span class="card-percent" id="uvsValue">55%</span>
+    
+            <div class="component-status-container">
+              <h2>Component Status</h2>
+    
+              <!-- card 1 -->
+              <div class="component-status-card">
+                <div class="card-left">
+                  <div class="icon-box">
+                    <img src="assets/icons/dashboard/funnel-thin.svg" alt="">
                   </div>
                 </div>
-                <div class="card-right-bottom">
-                  <input type="range" name="" id="uvsRate">
-                  <p class="due-time"><img src="assets/icons/dashboard/calendar.svg" alt="">Next due in - 211 days</p>
-                </div>
-              </div>
-            </div>
-            <!-- card 3 -->
-            <div class="component-status-card">
-              <div class="card-left">
-                <div class="icon-box">
-                  <img src="assets/icons/dashboard/droplet.svg" alt="">
-                </div>
-              </div>
-              <div class="card-right">
-                <div class="card-right-top">
-                  <div class="group1">
-                    <p class="card-title">Water Pump</p>
-                    <p class="card-desc">Main circulation and pressure pump</p>
-                    <p class="component-health">Component Health</p>
-                  </div>
-                  <div class="group2">
-                    <span class="card-attention">good</span>
-                    <span class="card-percent" id="wpValue">55%</span>
-                  </div>
-                </div>
-                <div class="card-right-bottom">
-                  <input type="range" name="" id="wpRate">
-                  <p class="due-time"><img src="assets/icons/dashboard/calendar.svg" alt="">Next due in - 110 days</p>
-                </div>
-              </div>
-            </div>
-            <!-- card 4 -->
-            <div class="component-status-card">
-              <div class="card-left">
-                <div class="icon-box">
-                  <img src="assets/icons/dashboard/droplet.svg" alt="">
-                </div>
-              </div>
-              <div class="card-right">
-                <div class="card-right-top">
-                  <div class="group1">
-                    <p class="card-title">Sensor Array</p>
-                    <p class="card-desc">TDS, pH, and quality sensors</p>
-                    <p class="component-health">Component Health</p>
-                  </div>
-                  <div class="group2">
-                    <span class="card-attention">due</span>
-                    <span class="card-percent" id="saValue">55%</span>
-                  </div>
-                </div>
-                <div class="card-right-bottom">
-                  <input type="range" name="" id="saRate">
-                  <p class="due-time"><img src="assets/icons/dashboard/calendar.svg" alt="">Next due in - 247 days</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- <div class="ai-prediction-container">
-              <h2>AI Predictive Maintenance</h2>
-              <div class="prediction-box">
-                <div class="prediction-card">
-                  <div class="card-left">
-                    <p class="card-title">Primary Filter <span>medium</span></p>
-                    <p class="message">Borehole Device: Based on current usage patterns, filter replacement will be needed 8 days earlier than scheduled.</p>
-                    <div class="card-btns">
-                      <button class="schedule">Schedule Now</button>
-                      <button class="remind">Remind Me</button>
+                <div class="card-right">
+                  <div class="card-right-top">
+                    <div class="group1">
+                      <p class="card-title">Primary Filter</p>
+                      <p class="card-desc">Sediment and carbon filtration system</p>
+                      <p class="component-health">Component Health</p>
+                    </div>
+                    <div class="group2">
+                      <span class="card-attention">excellent</span>
+                      <span class="card-percent" id="pfValue">55%</span>
                     </div>
                   </div>
-                  <div class="card-right"> 
-                    <p class="days-conf">+10 days <span>conf.</span></p>
+                  <div class="card-right-bottom">
+                    <input type="range" name="" id="pfRate">
+                    <p class="due-time"><img src="assets/icons/dashboard/calendar.svg" alt="">Next due in - 185 days</p>
                   </div>
                 </div>
               </div>
-            </div> -->
+              <!-- card 2 -->
+              <div class="component-status-card">
+                <div class="card-left">
+                  <div class="icon-box">
+                    <img src="assets/icons/dashboard/light-bulb.svg" alt="">
+                  </div>
+                </div>
+                <div class="card-right">
+                  <div class="card-right-top">
+                    <div class="group1">
+                      <p class="card-title">UV Sterilization Lamp</p>
+                      <p class="card-desc">Ultraviolet water steriliazationsystem</p>
+                      <p class="component-health">Component Health</p>
+                    </div>
+                    <div class="group2">
+                      <span class="card-attention">attention</span>
+                      <span class="card-percent" id="uvsValue">55%</span>
+                    </div>
+                  </div>
+                  <div class="card-right-bottom">
+                    <input type="range" name="" id="uvsRate">
+                    <p class="due-time"><img src="assets/icons/dashboard/calendar.svg" alt="">Next due in - 211 days</p>
+                  </div>
+                </div>
+              </div>
+              <!-- card 3 -->
+              <div class="component-status-card">
+                <div class="card-left">
+                  <div class="icon-box">
+                    <img src="assets/icons/dashboard/droplet.svg" alt="">
+                  </div>
+                </div>
+                <div class="card-right">
+                  <div class="card-right-top">
+                    <div class="group1">
+                      <p class="card-title">Water Pump</p>
+                      <p class="card-desc">Main circulation and pressure pump</p>
+                      <p class="component-health">Component Health</p>
+                    </div>
+                    <div class="group2">
+                      <span class="card-attention">good</span>
+                      <span class="card-percent" id="wpValue">55%</span>
+                    </div>
+                  </div>
+                  <div class="card-right-bottom">
+                    <input type="range" name="" id="wpRate">
+                    <p class="due-time"><img src="assets/icons/dashboard/calendar.svg" alt="">Next due in - 110 days</p>
+                  </div>
+                </div>
+              </div>
+              <!-- card 4 -->
+              <div class="component-status-card">
+                <div class="card-left">
+                  <div class="icon-box">
+                    <img src="assets/icons/dashboard/droplet.svg" alt="">
+                  </div>
+                </div>
+                <div class="card-right">
+                  <div class="card-right-top">
+                    <div class="group1">
+                      <p class="card-title">Sensor Array</p>
+                      <p class="card-desc">TDS, pH, and quality sensors</p>
+                      <p class="component-health">Component Health</p>
+                    </div>
+                    <div class="group2">
+                      <span class="card-attention">due</span>
+                      <span class="card-percent" id="saValue">55%</span>
+                    </div>
+                  </div>
+                  <div class="card-right-bottom">
+                    <input type="range" name="" id="saRate">
+                    <p class="due-time"><img src="assets/icons/dashboard/calendar.svg" alt="">Next due in - 247 days</p>
+                  </div>
+                </div>
+              </div>
+  
+              <!-- <div class="ai-prediction-container">
+                <h2>AI Predictive Maintenance</h2>
+                <div class="prediction-box">
+                  <div class="prediction-card">
+                    <div class="card-left">
+                      <p class="card-title">Primary Filter <span>medium</span></p>
+                      <p class="message">Borehole Device: Based on current usage patterns, filter replacement will be needed 8 days earlier than scheduled.</p>
+                      <div class="card-btns">
+                        <button class="schedule">Schedule Now</button>
+                        <button class="remind">Remind Me</button>
+                      </div>
+                    </div>
+                    <div class="card-right"> 
+                      <p class="days-conf">+10 days <span>conf.</span></p>
+                    </div>
+                  </div>
+                </div>
+              </div> -->
+            </div>
           </div>
+  
+  
+  
+          
         </div>
-
-
-
-        
-      </div>
-
-      <!-- settings section -->
-      <div class="settings-section section" id="settings">
-        <h1>settings</h1>
+  
+        <!-- settings section -->
+        <div class="settings-section section" id="settings">
+          <h1>settings</h1>
+        </div>
       </div>
     </div>
 
