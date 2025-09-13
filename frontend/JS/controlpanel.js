@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return `Last seen: ${diffHours} hour(s) ago`;
   }
 
-  function getStatus(timestamp, onlineFlag = true) {
+  function getStatus(timestamp, onlineFlag = false) {
     if (!timestamp) return "offline";
     const diffMs = Date.now() - timestamp;
     return (onlineFlag && diffMs < 5 * 60000) ? "online" : "offline";
@@ -232,7 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
         name: deviceName,
         location: location,
         model: model,
-        online: true,
+        online: false,
         lastSeen: Date.now()
       };
 
