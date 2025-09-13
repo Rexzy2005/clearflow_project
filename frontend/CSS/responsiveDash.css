@@ -505,7 +505,7 @@
 
                   & .status-bar {
                     gap: 12px;
-                    font-size: 10px;
+                    font-size: 8px;
 
                     & span {
                       gap: 2px;
