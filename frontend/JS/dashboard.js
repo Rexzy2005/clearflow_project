@@ -1,3 +1,17 @@
+import { showToast } from "./notification.js";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toastData = localStorage.getItem("toastMessage");
+  if (toastData) {
+    const { text, type } = JSON.parse(toastData);
+    showToast(text, { type, duration: 3000 });
+    localStorage.removeItem("toastMessage"); // clear after showing
+  }
+});
+
+
+
+
 const sections = document.querySelectorAll(".section");
 const menuBtns = document.querySelectorAll("[data-target]");
 

@@ -325,16 +325,27 @@ loginForm.addEventListener("submit", async (e) => {
 
     const data = await res.json();
     if (res.ok) {
-      showModal("Login Successful", "Redirecting to dashboard...", () => {
-        window.location.href = "dashboard.html";
-      });
+      // save toast message in localStorage
+      localStorage.setItem("toastMessage", JSON.stringify({
+        text: "Login Successful! Welcome back.",
+        type: "success"
+      }));
+
       clearFormInputs(loginForm);
+      window.location.href = "dashboard.html";
     } else {
+      showToast(data.message || "Invalid credentials", {
+        type: "error",
+        duration: 3000
+      });
       setHint("loginPass-hint", data.message || "Invalid credentials");
     }
   } catch (err) {
     console.error(err);
-    showModal("Error", "Error connecting to server.");
+    showToast("Error connecting to server", {
+      type: "error",
+      duration: 3000
+    });
   } finally {
     setButtonLoading(btn, "reset");
   }

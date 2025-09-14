@@ -23,6 +23,6 @@ export function showToast(message, type = "info", duration = 1500) {
   // remove toast after duration
   setTimeout(() => {
     toast.classList.remove("show");
-    setTimeout(() => toast.remove(), 400);
+    setTimeout(() => toast.remove(), 1500);
   }, duration);
 }
