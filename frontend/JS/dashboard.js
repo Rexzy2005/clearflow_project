@@ -1,4 +1,4 @@
-import { showToast } from "./notification.js";
+import { showToast } from "./utils/notification.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const toastData = localStorage.getItem("toastMessage");
