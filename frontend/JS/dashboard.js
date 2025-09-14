@@ -41,12 +41,9 @@ menuBtns.forEach(btn => {
   });
 });
 
-// profile click
-const profileClick = document.getElementById('profileClick');
-const dropDown = document.getElementById('dropDown');
-profileClick.addEventListener('click', () => {
-  dropDown.classList.toggle('showDropDown');
-})
+
+
+
 
 function updateSlider(slider, valueDisplay) {
   const value = slider.value;
@@ -78,4 +75,15 @@ sliders.forEach(({ slider, value }) => {
 hambugerMenubtn.addEventListener('click', () => {
   hambugerMenubtn.classList.toggle('open');
   sidePanel.classList.toggle('open');
+});
+document.addEventListener("click", (e) => {
+  if (
+    sidePanel.classList.contains("open") &&
+    !sidePanel.contains(e.target) &&
+    !hambugerMenubtn.contains(e.target)
+  ) {
+    sidePanel.classList.remove("open");
+    hambugerMenubtn.classList.remove("open");
+  }
+  
 });
