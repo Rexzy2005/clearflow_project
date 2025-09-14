@@ -29,11 +29,16 @@
         <div class="notification">
           <img src="assets/icons/dashboard/notification.svg" alt="">
         </div>
-        <div class="profile-pic">
-
+        <div class="profile-pic" id="profileClick">
+          <img src="assets/images/user2.png" alt="">
         </div>
-
+        <div class="dropdown" id="dropDown">
+          <p class="notification-preference"><i class="fa-regular fa-bell"></i> Notification preference</p>
+          <p class="profile-settings"><i class="fa-solid fa-gears"></i> Profile-settings</p>
+          <p class="logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</p>
+        </div>
       </div>
+
     </div>
 
     <div class="dashboard">
@@ -713,9 +718,93 @@
 
         </div>
 
-        <!-- settings section -->
+        <!-- profile-section -->
         <div class="settings-section section" id="settings">
-          <h1>settings</h1>
+          <div class="welcome">
+            <p class="page-title">Profile</p>
+            <p class="welcome-text"><a href="#dashboard">Dashboard</a>, User!</p>
+          </div>
+        
+          <div class="profile-settings-wrapper">
+            <div class="profile-card">
+              <div class="profile-pic">
+                <img src="assets/images/user2.png" alt="">
+                <h6>Joe</h6>
+                <p class="email">bitflow.com@gmail.com</p>
+              </div>
+        
+              <div class="profile-details">
+                <h6>Personal Info</h6>
+                <p>Full Name <span>: Joe</span></p>
+                <p>Email <span>: bitflow.com@gmail.com</span></p>
+                <p>Phone Number <span>: 9160364498</span></p>
+                <p>Country <span>: N/A</span></p>
+                <p>Refferral Code <span>: 66378426</span></p>
+                <p>Total Referred <span>: 0</span></p>
+              </div>
+            </div>
+        
+            <div class="profile-settings">
+              <div class="settings-nav">
+                <button class="edit-profile-btn active-btn" data-tab-target="user-profile">Edit Profile</button>
+        
+                <button class="change-password-btn" data-tab-target="user-password">Change Password</button>
+              </div>
+              <div class="profile active-section" data-tab="user-profile">
+                <form action="">
+                  <div class="form-group">
+                    <div class="input-wrapper">
+                      <label for="full-name">Full Name</label>
+                      <input type="text" placeholder="Enter Full Name">
+                    </div>
+        
+                    <div class="input-wrapper">
+                      <label for="full-name">Email</label>
+                      <input type="text" placeholder="Enter email address">
+                    </div>
+                  </div>
+        
+                  <div class="form-group">
+                    <div class="input-wrapper">
+                      <label for="phone-number">Phone Number</label>
+                      <input type="number" id="phone-number" placeholder="Enter Full Name">
+                    </div>
+        
+                    <div class="input-wrapper">
+                      <label for="country">Country</label>
+                      <input type="text" placeholder="Enter country">
+                    </div>
+                  </div>
+        
+                  <div class="form-group">
+                    <div class="input-wrapper">
+                      <label for="profile-pic">Profile Image</label>
+                      <input type="file" id="profile-pic" placeholder="No file chosen">
+                    </div>
+                  </div>
+        
+                  <div class="button-group">
+                    <button class="cancel">Cancel</button>
+                    <button class="save">Save</button>
+                  </div>
+                </form>
+              </div>
+        
+              <div class="password" data-tab="user-password">
+                <form action="">
+                  <label for="newPassword">New Password</label>
+                  <input type="password" placeholder="Enter new password">
+        
+                  <label for="confirmPassword">Confirm Password</label>
+                  <input type="password" placeholder="Confirm Password">
+        
+                  <div class="button-group">
+                    <button class="save">Change Password</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
 
 
