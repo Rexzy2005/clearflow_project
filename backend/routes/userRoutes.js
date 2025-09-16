@@ -5,6 +5,7 @@ const multer = require("multer");
 const protect = require("../middlewares/authMiddleware");
 const User = require("../models/User");
 const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 
 const router = express.Router();
 
@@ -25,6 +26,15 @@ const storage = new CloudinaryStorage({
   },
 });
 const upload = multer({ storage });
+
+// ✉️ Configure Nodemailer Transport
+const transporter = nodemailer.createTransport({
+  service: "gmail", // or "smtp.yourprovider.com"
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 /**
  * 📌 Upload or Change Profile Picture (Token-based)
@@ -49,7 +59,7 @@ router.put(
       user.profilePicture = req.file.path;
       user.profilePictureId = req.file.public_id;
 
-      await user.save();
+      await user.save({ validateBeforeSave: false });
 
       res.json({
         message: "Profile picture updated successfully",
@@ -109,13 +119,24 @@ router.put("/me", protect, async (req, res) => {
     if (Object.keys(sensitiveFields).length > 0) {
       const otp = crypto.randomInt(100000, 999999).toString();
       user.otp = otp;
-      user.otpExpire = Date.now() + 10 * 60 * 1000; // 10 mins
+      user.otpExpire = Date.now() + 1 * 60 * 1000; // ⏳ 1 minute expiry
       user.pendingUpdates = sensitiveFields;
 
       await user.save();
 
-      // TODO: Send OTP by email (for now log it)
-      console.log(`OTP for ${user.email}: ${otp}`);
+      // ✅ Send OTP by email
+      await transporter.sendMail({
+        from: `"ClearFlow Security" <${process.env.EMAIL_USER}>`,
+        to: user.email,
+        subject: "Your OTP Code - ClearFlow",
+        html: `
+          <p>Hello <b>${user.firstname || user.username}</b>,</p>
+          <p>You requested to update your profile. Use the OTP below to verify your action:</p>
+          <h2>${otp}</h2>
+          <p>This OTP will expire in <b>1 minute</b>.</p>
+          <p>If you did not request this, please ignore this email.</p>
+        `,
+      });
 
       return res.json({ otpRequired: true, message: "OTP sent to your email" });
     }
