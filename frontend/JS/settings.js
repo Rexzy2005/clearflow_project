@@ -44,8 +44,9 @@ function setButtonLoading(btn, action = "set", text = "Saving...") {
   }
 }
 
-// ===== OTP Modal (4-Digit) =====
-function showOtpModal(message, context = "profile-update") {
+// ===== OTP Modal (4-Digit Inline) =====
+async function showOtpModal(message, updates) {
+  // Remove existing modal
   const existingModal = document.querySelector(".custom-modal");
   if (existingModal) existingModal.remove();
 
@@ -61,10 +62,9 @@ function showOtpModal(message, context = "profile-update") {
   const msg = document.createElement("p");
   msg.textContent = message;
 
-  // OTP inputs container
+  // OTP input container
   const otpWrapper = document.createElement("div");
   otpWrapper.className = "otp-inputs";
-
   const inputs = [];
   for (let i = 0; i < 4; i++) {
     const input = document.createElement("input");
@@ -81,7 +81,6 @@ function showOtpModal(message, context = "profile-update") {
       e.target.value = e.target.value.replace(/[^0-9]/g, "");
       if (e.target.value && idx < inputs.length - 1) inputs[idx + 1].focus();
     });
-
     input.addEventListener("keydown", (e) => {
       if (e.key === "Backspace" && !e.target.value && idx > 0) inputs[idx - 1].focus();
     });
@@ -89,18 +88,36 @@ function showOtpModal(message, context = "profile-update") {
 
   // Verify button
   const verifyBtn = document.createElement("button");
-  verifyBtn.id = "verify-otp-btn";
   verifyBtn.textContent = "Verify OTP";
-  verifyBtn.addEventListener("click", () => {
+  verifyBtn.addEventListener("click", async () => {
     const otp = inputs.map((input) => input.value).join("");
     if (otp.length < 4) {
       showToast("Please enter all 4 digits of the OTP.", "error");
       return;
     }
-    localStorage.setItem("otpContext", context);
-    localStorage.setItem("otpCode", otp);
-    overlay.remove();
-    window.location.href = "otp.html"; // Redirect to OTP verification page
+
+    try {
+      setButtonLoading(verifyBtn, "set", "Verifying...");
+      const res = await fetch(`${backend_URL}/user/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ otp }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Invalid OTP");
+
+      // Update local user after verification
+      currentUser = { ...currentUser, ...updates };
+      localStorage.setItem("currentUser", JSON.stringify(currentUser));
+      loadUserProfile();
+      showToast("Profile updated successfully!", "success");
+      overlay.remove();
+    } catch (err) {
+      console.error(err);
+      showToast(err.message || "OTP verification failed", "error");
+    } finally {
+      setButtonLoading(verifyBtn, "reset");
+    }
   });
 
   modalBox.appendChild(msg);
@@ -109,62 +126,22 @@ function showOtpModal(message, context = "profile-update") {
   overlay.appendChild(modalBox);
   document.body.appendChild(overlay);
 
-  // Focus first input
   inputs[0].focus();
 }
 
 // ===== Upload preview =====
-uploadBtn.addEventListener("click", (e) => {
-  e.preventDefault();
-  fileInput.click();
-});
-
+uploadBtn.addEventListener("click", (e) => { e.preventDefault(); fileInput.click(); });
 fileInput.addEventListener("change", handleFile);
-
-uploadBox.addEventListener("dragover", (e) => {
-  e.preventDefault();
-  uploadBox.classList.add("dragover");
-  uploadContent.classList.add("hidden");
-  dropText.style.display = "block";
-});
-
-uploadBox.addEventListener("dragleave", (e) => {
-  e.preventDefault();
-  uploadBox.classList.remove("dragover");
-  uploadContent.classList.remove("hidden");
-  dropText.style.display = "none";
-});
-
-uploadBox.addEventListener("drop", (e) => {
-  e.preventDefault();
-  uploadBox.classList.remove("dragover");
-  dropText.style.display = "none";
-  const file = e.dataTransfer.files[0];
-  if (file) showPreview(file);
-});
-
-function handleFile(e) {
-  const file = e.target.files[0];
-  if (file) showPreview(file);
-}
-
+uploadBox.addEventListener("dragover", (e) => { e.preventDefault(); uploadBox.classList.add("dragover"); uploadContent.classList.add("hidden"); dropText.style.display = "block"; });
+uploadBox.addEventListener("dragleave", (e) => { e.preventDefault(); uploadBox.classList.remove("dragover"); uploadContent.classList.remove("hidden"); dropText.style.display = "none"; });
+uploadBox.addEventListener("drop", (e) => { e.preventDefault(); uploadBox.classList.remove("dragover"); dropText.style.display = "none"; const file = e.dataTransfer.files[0]; if (file) showPreview(file); });
+function handleFile(e) { const file = e.target.files[0]; if (file) showPreview(file); }
 function showPreview(file) {
   const MAX_SIZE = 2 * 1024 * 1024;
-  if (!["image/png", "image/jpeg"].includes(file.type)) {
-    showToast("Only PNG and JPEG files are allowed!", "error");
-    return;
-  }
-  if (file.size > MAX_SIZE) {
-    showToast("File size must be less than 2MB!", "error");
-    return;
-  }
-
+  if (!["image/png", "image/jpeg"].includes(file.type)) { showToast("Only PNG and JPEG files are allowed!", "error"); return; }
+  if (file.size > MAX_SIZE) { showToast("File size must be less than 2MB!", "error"); return; }
   const reader = new FileReader();
-  reader.onload = function (e) {
-    preview.src = e.target.result;
-    previewWrapper.style.display = "flex";
-    uploadContent.classList.add("hidden");
-  };
+  reader.onload = function (e) { preview.src = e.target.result; previewWrapper.style.display = "flex"; uploadContent.classList.add("hidden"); };
   reader.readAsDataURL(file);
 }
 
@@ -174,10 +151,7 @@ function loadUserProfile() {
   UserOverviewEmail.textContent = currentUser.email || "";
   UserOverviewPhone.textContent = currentUser.phoneNumber || "";
   UserOverviewUname.forEach((name) => (name.textContent = currentUser.username || ""));
-  profilePic.forEach((pic) => {
-    pic.src = currentUser.profilePicture || DEFAULT_PROFILE;
-    pic.onerror = () => (pic.src = DEFAULT_PROFILE);
-  });
+  profilePic.forEach((pic) => { pic.src = currentUser.profilePicture || DEFAULT_PROFILE; pic.onerror = () => (pic.src = DEFAULT_PROFILE); });
 }
 loadUserProfile();
 
@@ -185,34 +159,27 @@ loadUserProfile();
 async function uploadProfilePicture(file) {
   const formData = new FormData();
   formData.append("profilePicture", file);
-
   try {
     const res = await fetch(`${backend_URL}/user/profile-picture`, {
       method: "PUT",
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
     });
-
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Failed to upload profile picture");
-
     currentUser.profilePicture = data.profilePicture;
     localStorage.setItem("currentUser", JSON.stringify(currentUser));
     loadUserProfile();
     showToast("Profile picture updated successfully!", "success");
-
     preview.src = "";
     previewWrapper.style.display = "none";
     uploadContent.classList.remove("hidden");
     dropText.style.display = "none";
     fileInput.value = "";
-  } catch (err) {
-    console.error(err);
-    showToast(err.message || "Failed to upload profile picture", "error");
-  }
+  } catch (err) { console.error(err); showToast(err.message || "Failed to upload profile picture", "error"); }
 }
 
-// ===== Update profile (with OTP for sensitive fields) =====
+// ===== Update profile (with inline OTP) =====
 profileUpdateForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   setButtonLoading(saveBtn, "set", "Saving...");
@@ -246,12 +213,11 @@ profileUpdateForm.addEventListener("submit", async (e) => {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(updates),
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to update profile");
 
       if (data.otpRequired) {
-        showOtpModal("An OTP has been sent to your email/phone. Please verify to continue.", "profile-update");
+        showOtpModal("An OTP has been sent to your email/phone. Enter it below to update your profile.", updates);
         return;
       }
 
@@ -260,12 +226,8 @@ profileUpdateForm.addEventListener("submit", async (e) => {
       loadUserProfile();
       showToast("Profile updated successfully!", "success");
     }
-  } catch (err) {
-    console.error(err);
-    showToast(err.message || "Failed to update profile", "error");
-  } finally {
-    setButtonLoading(saveBtn, "reset");
-  }
+  } catch (err) { console.error(err); showToast(err.message || "Failed to update profile", "error"); }
+  finally { setButtonLoading(saveBtn, "reset"); }
 });
 
 // ===== Cancel Edit =====
