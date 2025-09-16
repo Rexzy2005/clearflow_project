@@ -278,6 +278,7 @@ function startOtpTimer(initialSec = 60) {
 }
 
 // -------------------- LOGIN --------------------
+const loginForm = document.getElementById("login");
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
