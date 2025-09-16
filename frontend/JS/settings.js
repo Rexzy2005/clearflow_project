@@ -51,7 +51,7 @@ function showOtpModal(message, context = "profile-update") {
   okBtn.textContent = "OK";
 
   okBtn.addEventListener("click", () => {
-    localStorage.setItem("otpContext", JSON.stringify({ type: context }));
+    localStorage.setItem("otpContext", context);
     overlay.remove();
     window.location.href = "otp.html";
   });

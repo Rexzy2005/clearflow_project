@@ -5,7 +5,9 @@ const multer = require("multer");
 const protect = require("../middlewares/authMiddleware");
 const User = require("../models/User");
 const crypto = require("crypto");
-const sendEmail = require("../utils/sendEmail"); // ✅ Import reusable email util
+const sendEmail = require("../utils/sendEmail"); 
+const generateOTP = require('../utils/generateOTP');
+
 
 const router = express.Router();
 
@@ -108,7 +110,7 @@ router.put("/me", protect, async (req, res) => {
 
     // If updating sensitive fields, require OTP verification
     if (Object.keys(sensitiveFields).length > 0) {
-      const otp = crypto.randomInt(100000, 999999).toString();
+      const otp = generateOTP();
       user.otp = otp;
       user.otpExpire = Date.now() + 1 * 60 * 1000; // ⏳ 1 minute expiry
       user.pendingUpdates = sensitiveFields;
