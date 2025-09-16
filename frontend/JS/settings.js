@@ -154,7 +154,7 @@ async function uploadProfilePicture(file) {
   formData.append("profilePicture", file);
 
   try {
-    const res = await fetch(`${backend_URL}/users/profile-picture`, {
+    const res = await fetch(`${backend_URL}/user/profile-picture`, {
       method: "PUT",
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
@@ -212,7 +212,7 @@ profileUpdateForm.addEventListener("submit", async (e) => {
 
     // Update text fields if any
     if (Object.keys(updates).length > 0) {
-      const res = await fetch(`${backend_URL}/users/me`, {
+      const res = await fetch(`${backend_URL}/user/me`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(updates),
