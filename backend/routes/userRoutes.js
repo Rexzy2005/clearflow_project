@@ -122,7 +122,7 @@ router.put("/me", protect, async (req, res) => {
       user.otpExpire = Date.now() + 1 * 60 * 1000; // ⏳ 1 minute expiry
       user.pendingUpdates = sensitiveFields;
 
-      await user.save();
+      await user.save({ validateBeforeSave: false });
 
       // ✅ Send OTP by email
       await transporter.sendMail({
@@ -143,7 +143,7 @@ router.put("/me", protect, async (req, res) => {
 
     // If only non-sensitive fields
     Object.assign(user, updateData);
-    await user.save();
+    await user.save({ validateBeforeSave: false }); // ✅ Allow partial updates
 
     res.json(user);
   } catch (error) {
@@ -179,7 +179,7 @@ router.post("/verify-otp", protect, async (req, res) => {
     // Clear OTP
     user.otp = undefined;
     user.otpExpire = undefined;
-    await user.save();
+    await user.save({ validateBeforeSave: false });
 
     res.json({ message: "OTP verified, profile updated successfully", user });
   } catch (error) {
