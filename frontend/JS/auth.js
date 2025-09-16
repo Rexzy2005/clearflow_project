@@ -224,12 +224,12 @@ if (otpForm) {
       return;
     }
 
-    const identifier = getOtpEmail();
+    const email = getOtpEmail();
     try {
       const res = await fetch(`${backend_URL}/api/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier, otp })
+        body: JSON.stringify({ email, otp })
       });
       const data = await res.json();
 
