@@ -122,7 +122,7 @@ exports.login = async (req, res) => {
         lastname: user.lastname,
         username: user.username,
         email: user.email,
-        phoneNumber: user.phoneNumber || "",
+        phoneNumber: user.phoneNumber || "Added Phone Number",
         profilePicture: user.profilePicture || null
       }
     });

@@ -4,6 +4,7 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const multer = require("multer");
 const protect = require("../middlewares/authMiddleware");
 const User = require("../models/User");
+const crypto = require("crypto");
 
 const router = express.Router();
 
@@ -18,16 +19,15 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: "profile_pictures", // cloudinary folder
+    folder: "profile_pictures",
     allowed_formats: ["jpg", "jpeg", "png"],
-    transformation: [{ width: 400, height: 400, crop: "limit" }],
+    transformation: [{ width: 1024, height: 1024, crop: "limit" }],
   },
 });
 const upload = multer({ storage });
 
 /**
- * 📌 Upload or Change Profile Picture
- * PUT /api/users/profile-picture
+ * 📌 Upload or Change Profile Picture (Token-based)
  */
 router.put(
   "/profile-picture",
@@ -42,15 +42,13 @@ router.put(
       const user = await User.findById(req.user._id);
       if (!user) return res.status(404).json({ error: "User not found" });
 
-      // 🧹 Delete old Cloudinary image if exists
       if (user.profilePictureId) {
         await cloudinary.uploader.destroy(user.profilePictureId);
       }
 
-      // 💾 Save new image URL and public_id
-      user.profilePicture = req.file.path; // Cloudinary secure URL
-      user.profilePictureId =
-        req.file.filename || req.file.public_id; // ensure correct public_id
+      user.profilePicture = req.file.path;
+      user.profilePictureId = req.file.public_id;
+
       await user.save();
 
       res.json({
@@ -65,8 +63,7 @@ router.put(
 );
 
 /**
- * 📌 Get User Profile
- * GET /api/users/:id
+ * 📌 Get User Profile (ID-based)
  */
 router.get("/:id", protect, async (req, res) => {
   try {
@@ -83,24 +80,89 @@ router.get("/:id", protect, async (req, res) => {
 });
 
 /**
- * 📌 Update User Info (without picture)
- * PUT /api/users/:id
+ * 📌 Update User Info (Token-based) + OTP for sensitive fields
  */
-router.put("/:id", protect, async (req, res) => {
+router.put("/me", protect, async (req, res) => {
   try {
     const { firstname, lastname, username, email, phoneNumber } = req.body;
 
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      { firstname, lastname, username, email, phoneNumber },
-      { new: true, runValidators: true }
-    ).select("-password -otp -otpExpire");
+    const updateData = {};
+    if (firstname) updateData.firstname = firstname;
+    if (lastname) updateData.lastname = lastname;
 
+    const sensitiveFields = {};
+    if (username) sensitiveFields.username = username;
+    if (email) sensitiveFields.email = email;
+    if (phoneNumber) sensitiveFields.phoneNumber = phoneNumber;
+
+    if (
+      Object.keys(updateData).length === 0 &&
+      Object.keys(sensitiveFields).length === 0
+    ) {
+      return res.status(400).json({ error: "No valid fields provided" });
+    }
+
+    const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ error: "User not found" });
+
+    // If updating sensitive fields, require OTP verification
+    if (Object.keys(sensitiveFields).length > 0) {
+      const otp = crypto.randomInt(100000, 999999).toString();
+      user.otp = otp;
+      user.otpExpire = Date.now() + 10 * 60 * 1000; // 10 mins
+      user.pendingUpdates = sensitiveFields;
+
+      await user.save();
+
+      // TODO: Send OTP by email (for now log it)
+      console.log(`OTP for ${user.email}: ${otp}`);
+
+      return res.json({ otpRequired: true, message: "OTP sent to your email" });
+    }
+
+    // If only non-sensitive fields
+    Object.assign(user, updateData);
+    await user.save();
 
     res.json(user);
   } catch (error) {
     console.error("Update user error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * 📌 Verify OTP & apply sensitive updates
+ */
+router.post("/verify-otp", protect, async (req, res) => {
+  try {
+    const { otp } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    if (!user.otp || user.otpExpire < Date.now()) {
+      return res.status(400).json({ error: "OTP expired or invalid" });
+    }
+
+    if (user.otp !== otp) {
+      return res.status(400).json({ error: "Invalid OTP" });
+    }
+
+    // Apply pending sensitive updates
+    if (user.pendingUpdates) {
+      Object.assign(user, user.pendingUpdates);
+      user.pendingUpdates = undefined;
+    }
+
+    // Clear OTP
+    user.otp = undefined;
+    user.otpExpire = undefined;
+    await user.save();
+
+    res.json({ message: "OTP verified, profile updated successfully", user });
+  } catch (error) {
+    console.error("Verify OTP error:", error);
     res.status(500).json({ error: error.message });
   }
 });

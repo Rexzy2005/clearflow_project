@@ -1,6 +1,7 @@
 import { showToast } from "./utils/notification.js";
 
 const backend_URL = "https://clearflow-project.onrender.com/api";
+const DEFAULT_PROFILE = "./default_profile_pic/default_user_img.png";
 
 // DOM elements
 const cancelEdit = document.getElementById("cancelEdit");
@@ -17,9 +18,10 @@ const uploadContent = document.getElementById("uploadContent");
 const dropText = document.getElementById("dropText");
 const profilePic = document.querySelectorAll("#userProfilePic");
 const profileUpdateForm = document.getElementById("profileUpdateForm");
+const saveBtn = document.getElementById("saveBtn"); // button for loading state
 
 // Get user from localStorage
-const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+let currentUser = JSON.parse(localStorage.getItem("currentUser"));
 const token = localStorage.getItem("token");
 
 // Redirect if not logged in
@@ -27,21 +29,76 @@ if (!currentUser || !token) {
   window.location.href = "login.html";
 }
 
+// ===== Utility: Show OTP Modal =====
+function showOtpModal(message, context = "profile-update") {
+  // Remove existing modal if any
+  const existingModal = document.querySelector(".custom-modal");
+  if (existingModal) existingModal.remove();
+
+  // Overlay
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay custom-modal";
+
+  // Box
+  const modalBox = document.createElement("div");
+  modalBox.className = "modal-box";
+
+  const msg = document.createElement("p");
+  msg.textContent = message;
+
+  const okBtn = document.createElement("button");
+  okBtn.id = "modal-ok";
+  okBtn.textContent = "OK";
+
+  okBtn.addEventListener("click", () => {
+    localStorage.setItem("otpContext", JSON.stringify({ type: context }));
+    overlay.remove();
+    window.location.href = "otp.html";
+  });
+
+  modalBox.appendChild(msg);
+  modalBox.appendChild(okBtn);
+  overlay.appendChild(modalBox);
+  document.body.appendChild(overlay);
+}
+
+// ===== Utility: Button Loading =====
+function setButtonLoading(btn, action = "set", text = "Saving...") {
+  if (!btn) return;
+  if (action === "set") {
+    btn.dataset.originalText = btn.textContent;
+    btn.disabled = true;
+    btn.classList.add("loading");
+    btn.innerHTML = `<div class="spinner"></div><span>${text}</span>`;
+  } else if (action === "reset") {
+    btn.disabled = false;
+    btn.classList.remove("loading");
+    btn.textContent = btn.dataset.originalText || "Save";
+  }
+}
+
 // ===== Upload preview =====
-uploadBtn.addEventListener("click", () => fileInput.click());
+uploadBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  fileInput.click();
+});
+
 fileInput.addEventListener("change", handleFile);
+
 uploadBox.addEventListener("dragover", (e) => {
   e.preventDefault();
   uploadBox.classList.add("dragover");
   uploadContent.classList.add("hidden");
   dropText.style.display = "block";
 });
+
 uploadBox.addEventListener("dragleave", (e) => {
   e.preventDefault();
   uploadBox.classList.remove("dragover");
   uploadContent.classList.remove("hidden");
   dropText.style.display = "none";
 });
+
 uploadBox.addEventListener("drop", (e) => {
   e.preventDefault();
   uploadBox.classList.remove("dragover");
@@ -49,37 +106,84 @@ uploadBox.addEventListener("drop", (e) => {
   const file = e.dataTransfer.files[0];
   if (file) showPreview(file);
 });
+
 function handleFile(e) {
   const file = e.target.files[0];
   if (file) showPreview(file);
 }
+
 function showPreview(file) {
-  if (file.type === "image/png" || file.type === "image/jpeg") {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      preview.src = e.target.result;
-      previewWrapper.style.display = "flex";
-      uploadContent.classList.add("hidden");
-    };
-    reader.readAsDataURL(file);
-  } else {
+  const MAX_SIZE = 2 * 1024 * 1024; // 2MB
+  if (!["image/png", "image/jpeg"].includes(file.type)) {
     showToast("Only PNG and JPEG files are allowed!", "error");
+    return;
   }
+  if (file.size > MAX_SIZE) {
+    showToast("File size must be less than 2MB!", "error");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    preview.src = e.target.result;
+    previewWrapper.style.display = "flex";
+    uploadContent.classList.add("hidden");
+  };
+  reader.readAsDataURL(file);
 }
 
 // ===== Load user profile =====
 function loadUserProfile() {
-  UserOverviewFullname.textContent = `${currentUser.firstname} ${currentUser.lastname}`;
-  UserOverviewEmail.textContent = currentUser.email;
+  UserOverviewFullname.textContent = `${currentUser.firstname || ""} ${currentUser.lastname || ""}`;
+  UserOverviewEmail.textContent = currentUser.email || "";
   UserOverviewPhone.textContent = currentUser.phoneNumber || "";
-  UserOverviewUname.forEach((name) => (name.textContent = currentUser.username));
-  profilePic.forEach((pic) => (pic.src = currentUser.profilePicture || "/images/default-profile.png"));
+  UserOverviewUname.forEach((name) => (name.textContent = currentUser.username || ""));
+
+  profilePic.forEach((pic) => {
+    pic.src = currentUser.profilePicture || DEFAULT_PROFILE;
+    pic.onerror = () => {
+      pic.src = DEFAULT_PROFILE;
+    };
+  });
 }
 loadUserProfile();
 
-// ===== Update Profile =====
+// ===== Upload profile picture only =====
+async function uploadProfilePicture(file) {
+  const formData = new FormData();
+  formData.append("profilePicture", file);
+
+  try {
+    const res = await fetch(`${backend_URL}/users/profile-picture`, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to upload profile picture");
+
+    currentUser.profilePicture = data.profilePicture;
+    localStorage.setItem("currentUser", JSON.stringify(currentUser));
+    loadUserProfile();
+    showToast("Profile picture updated successfully!", "success");
+
+    // reset UI
+    preview.src = "";
+    previewWrapper.style.display = "none";
+    uploadContent.classList.remove("hidden");
+    dropText.style.display = "none";
+    fileInput.value = "";
+  } catch (err) {
+    console.error(err);
+    showToast(err.message || "Failed to upload profile picture", "error");
+  }
+}
+
+// ===== Update profile (with OTP for sensitive fields) =====
 profileUpdateForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+  setButtonLoading(saveBtn, "set", "Saving...");
 
   const fname = document.getElementById("fname").value.trim();
   const lname = document.getElementById("lname").value.trim();
@@ -88,68 +192,52 @@ profileUpdateForm.addEventListener("submit", async (e) => {
   const phoneNumber = document.getElementById("phone-number").value.trim();
   const file = fileInput.files[0];
 
+  // Only non-empty fields
+  const updates = {};
+  if (fname) updates.firstname = fname;
+  if (lname) updates.lastname = lname;
+  if (username) updates.username = username;
+  if (email) updates.email = email;
+  if (phoneNumber) updates.phoneNumber = phoneNumber;
+
+  if (Object.keys(updates).length === 0 && !file) {
+    showToast("Please fill at least one field or upload a profile picture.", "error");
+    setButtonLoading(saveBtn, "reset");
+    return;
+  }
+
   try {
-    let profilePicUrl = currentUser.profilePicture || "/images/default-profile.png";
+    // Upload picture if selected (no OTP required)
+    if (file) await uploadProfilePicture(file);
 
-    // Upload new picture if selected
-    if (file) {
-      const formData = new FormData();
-      formData.append("profilePicture", file);
-
-      const uploadRes = await fetch(`${backend_URL}/user/profile-picture`, {
+    // Update text fields if any
+    if (Object.keys(updates).length > 0) {
+      const res = await fetch(`${backend_URL}/users/me`, {
         method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(updates),
       });
 
-      let data;
-      try {
-        data = await uploadRes.json();
-      } catch {
-        data = { message: "Server did not return valid JSON" };
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update profile");
+
+      if (data.otpRequired) {
+        // OTP flow triggered
+        showOtpModal("An OTP has been sent to your email/phone. Please verify to continue.", "profile-update");
+        return;
       }
 
-      if (!uploadRes.ok) {
-        console.error("Profile picture upload failed:", data);
-        throw new Error(data.message || `Failed to upload profile picture (status ${uploadRes.status})`);
-      }
-
-      profilePicUrl = data.profilePicture || profilePicUrl;
+      // update local user
+      currentUser = { ...currentUser, ...updates };
+      localStorage.setItem("currentUser", JSON.stringify(currentUser));
+      loadUserProfile();
+      showToast("Profile updated successfully!", "success");
     }
-
-    // Update user info
-    const updateRes = await fetch(`${backend_URL}/user/${currentUser.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ firstname: fname, lastname: lname, username, email, phoneNumber }),
-    });
-
-    let updatedUser;
-    try {
-      updatedUser = await updateRes.json();
-    } catch {
-      updatedUser = { message: "Server did not return valid JSON" };
-    }
-
-    if (!updateRes.ok) throw new Error(updatedUser.message || `Failed to update profile (status ${updateRes.status})`);
-
-    // Update localStorage
-    const newUser = { ...currentUser, ...updatedUser, profilePicture: profilePicUrl };
-    localStorage.setItem("currentUser", JSON.stringify(newUser));
-
-    // Update UI
-    loadUserProfile();
-    showToast("Profile updated successfully!", "success");
-
-    // Reset upload box
-    preview.src = "";
-    previewWrapper.style.display = "none";
-    uploadContent.classList.remove("hidden");
-    dropText.style.display = "none";
-    fileInput.value = "";
   } catch (err) {
-    console.error("Error updating profile:", err);
+    console.error(err);
     showToast(err.message || "Failed to update profile", "error");
+  } finally {
+    setButtonLoading(saveBtn, "reset");
   }
 });
 

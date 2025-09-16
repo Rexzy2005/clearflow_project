@@ -1,4 +1,3 @@
-// auth.js
 const backend_URL = "https://clearflow-project.onrender.com";
 
 // -------------------- Utilities --------------------
@@ -21,7 +20,7 @@ function setHint(id, message, success = false) {
   setTimeout(() => {
     if (target) target.style.border = "";
     hint.style.display = "none";
-  }, 1500);
+  }, 3000); // ⬅ Extended to 3s
 }
 
 function clearFormInputs(form) {
@@ -45,10 +44,19 @@ function showModal(title, message, callback) {
     </div>
   `;
   document.body.appendChild(modal);
-  document.getElementById("modal-ok").onclick = () => {
+
+  function closeModal() {
     modal.remove();
     if (callback) callback();
-  };
+  }
+
+  document.getElementById("modal-ok").onclick = closeModal;
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeModal();
+  }, { once: true });
 }
 
 function setButtonLoading(btn, action = "set", text = "Processing...") {
@@ -86,12 +94,25 @@ document.querySelectorAll(".toggle-password").forEach(toggle => {
 });
 
 // -------------------- OTP CONTEXT --------------------
-function setOtpContext(ctx) { localStorage.setItem("otpContext", ctx); }
-function getOtpContext() { return localStorage.getItem("otpContext") || ""; }
+function setOtpContext(ctx, identifier = "") {
+  localStorage.setItem("otpContext", ctx);
+  if (identifier) localStorage.setItem("otpIdentifier", identifier);
+}
+function getOtpContext() {
+  return localStorage.getItem("otpContext") || "";
+}
+function getOtpIdentifier() {
+  return localStorage.getItem("otpIdentifier") || "";
+}
+function clearOtpContext() {
+  localStorage.removeItem("otpContext");
+  localStorage.removeItem("otpIdentifier");
+}
 function getOtpEmail() {
   const ctx = getOtpContext();
   if (ctx === "signup") return localStorage.getItem("signupEmail") || "";
   if (ctx === "forgot-password") return localStorage.getItem("femail") || "";
+  if (ctx === "profile-update") return getOtpIdentifier();
   return "";
 }
 
@@ -118,9 +139,17 @@ if (signupForm) {
     if (!/^\S+@\S+\.\S+$/.test(email)) { setHint("signUpEmail-hint", "Enter a valid email"); valid = false; }
     if (!password) { setHint("signUpPassword-hint", "Password required"); valid = false; }
     if (!confirmPassword) { setHint("signupConfirmPassword-hint", "Confirm password"); valid = false; }
-    if (password && (password.length < 6 || !/[A-Z]/.test(password) || !/[0-9]/.test(password))) {
-      setHint("signUpPassword-hint", "Password must be 6+ chars, include uppercase & number"); valid = false;
+
+    if (password && (
+      password.length < 6 ||
+      !/[A-Z]/.test(password) ||
+      !/[0-9]/.test(password) ||
+      !/[!@#$%^&*(),.?":{}|<>]/.test(password)
+    )) {
+      setHint("signUpPassword-hint", "Password must be 6+ chars, include uppercase, number & special char");
+      valid = false;
     }
+
     if (password !== confirmPassword) { setHint("signupConfirmPassword-hint", "Passwords do not match"); valid = false; }
     if (!accept) { setHint("accept-hint", "You must agree to terms"); valid = false; }
 
@@ -135,7 +164,7 @@ if (signupForm) {
       const data = await res.json();
       if (res.ok) {
         localStorage.setItem("signupEmail", email);
-        setOtpContext("signup");
+        setOtpContext("signup", email);
         showModal("Success", "OTP sent to your email.", () => {
           window.location.href = "otp.html";
         });
@@ -154,7 +183,6 @@ if (signupForm) {
 const otpForm = document.getElementById("otp");
 let otpInterval = null;
 
-// Block direct access to OTP page
 if (window.location.pathname.includes("otp.html")) {
   const ctx = getOtpContext();
   const email = getOtpEmail();
@@ -168,6 +196,11 @@ if (otpForm) {
     box.addEventListener("input", () => {
       if (box.value.length > 1) box.value = box.value.slice(-1);
       if (box.value && idx < arr.length - 1) arr[idx + 1].focus();
+
+      // ⬅ Auto-submit when all fields filled
+      if (Array.from(arr).every(i => i.value)) {
+        otpForm.requestSubmit();
+      }
     });
     box.addEventListener("keydown", e => {
       if (e.key === "Backspace" && !box.value && idx > 0) arr[idx - 1].focus();
@@ -185,29 +218,43 @@ if (otpForm) {
     setButtonLoading(btn, "set", "Verifying...");
 
     const otp = Array.from(otpInputs).map(i => i.value).join("");
-    if (otp.length !== otpInputs.length) { otpInputs.forEach(i => { if (!i.value) i.style.border = "1px solid red"; }); setButtonLoading(btn, "reset"); return; }
+    if (otp.length !== otpInputs.length) {
+      otpInputs.forEach(i => { if (!i.value) i.style.border = "1px solid red"; });
+      setButtonLoading(btn, "reset");
+      return;
+    }
 
-    const email = getOtpEmail();
+    const identifier = getOtpEmail();
     try {
       const res = await fetch(`${backend_URL}/api/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp })
+        body: JSON.stringify({ identifier, otp })
       });
       const data = await res.json();
+
       if (res.ok) {
         otpInputs.forEach(i => i.style.border = "1px solid green");
-        if (getOtpContext() === "signup") {
+
+        const ctx = getOtpContext();
+        if (ctx === "signup") {
           showModal("OTP Verified", "You can now login.", () => {
-            localStorage.removeItem("otpContext");
+            clearOtpContext();
             window.location.href = "login.html";
           });
-        } else {
+        } else if (ctx === "forgot-password") {
           showModal("OTP Verified", "You can now reset your password.", () => {
-            localStorage.removeItem("otpContext");
+            clearOtpContext();
             window.location.href = "new-password.html";
           });
+        } else if (ctx === "profile-update") {
+          showModal("OTP Verified", "Identity confirmed. Proceed with your changes.", () => {
+            clearOtpContext();
+            localStorage.setItem("openSettings", "true");
+            window.location.href = "dashboard.html";
+          });
         }
+
         clearFormInputs(otpForm);
         sessionStorage.removeItem("otpTimeLeft");
         if (otpInterval) clearInterval(otpInterval);
@@ -255,7 +302,7 @@ function startOtpTimer(initialSec = 60) {
     e.preventDefault();
     resendEl.disabled = true;
     const email = getOtpEmail();
-    if (!email) { showModal("Error", "No email found to resend OTP."); resendEl.disabled = false; return; }
+    if (!email) { showModal("Error", "No identifier found to resend OTP."); resendEl.disabled = false; return; }
 
     try {
       const res = await fetch(`${backend_URL}/api/auth/resend-otp`, {
@@ -300,7 +347,7 @@ if (loginForm) {
       const data = await res.json();
       if (res.ok) {
         localStorage.setItem("token", data.token);
-        localStorage.setItem("currentUser", JSON.stringify(data.user)); // <- full user info
+        localStorage.setItem("currentUser", JSON.stringify(data.user));
 
         localStorage.setItem("toastMessage", JSON.stringify({
           text: `Login Successful! Welcome back, ${email}.`,
@@ -337,7 +384,7 @@ if (forgotForm) {
       const data = await res.json();
       if (res.ok) {
         localStorage.setItem("femail", email);
-        setOtpContext("forgot-password");
+        setOtpContext("forgot-password", email);
         showModal("OTP Sent", "Check your email for the code.", () => { window.location.href = "otp.html"; });
       } else {
         setHint("femail-hint", data.message || "Failed to send reset link");
@@ -391,12 +438,29 @@ document.addEventListener("DOMContentLoaded", () => {
       else window.location.href = "login.html";
     });
   }
+
+  // Auto-open settings after OTP verification
+  if (window.location.pathname.includes("dashboard.html")) {
+    if (localStorage.getItem("openSettings") === "true") {
+      localStorage.removeItem("openSettings");
+      if (typeof openSettingsModal === "function") openSettingsModal();
+    }
+  }
 });
 
-// -------------------- AUTH FETCH --------------------
+// -------------------- AUTH FETCH (token auto-expiry) --------------------
 async function authFetch(url, options = {}) {
   const token = localStorage.getItem("token");
-  if (!options.headers) options.headers = {};
-  if (token) options.headers["Authorization"] = `Bearer ${token}`;
-  return fetch(url, options);
+  if (!token) { window.location.href = "login.html"; throw new Error("No token"); }
+
+  options.headers = { ...(options.headers || {}), Authorization: `Bearer ${token}` };
+
+  const res = await fetch(url, options);
+  if (res.status === 401) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("currentUser");
+    showModal("Session Expired", "Please log in again.", () => { window.location.href = "login.html"; });
+    throw new Error("Unauthorized");
+  }
+  return res;
 }
