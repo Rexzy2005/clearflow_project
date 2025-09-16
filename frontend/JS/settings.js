@@ -101,8 +101,19 @@ profileUpdateForm.addEventListener("submit", async (e) => {
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
-      const data = await uploadRes.json();
-      if (!uploadRes.ok) throw new Error(data.message || "Failed to upload profile picture");
+
+      let data;
+      try {
+        data = await uploadRes.json();
+      } catch {
+        data = { message: "Server did not return valid JSON" };
+      }
+
+      if (!uploadRes.ok) {
+        console.error("Profile picture upload failed:", data);
+        throw new Error(data.message || `Failed to upload profile picture (status ${uploadRes.status})`);
+      }
+
       profilePicUrl = data.profilePicture || profilePicUrl;
     }
 
@@ -112,8 +123,15 @@ profileUpdateForm.addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ firstname: fname, lastname: lname, username, email, phoneNumber }),
     });
-    const updatedUser = await updateRes.json();
-    if (!updateRes.ok) throw new Error(updatedUser.message || "Failed to update profile");
+
+    let updatedUser;
+    try {
+      updatedUser = await updateRes.json();
+    } catch {
+      updatedUser = { message: "Server did not return valid JSON" };
+    }
+
+    if (!updateRes.ok) throw new Error(updatedUser.message || `Failed to update profile (status ${updateRes.status})`);
 
     // Update localStorage
     const newUser = { ...currentUser, ...updatedUser, profilePicture: profilePicUrl };
@@ -121,7 +139,6 @@ profileUpdateForm.addEventListener("submit", async (e) => {
 
     // Update UI
     loadUserProfile();
-
     showToast("Profile updated successfully!", "success");
 
     // Reset upload box
