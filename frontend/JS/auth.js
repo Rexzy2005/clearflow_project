@@ -300,7 +300,7 @@ if (loginForm) {
       const data = await res.json();
       if (res.ok) {
         localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify({ email }));
+        localStorage.setItem("currentUser", JSON.stringify(data.user)); // <- full user info
 
         localStorage.setItem("toastMessage", JSON.stringify({
           text: `Login Successful! Welcome back, ${email}.`,
