@@ -5,7 +5,7 @@ const multer = require("multer");
 const protect = require("../middlewares/authMiddleware");
 const User = require("../models/User");
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
+const sendEmail = require("../utils/sendEmail"); // ✅ Import reusable email util
 
 const router = express.Router();
 
@@ -26,15 +26,6 @@ const storage = new CloudinaryStorage({
   },
 });
 const upload = multer({ storage });
-
-// ✉️ Configure Nodemailer Transport
-const transporter = nodemailer.createTransport({
-  service: "gmail", // or "smtp.yourprovider.com"
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
 /**
  * 📌 Upload or Change Profile Picture (Token-based)
@@ -124,19 +115,12 @@ router.put("/me", protect, async (req, res) => {
 
       await user.save({ validateBeforeSave: false });
 
-      // ✅ Send OTP by email
-      await transporter.sendMail({
-        from: `"ClearFlow Security" <${process.env.EMAIL_USER}>`,
-        to: user.email,
-        subject: "Your OTP Code - ClearFlow",
-        html: `
-          <p>Hello <b>${user.firstname || user.username}</b>,</p>
-          <p>You requested to update your profile. Use the OTP below to verify your action:</p>
-          <h2>${otp}</h2>
-          <p>This OTP will expire in <b>1 minute</b>.</p>
-          <p>If you did not request this, please ignore this email.</p>
-        `,
-      });
+      // ✅ Send OTP by email using helper
+      await sendEmail(
+        user.email,
+        "Your OTP Code - ClearFlow",
+        otp
+      );
 
       return res.json({ otpRequired: true, message: "OTP sent to your email" });
     }
