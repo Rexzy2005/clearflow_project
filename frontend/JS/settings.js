@@ -29,39 +29,6 @@ if (!currentUser || !token) {
   window.location.href = "login.html";
 }
 
-// ===== Utility: Show OTP Modal =====
-function showOtpModal(message, context = "profile-update") {
-  // Remove existing modal if any
-  const existingModal = document.querySelector(".custom-modal");
-  if (existingModal) existingModal.remove();
-
-  // Overlay
-  const overlay = document.createElement("div");
-  overlay.className = "modal-overlay custom-modal";
-
-  // Box
-  const modalBox = document.createElement("div");
-  modalBox.className = "modal-box";
-
-  const msg = document.createElement("p");
-  msg.textContent = message;
-
-  const okBtn = document.createElement("button");
-  okBtn.id = "modal-ok";
-  okBtn.textContent = "OK";
-
-  okBtn.addEventListener("click", () => {
-    localStorage.setItem("otpContext", context);
-    overlay.remove();
-    window.location.href = "otp.html";
-  });
-
-  modalBox.appendChild(msg);
-  modalBox.appendChild(okBtn);
-  overlay.appendChild(modalBox);
-  document.body.appendChild(overlay);
-}
-
 // ===== Utility: Button Loading =====
 function setButtonLoading(btn, action = "set", text = "Saving...") {
   if (!btn) return;
@@ -75,6 +42,75 @@ function setButtonLoading(btn, action = "set", text = "Saving...") {
     btn.classList.remove("loading");
     btn.textContent = btn.dataset.originalText || "Save";
   }
+}
+
+// ===== OTP Modal (4-Digit) =====
+function showOtpModal(message, context = "profile-update") {
+  const existingModal = document.querySelector(".custom-modal");
+  if (existingModal) existingModal.remove();
+
+  // Overlay
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay custom-modal";
+
+  // Modal box
+  const modalBox = document.createElement("div");
+  modalBox.className = "modal-box otp-modal";
+
+  // Message
+  const msg = document.createElement("p");
+  msg.textContent = message;
+
+  // OTP inputs container
+  const otpWrapper = document.createElement("div");
+  otpWrapper.className = "otp-inputs";
+
+  const inputs = [];
+  for (let i = 0; i < 4; i++) {
+    const input = document.createElement("input");
+    input.type = "text";
+    input.maxLength = 1;
+    input.className = "otp-box";
+    otpWrapper.appendChild(input);
+    inputs.push(input);
+  }
+
+  // Auto-focus logic
+  inputs.forEach((input, idx) => {
+    input.addEventListener("input", (e) => {
+      e.target.value = e.target.value.replace(/[^0-9]/g, "");
+      if (e.target.value && idx < inputs.length - 1) inputs[idx + 1].focus();
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Backspace" && !e.target.value && idx > 0) inputs[idx - 1].focus();
+    });
+  });
+
+  // Verify button
+  const verifyBtn = document.createElement("button");
+  verifyBtn.id = "verify-otp-btn";
+  verifyBtn.textContent = "Verify OTP";
+  verifyBtn.addEventListener("click", () => {
+    const otp = inputs.map((input) => input.value).join("");
+    if (otp.length < 4) {
+      showToast("Please enter all 4 digits of the OTP.", "error");
+      return;
+    }
+    localStorage.setItem("otpContext", context);
+    localStorage.setItem("otpCode", otp);
+    overlay.remove();
+    window.location.href = "otp.html"; // Redirect to OTP verification page
+  });
+
+  modalBox.appendChild(msg);
+  modalBox.appendChild(otpWrapper);
+  modalBox.appendChild(verifyBtn);
+  overlay.appendChild(modalBox);
+  document.body.appendChild(overlay);
+
+  // Focus first input
+  inputs[0].focus();
 }
 
 // ===== Upload preview =====
@@ -113,7 +149,7 @@ function handleFile(e) {
 }
 
 function showPreview(file) {
-  const MAX_SIZE = 2 * 1024 * 1024; // 2MB
+  const MAX_SIZE = 2 * 1024 * 1024;
   if (!["image/png", "image/jpeg"].includes(file.type)) {
     showToast("Only PNG and JPEG files are allowed!", "error");
     return;
@@ -138,17 +174,14 @@ function loadUserProfile() {
   UserOverviewEmail.textContent = currentUser.email || "";
   UserOverviewPhone.textContent = currentUser.phoneNumber || "";
   UserOverviewUname.forEach((name) => (name.textContent = currentUser.username || ""));
-
   profilePic.forEach((pic) => {
     pic.src = currentUser.profilePicture || DEFAULT_PROFILE;
-    pic.onerror = () => {
-      pic.src = DEFAULT_PROFILE;
-    };
+    pic.onerror = () => (pic.src = DEFAULT_PROFILE);
   });
 }
 loadUserProfile();
 
-// ===== Upload profile picture only =====
+// ===== Upload profile picture =====
 async function uploadProfilePicture(file) {
   const formData = new FormData();
   formData.append("profilePicture", file);
@@ -168,7 +201,6 @@ async function uploadProfilePicture(file) {
     loadUserProfile();
     showToast("Profile picture updated successfully!", "success");
 
-    // reset UI
     preview.src = "";
     previewWrapper.style.display = "none";
     uploadContent.classList.remove("hidden");
@@ -192,7 +224,6 @@ profileUpdateForm.addEventListener("submit", async (e) => {
   const phoneNumber = document.getElementById("phone-number").value.trim();
   const file = fileInput.files[0];
 
-  // Only non-empty fields
   const updates = {};
   if (fname) updates.firstname = fname;
   if (lname) updates.lastname = lname;
@@ -207,10 +238,8 @@ profileUpdateForm.addEventListener("submit", async (e) => {
   }
 
   try {
-    // Upload picture if selected (no OTP required)
     if (file) await uploadProfilePicture(file);
 
-    // Update text fields if any
     if (Object.keys(updates).length > 0) {
       const res = await fetch(`${backend_URL}/user/me`, {
         method: "PUT",
@@ -222,12 +251,10 @@ profileUpdateForm.addEventListener("submit", async (e) => {
       if (!res.ok) throw new Error(data.error || "Failed to update profile");
 
       if (data.otpRequired) {
-        // OTP flow triggered
         showOtpModal("An OTP has been sent to your email/phone. Please verify to continue.", "profile-update");
         return;
       }
 
-      // update local user
       currentUser = { ...currentUser, ...updates };
       localStorage.setItem("currentUser", JSON.stringify(currentUser));
       loadUserProfile();
