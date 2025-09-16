@@ -39,6 +39,40 @@
 
         }
       }
+
+      & .profile-action {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+
+        & .notification {
+          position: relative;
+
+          &::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: red;
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            border: 2px solid var(--white-bg);
+          }
+        }
+
+        & .profile-pic {
+          width: 45px;
+          height: 45px;
+        }
+
+        & .dropdown {
+          top: 200%;
+          right: -300%;
+        }
+      }
     }
 
     & .dashboard {
@@ -659,7 +693,7 @@
               display: flex;
               align-items: center;
               justify-content: space-between;
-              
+
               gap: 10px;
               padding: 1rem;
 
@@ -698,6 +732,7 @@
                     width: 40px;
                     height: 40px;
                     border-radius: 8px;
+
                     & img {
                       width: 20px;
                       height: 20px;
@@ -792,13 +827,183 @@
           }
 
         }
+
+        /* profile section */
+        & .settings-section {
+          & .settings-section-top {
+            margin-bottom: 20px;
+
+            & h1 {
+              font-size: 18px;
+              font-weight: 400;
+              margin-bottom: 8px;
+            }
+
+            & p {
+              font-weight: 300;
+              font-size: 12px;
+              color: var(--gray-color);
+            }
+
+            & button {
+              /* display: none; */
+            }
+          }
+
+          & .settings-container {
+            width: 100%;
+            overflow: auto;
+            height: 90vh;
+            box-sizing: border-box;
+            padding-bottom: 400px;
+            scrollbar-width: none;
+
+            & .settings-section-wrapper {
+              display: grid;
+              grid-template-columns: 1fr;
+              gap: 15px;
+              margin-bottom: 20px;
+
+              & .profile-card {
+                background: #fff;
+                height: 100%;
+                background-image: url("../assets/images/user-grid-bg1.png");
+                background-repeat: no-repeat;
+                border: 1px solid #d1d5db80;
+                background-size: 100% 120px;
+                border-radius: 20px;
+                padding: 15px 10px;
+
+                & .profile-pic {
+                  border-bottom: 1px solid #d1d5db80;
+                  width: 100%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  flex-direction: column;
+
+                  & img {
+                    width: 150px;
+                    height: 150px;
+                    border: 3px solid #fff;
+                    border-radius: 50%;
+                    object-fit: cover;
+                  }
+
+                  & .username {
+                    font-size: .9rem;
+                    margin-top: 1rem;
+                    font-weight: 500;
+                  }
+
+                  & .email {
+                    font-size: .7rem;
+                    opacity: .5;
+                    margin-bottom: 1rem;
+                    font-weight: 300;
+                  }
+
+                }
+
+                & .profile-details {
+                  margin-top: 1rem;
+                  color: #111827;
+
+                  & h6 {
+                    font-size: 1rem;
+                    font-weight: 400;
+                    margin-bottom: 1rem;
+                  }
+
+                  & p {
+                    font-size: .9rem;
+                    font-weight: 400;
+                    margin-bottom: 12px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    max-width: 100%;
+                    display: inline-block;
+
+                    & span {
+                      font-weight: 300;
+                      color: #4b5563;
+                      font-size: .8rem;
+                      margin-left: 5px;
+                    }
+
+                  }
+
+                }
+              }
+
+              & .profile-settings {
+                padding: 15px;
+
+                & .settings-nav {
+                  & button {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 10px;
+                    border: none;
+                    font-size: 12px;
+                    color: var(--gray-color);
+                    background: transparent;
+                    cursor: pointer;
+                    transition: all .2s ease-in-out;
+                    cursor: pointer;
+                  }
+
+                  & .active-btn {
+                    border-top: 2px solid var(--primary-color);
+                    background: linear-gradient(180deg, rgba(72, 127, 255, 0.12) 0%, rgba(72, 127, 255, 0.03) 100%);
+                    font-weight: 400;
+                    color: var(--primary-color);
+                  }
+                }
+
+                & .profile {
+                  & form {
+                    grid-template-columns: repeat(1, 1fr);
+                    gap: 20px;
+
+                    & .button-group {
+                      gap: 15px;
+                    }
+                  }
+
+                }
+              }
+            }
+
+            & .notification-preference {
+              & h2 {
+                font-size: 16px;
+              }
+            }
+
+            & .account-action {
+              & h2 {
+                font-size: 16px;
+              }
+
+              & .btn-group {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+
+                & button {
+                  padding: 8px;
+                  font-size: 12px;
+                  white-space: nowrap;
+                }
+              }
+            }
+          }
+
+        }
       }
     }
   }
-}
-.section {
-  display: none;
-}
-.section.active-section {
-  display: block !important;
 }

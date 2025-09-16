@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const toastData = localStorage.getItem("toastMessage");
   if (toastData) {
     const { text, type } = JSON.parse(toastData);
-    showToast(text, { type, duration: 3000 });
+    showToast(text, type);
     localStorage.removeItem("toastMessage"); // clear after showing
   }
 });
@@ -99,5 +99,26 @@ document.addEventListener("click", (e) => {
     sidePanel.classList.remove("open");
     hambugerMenubtn.classList.remove("open");
   }
-  
+
+});
+
+// profile control UI element
+const tabButtons = document.querySelectorAll('[data-tab-target]')
+const tabSections = document.querySelectorAll('[data-tab]')
+
+// profile control js
+tabButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const target = button.getAttribute('data-tab-target');
+
+    // removing active class from all buttons & section
+    tabButtons.forEach(btn => btn.classList.remove('active-btn'))
+    tabSections.forEach(section => section.classList.remove('active-section'))
+
+    // adding active state to clicked btn and matching section
+    button.classList.add('active-btn')
+    document.querySelector(`[data-tab='${target}']`).classList.add('active-section');
+
+  })
+
 });

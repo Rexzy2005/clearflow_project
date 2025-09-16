@@ -85,13 +85,13 @@ body {
   }
 
 
-  & .form-section {
+  /* & .form-section {
     display: none;
   }
 
   & .form-section.active {
     display: flex;
-  }
+  } */
 
 
 
@@ -107,7 +107,6 @@ body {
   /* sign up */
   & .sign-up-container {
     text-align: center;
-    /* display: none; */
     flex-direction: column;
     width: 100%;
 
@@ -486,7 +485,7 @@ body {
     }
   }
 
-  /* login */
+  /* forgot */
   & .forgot-password-container {
     text-align: center;
     /* display: none; */

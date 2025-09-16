@@ -31,7 +31,7 @@
           <img src="assets/icons/dashboard/notification.svg" alt="">
         </div>
         <div class="profile-pic" id="profileClick">
-          <img src="assets/images/user2.png" alt="">
+          <img src="assets/images/user2.png" alt="" id="userProfilePic">
         </div>
         <div class="dropdown" id="dropDown">
           <p class="notification-preference"><i class="fa-regular fa-bell"></i> Notification preference</p>
@@ -411,7 +411,7 @@
                 </div>
                 <h2>Add New Device</h2>
                 <p>Configure a new water System</p>
-                <div class="form-group">
+                <!-- <div class="form-group"> -->
                 <label for="deviceName">Name of Device</label>
                 <input type="text" id="deviceName" name="deviceName" placeholder="e.g Borehole filter" required>
 
@@ -428,6 +428,7 @@
                   <option value="CLEARFLOW-pro-2025">
                   <option value="CLEARFLOW-premium-2025">
                 </datalist>
+
                 <button type="submit">Add Device</button>
               </form>
             </div>
@@ -730,74 +731,90 @@
           <div class="settings-container">
             <div class="settings-section-wrapper">
               <div class="profile-card">
-                <div class="profile-pic">
+                <div class="profile-pic" id="profilePic">
                   <img src="assets/images/user2.png" alt="" id="userProfilePic">
-                  <p class="username">DevRex</p>
+                  <p class="username" id="UserOverviewUname">DevRex</p>
                   <p class="email">timothypererat2004@gmail.com</p>
                 </div>
 
                 <div class="profile-details">
                   <h6>Personal Info</h6>
-                  <p>Username: <span>DevRex</span></p>
-                  <p>First Name: <span>Pererat Timothy</span></p>
-                  <p>Email: <span>timothypererat2004@gmail.com</span></p>
-                  <p>Phone: <span>NaN</span></p>
+                  <p>Username: <span id="UserOverviewUname">DevRex</span></p>
+                  <p>First Name: <span id="UserOverviewFullname">Pererat Timothy</span></p>
+                  <p>Email: <span id="UserOverviewEmail">timothypererat2004@gmail.com</span></p>
+                  <p>Phone: <span id="UserOverviewPhone">Nil</span></p>
                 </div>
               </div>
 
               <div class="profile-settings">
                 <div class="settings-nav">
                   <button class="edit-profile-btn active-btn" data-tab-target="user-profile">Edit Profile</button>
-
                   <button class="change-password-btn" data-tab-target="user-password">Change Password</button>
                 </div>
                 <div class="profile active-section" data-tab="user-profile">
-                  <form action="">
-                    <div class="form-group">
-                      <div class="input-wrapper">
-                        <label for="full-name">Full Name</label>
-                        <input type="text" placeholder="Enter Full Name">
+                  <form action="" id="profileUpdateForm">
+                    <div class="image-field" id="uploadBox">
+                      <div class="upload-content" id="uploadContent">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p class="drop">Drop file here</p>
+                        <span>OR</span>
+                        <button id="UploadBtn">Upload file</button>
+                        <p class="restriction">Only PNG and JPG <br> file are supported</p>
                       </div>
+                      <p class="drop-text" id="dropText">Drop here</p>
+                      <input type="file" id="fileInput" accept="image/png, image/jpeg">
 
-                      <div class="input-wrapper">
-                        <label for="full-name">Email</label>
-                        <input type="text" placeholder="Enter email address">
+                      <div class="preview-wrapper" id="previewWrapper">
+                        <img id="preview" class="preview">
                       </div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="text-inputs">
+                      <p class="title">Personal Info</p>
+                      <!-- <div class="name-group"> -->
                       <div class="input-wrapper">
+                        <input type="text" placeholder=" " id="fname">
+                        <label for="fname">First Name</label>
+                      </div>
+
+                      <!-- </div> -->
+                      <div class="input-wrapper">
+                        <input type="text" placeholder=" " id="lname">
+                        <label for="lname">Last Name</label>
+                      </div>
+
+                      <div class="input-wrapper">
+                        <input type="text" placeholder=" " id="username">
+                        <label for="username">Username</label>
+                      </div>
+
+                      <div class="input-wrapper">
+                        <input type="email" id="email" placeholder=" ">
+                        <label for="email">Email</label>
+                      </div>
+                      <p class="add-phone">Add Phone number</p>
+                      <div class="input-wrapper">
+                        <input type="number" id="phone-number" placeholder=" ">
                         <label for="phone-number">Phone Number</label>
-                        <input type="number" id="phone-number" placeholder="Enter Full Name">
                       </div>
-
-                      <div class="input-wrapper">
-                        <label for="country">Country</label>
-                        <input type="text" placeholder="Enter country">
+                      <div class="button-group">
+                        <button class="cancel" id="cancelEdit">Cancel</button>
+                        <button class="save" type="submit">Save</button>
                       </div>
-                    </div>
-
-                    <div class="form-group">
-                      <div class="input-wrapper">
-                        <label for="profile-pic">Profile Image</label>
-                        <input type="file" id="profile-pic" placeholder="No file chosen">
-                      </div>
-                    </div>
-
-                    <div class="button-group">
-                      <button class="cancel">Cancel</button>
-                      <button class="save">Save</button>
                     </div>
                   </form>
                 </div>
 
                 <div class="password" data-tab="user-password">
                   <form action="">
-                    <label for="newPassword">New Password</label>
-                    <input type="password" placeholder="Enter new password">
-
-                    <label for="confirmPassword">Confirm Password</label>
-                    <input type="password" placeholder="Confirm Password">
+                    <div class="input-wrapper">
+                      <input type="password" placeholder=" ">
+                      <label for="newPassword">New Password</label>
+                    </div>
+                    <div class="input-wrapper">
+                      <input type="password" placeholder=" ">
+                      <label for="confirmPassword">Confirm Password</label>
+                    </div>
 
                     <div class="button-group">
                       <button class="save">Change Password</button>
@@ -829,6 +846,14 @@
                 </div>
               </div>
             </div>
+            <div class="account-action">
+              <h2>Account Actions</h2>
+              <div class="btn-group">
+                <button class="export">Export Data</button>
+                <button class="download">Download Reports</button>
+                <button class="delete">Delete Account</button>
+              </div>
+            </div>
 
           </div>
 
@@ -843,6 +868,7 @@
     <script type="module" src="JS/controlpanel.js"></script>
     <script src="JS/utils/profiletoggle.js"></script>
     <script type="module" src="JS/utils/toggleBtn.js"></script>
+    <script type="module" src="JS/settings.js"></script>
 </body>
 
 </html>

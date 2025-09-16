@@ -103,17 +103,22 @@ document.addEventListener("DOMContentLoaded", () => {
         <button class="viewMoreBtn">View Details</button>
       </div>
     `;
+    
     const lastSeenEl = deviceCard.querySelector(".last-seen");
     const statusEl = deviceCard.querySelector(".device-stats");
 
     // set initial color
-    statusEl.style.color = statusEl.textContent === "online" ? "green" : "red";
+    statusEl.style.color = statusEl.textContent === "online" ? "#437509" : "#BF6A29";
+    statusEl.style.background = statusEl.textContent === "online" ? "#F6FDE6" : "#FFFBEB";
+    statusEl.style.borderColor = statusEl.textContent === "online" ? "#E3FAB8" : "#FDEEB1";
 
     // update every minute
     const intervalId = setInterval(() => {
       lastSeenEl.textContent = getLastSeenText(device.lastSeen);
       statusEl.textContent = getStatus(device.lastSeen, device.online);
-      statusEl.style.color = statusEl.textContent === "online" ? "green" : "red";
+      statusEl.style.color = statusEl.textContent === "online" ? "#437509" : "#BF6A29";
+      statusEl.style.background = statusEl.textContent === "online" ? "#F6FDE6" : "#FFFBEB";
+      statusEl.style.borderColor = statusEl.textContent === "online" ? "#E3FAB8" : "#FDEEB1";
     }, 60000);
 
     // Attach "View Details"
@@ -133,7 +138,9 @@ document.addEventListener("DOMContentLoaded", () => {
         device.lastSeen = newTs;
         lastSeenEl.textContent = getLastSeenText(device.lastSeen);
         statusEl.textContent = getStatus(device.lastSeen, device.online);
-        statusEl.style.color = statusEl.textContent === "online" ? "green" : "red";
+        statusEl.style.color = statusEl.textContent === "online" ? "#437509" : "#BF6A29";
+        statusEl.style.background = statusEl.textContent === "online" ? "#F6FDE6" : "#FFFBEB";
+        statusEl.style.borderColor = statusEl.textContent === "online" ? "#E3FAB8" : "#FDEEB1";
       }
 
       // sync ON/OFF switch
@@ -154,7 +161,9 @@ document.addEventListener("DOMContentLoaded", () => {
             switchBtn.textContent = device.online ? "ON" : "OFF";
             switchBtn.classList.toggle("off", device.online);
             statusEl.textContent = getStatus(device.lastSeen, device.online);
-            statusEl.style.color = statusEl.textContent === "online" ? "green" : "red";
+            statusEl.style.color = statusEl.textContent === "online" ? "#437509" : "#BF6A29";
+            statusEl.style.background = statusEl.textContent === "online" ? "#F6FDE6" : "#FFFBEB";
+            statusEl.style.borderColor = statusEl.textContent === "online" ? "#E3FAB8" : "#FDEEB1";
 
             // show toast
             if (device.online) {

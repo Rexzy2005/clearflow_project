@@ -21,14 +21,14 @@ const authMiddleware = async (req, res, next) => {
     if (!user) return res.status(404).json({ error: "User not found" });
 
     // 🚨 Check if password changed after token was issued
-    if (user.passwordChangedAt) {
-      const passwordChangedAt = new Date(user.passwordChangedAt).getTime();
-      if (decoded.passwordChangedAt === null || decoded.passwordChangedAt < passwordChangedAt) {
-        return res.status(401).json({ error: "Password has been changed. Please log in again." });
-      }
-    }
+if (user.passwordChangedAt && decoded.passwordChangedAt) {
+  const passwordChangedAt = new Date(user.passwordChangedAt).getTime();
+  if (decoded.passwordChangedAt < passwordChangedAt) {
+    return res.status(401).json({ error: "Password has been changed. Please log in again." });
+  }
+}
 
-    req.user = decoded; // { id, username, passwordChangedAt }
+   req.user = user; 
     next();
   } catch (err) {
     return res.status(401).json({ error: 'Invalid or expired token' });

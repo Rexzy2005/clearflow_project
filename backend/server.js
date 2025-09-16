@@ -3,7 +3,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
-
+const deviceRoutes = require("./routes/deviceRoutes");
+const userRoutes = require("./routes/userRoutes");
 const app = express();
 
 // Middleware
@@ -19,8 +20,10 @@ mongoose.connect(process.env.MONGO_URI, {
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// Routes
+// ================== ROUTES ==================
 app.use('/api/auth', authRoutes);
+app.use("/api/device", deviceRoutes);
+app.use("/api/user", userRoutes);
 
 // Root route (optional for testing)
 app.get('/', (req, res) => {

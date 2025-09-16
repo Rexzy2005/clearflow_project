@@ -9,12 +9,13 @@ const passwordSchema = require('../utils/passwordValidator');
 // ======================= SIGNUP =======================
 exports.signup = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { firstname, lastname, username, email, password } = req.body;
 
     if (!passwordSchema.validate(password)) {
       return res.status(400).json({
         success: false,
-        message: "Password must be at least 8 characters long, include uppercase, lowercase, 2 numbers, and a special character."
+        message:
+          "Password must be at least 8 characters long, include uppercase, lowercase, 2 numbers, and a special character.",
       });
     }
 
@@ -22,27 +23,46 @@ exports.signup = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: "Email already registered. Please login or use another email."
+        message: "Email already registered. Please login or use another email.",
+      });
+    }
+
+     const existinUser = await User.findOne({ username });
+    if (existinUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Username already exists. Please login or use another username.",
       });
     }
 
     const otp = generateOTP();
     const otpExpire = new Date(Date.now() + 1 * 60 * 1000);
 
-    const user = new User({ username, email, password, otp, otpExpire });
+    const user = new User({
+      firstname, 
+      lastname,
+      username,
+      email,
+      password,
+      otp,
+      otpExpire,
+    });
+
     await user.save();
 
     await sendEmail(email, "Your OTP Code", otp);
-    res.status(201).json({
+
+    return res.status(201).json({
       success: true,
       message: "OTP sent to email",
-      email,
+      email, // ✅ send back for frontend storage
     });
   } catch (err) {
     console.error("❌ Signup error:", err);
-    res.status(500).json({ 
-       success: false,
-       message: "Failed to sign up. Please try again." });
+    return res.status(500).json({
+      success: false,
+      message: "Failed to sign up. Please try again.",
+    });
   }
 };
 
