@@ -27,7 +27,7 @@ exports.signup = async (req, res) => {
       });
     }
 
-     const existinUser = await User.findOne({ username });
+    const existinUser = await User.findOne({ username });
     if (existinUser) {
       return res.status(400).json({
         success: false,
@@ -39,7 +39,7 @@ exports.signup = async (req, res) => {
     const otpExpire = new Date(Date.now() + 1 * 60 * 1000);
 
     const user = new User({
-      firstname, 
+      firstname,
       lastname,
       username,
       email,
@@ -49,13 +49,12 @@ exports.signup = async (req, res) => {
     });
 
     await user.save();
-
     await sendEmail(email, "Your OTP Code", otp);
 
     return res.status(201).json({
       success: true,
       message: "OTP sent to email",
-      email, // ✅ send back for frontend storage
+      email, // send back for frontend storage
     });
   } catch (err) {
     console.error("❌ Signup error:", err);
@@ -112,7 +111,21 @@ exports.login = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.json({ success: true, message: `Welcome ${user.username}`, token });
+    // ✅ Return token + user info for frontend
+    res.json({
+      success: true,
+      message: `Welcome ${user.username}`,
+      token,
+      user: {
+        id: user._id,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        username: user.username,
+        email: user.email,
+        phoneNumber: user.phoneNumber || "",
+        profilePicture: user.profilePicture || null
+      }
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -182,7 +195,7 @@ exports.resetPassword = async (req, res) => {
       });
     }
 
-    user.password = newPassword; // ✅ hashed in User model pre-save
+    user.password = newPassword; // hashed in User model pre-save
     user.otp = undefined;
     user.otpExpire = undefined;
     await user.save();
@@ -210,7 +223,7 @@ exports.changePassword = async (req, res) => {
       });
     }
 
-    user.password = newPassword;  // ✅ Let pre('save') handle hashing
+    user.password = newPassword;  // Let pre('save') handle hashing
     user.passwordChangedAt = Date.now();
     await user.save();
 
@@ -219,7 +232,6 @@ exports.changePassword = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
-
 
 // ======================= LOGOUT =======================
 exports.logout = async (req, res) => {
@@ -246,4 +258,3 @@ exports.logout = async (req, res) => {
     res.status(500).json({ error: "Logout failed. Try again later.", details: err.message });
   }
 };
-

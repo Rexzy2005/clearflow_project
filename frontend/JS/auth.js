@@ -5,7 +5,6 @@ const backend_URL = "https://clearflow-project.onrender.com";
 function setHint(id, message, success = false) {
   const hint = document.getElementById(id);
   if (!hint) return;
-
   hint.textContent = message;
   hint.style.color = success ? "green" : "red";
   hint.style.display = "block";
@@ -17,9 +16,7 @@ function setHint(id, message, success = false) {
     target = target.parentElement.querySelector("input");
   }
 
-  if (target) {
-    target.style.border = success ? "1px solid green" : "1px solid red";
-  }
+  if (target) target.style.border = success ? "1px solid green" : "1px solid red";
 
   setTimeout(() => {
     if (target) target.style.border = "";
@@ -88,13 +85,9 @@ document.querySelectorAll(".toggle-password").forEach(toggle => {
   });
 });
 
-// -------------------- OTP CONTEXT HELPERS --------------------
-function setOtpContext(ctx) {
-  localStorage.setItem("otpContext", ctx);
-}
-function getOtpContext() {
-  return localStorage.getItem("otpContext") || "";
-}
+// -------------------- OTP CONTEXT --------------------
+function setOtpContext(ctx) { localStorage.setItem("otpContext", ctx); }
+function getOtpContext() { return localStorage.getItem("otpContext") || ""; }
 function getOtpEmail() {
   const ctx = getOtpContext();
   if (ctx === "signup") return localStorage.getItem("signupEmail") || "";
@@ -126,8 +119,7 @@ if (signupForm) {
     if (!password) { setHint("signUpPassword-hint", "Password required"); valid = false; }
     if (!confirmPassword) { setHint("signupConfirmPassword-hint", "Confirm password"); valid = false; }
     if (password && (password.length < 6 || !/[A-Z]/.test(password) || !/[0-9]/.test(password))) {
-      setHint("signUpPassword-hint", "Password must be 6+ chars, include uppercase & number");
-      valid = false;
+      setHint("signUpPassword-hint", "Password must be 6+ chars, include uppercase & number"); valid = false;
     }
     if (password !== confirmPassword) { setHint("signupConfirmPassword-hint", "Passwords do not match"); valid = false; }
     if (!accept) { setHint("accept-hint", "You must agree to terms"); valid = false; }
@@ -138,11 +130,10 @@ if (signupForm) {
       const res = await fetch(`${backend_URL}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password })
+        body: JSON.stringify({ firstname: fname, lastname: lname, username, email, password })
       });
-
       const data = await res.json();
-      if (res.ok || (data.message && data.message.includes("already registered but not verified"))) {
+      if (res.ok) {
         localStorage.setItem("signupEmail", email);
         setOtpContext("signup");
         showModal("Success", "OTP sent to your email.", () => {
@@ -163,18 +154,15 @@ if (signupForm) {
 const otpForm = document.getElementById("otp");
 let otpInterval = null;
 
-// ✅ Block direct access to OTP page
+// Block direct access to OTP page
 if (window.location.pathname.includes("otp.html")) {
   const ctx = getOtpContext();
   const email = getOtpEmail();
-  if (!ctx || !email) {
-    window.location.href = "login.html";
-  }
+  if (!ctx || !email) window.location.href = "login.html";
 }
 
 if (otpForm) {
   const otpInputs = otpForm.querySelectorAll("input");
-
   otpInputs.forEach((box, idx, arr) => {
     box.setAttribute("maxlength", 1);
     box.addEventListener("input", () => {
@@ -197,11 +185,7 @@ if (otpForm) {
     setButtonLoading(btn, "set", "Verifying...");
 
     const otp = Array.from(otpInputs).map(i => i.value).join("");
-    if (otp.length !== otpInputs.length) {
-      otpInputs.forEach(i => { if (!i.value) i.style.border = "1px solid red"; });
-      setButtonLoading(btn, "reset");
-      return;
-    }
+    if (otp.length !== otpInputs.length) { otpInputs.forEach(i => { if (!i.value) i.style.border = "1px solid red"; }); setButtonLoading(btn, "reset"); return; }
 
     const email = getOtpEmail();
     try {
@@ -210,7 +194,6 @@ if (otpForm) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp })
       });
-
       const data = await res.json();
       if (res.ok) {
         otpInputs.forEach(i => i.style.border = "1px solid green");
@@ -233,9 +216,7 @@ if (otpForm) {
       }
     } catch {
       setHint("otp-hint", "Error connecting to server");
-    } finally {
-      setButtonLoading(btn, "reset");
-    }
+    } finally { setButtonLoading(btn, "reset"); }
   });
 
   startOtpTimer(60);
@@ -250,10 +231,7 @@ function startOtpTimer(initialSec = 60) {
 
   let time = initialSec;
   const savedTime = sessionStorage.getItem("otpTimeLeft");
-  if (savedTime) {
-    const parsed = parseInt(savedTime, 10);
-    if (!isNaN(parsed) && parsed > 0) time = parsed;
-  }
+  if (savedTime) { const parsed = parseInt(savedTime, 10); if (!isNaN(parsed) && parsed > 0) time = parsed; }
 
   if (resendText) resendText.style.display = "none";
   if (otpInterval) clearInterval(otpInterval);
@@ -277,11 +255,7 @@ function startOtpTimer(initialSec = 60) {
     e.preventDefault();
     resendEl.disabled = true;
     const email = getOtpEmail();
-    if (!email) {
-      showModal("Error", "No email found to resend OTP.");
-      resendEl.disabled = false;
-      return;
-    }
+    if (!email) { showModal("Error", "No email found to resend OTP."); resendEl.disabled = false; return; }
 
     try {
       const res = await fetch(`${backend_URL}/api/auth/resend-otp`, {
@@ -289,27 +263,21 @@ function startOtpTimer(initialSec = 60) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
       });
-
       const data = await res.json();
       if (res.ok) {
         sessionStorage.setItem("otpTimeLeft", initialSec);
         if (resendText) resendText.style.display = "none";
-        showModal("Resent", "A new OTP has been sent.", () => {
-          startOtpTimer(initialSec);
-        });
+        showModal("Resent", "A new OTP has been sent.", () => { startOtpTimer(initialSec); });
       } else {
         showModal("Error", data.message || "Could not resend OTP");
       }
     } catch {
       showModal("Error", "Network error while resending OTP");
-    } finally {
-      resendEl.disabled = false;
-    }
+    } finally { resendEl.disabled = false; }
   };
 }
 
 // -------------------- LOGIN --------------------
-const loginForm = document.getElementById("login");
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -328,11 +296,13 @@ if (loginForm) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
       });
-
       const data = await res.json();
       if (res.ok) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify({ email }));
+
         localStorage.setItem("toastMessage", JSON.stringify({
-          text: "Login Successful! Welcome back.",
+          text: `Login Successful! Welcome back, ${email}.`,
           type: "success"
         }));
         clearFormInputs(loginForm);
@@ -342,9 +312,7 @@ if (loginForm) {
       }
     } catch {
       showModal("Error", "Error connecting to server");
-    } finally {
-      setButtonLoading(btn, "reset");
-    }
+    } finally { setButtonLoading(btn, "reset"); }
   });
 }
 
@@ -357,11 +325,7 @@ if (forgotForm) {
     setButtonLoading(btn, "set", "Processing...");
 
     const email = document.getElementById("femail")?.value.trim();
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
-      setHint("femail-hint", "Enter a valid email");
-      setButtonLoading(btn, "reset");
-      return;
-    }
+    if (!/^\S+@\S+\.\S+$/.test(email)) { setHint("femail-hint", "Enter a valid email"); setButtonLoading(btn, "reset"); return; }
 
     try {
       const res = await fetch(`${backend_URL}/api/auth/forgot-password`, {
@@ -369,22 +333,17 @@ if (forgotForm) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
       });
-
       const data = await res.json();
       if (res.ok) {
         localStorage.setItem("femail", email);
         setOtpContext("forgot-password");
-        showModal("OTP Sent", "Check your email for the code.", () => {
-          window.location.href = "otp.html";
-        });
+        showModal("OTP Sent", "Check your email for the code.", () => { window.location.href = "otp.html"; });
       } else {
         setHint("femail-hint", data.message || "Failed to send reset link");
       }
     } catch {
       setHint("femail-hint", "Error connecting to server");
-    } finally {
-      setButtonLoading(btn, "reset");
-    }
+    } finally { setButtonLoading(btn, "reset"); }
   });
 }
 
@@ -409,7 +368,6 @@ if (resetForm) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, newPassword })
       });
-
       const data = await res.json();
       if (res.ok) {
         showModal("Password Reset", "Please login with your new password.", () => window.location.href = "login.html");
@@ -419,9 +377,7 @@ if (resetForm) {
       }
     } catch {
       setHint("cnpass-hint", "Error connecting to server");
-    } finally {
-      setButtonLoading(btn, "reset");
-    }
+    } finally { setButtonLoading(btn, "reset"); }
   });
 }
 
@@ -430,11 +386,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const backBtn = document.getElementById("backBtn");
   if (backBtn && !window.location.pathname.includes("otp.html")) {
     backBtn.addEventListener("click", () => {
-      if (document.referrer && document.referrer !== window.location.href) {
-        window.history.back();
-      } else {
-        window.location.href = "login.html";
-      }
+      if (document.referrer && document.referrer !== window.location.href) window.history.back();
+      else window.location.href = "login.html";
     });
   }
 });
+
+// -------------------- AUTH FETCH --------------------
+async function authFetch(url, options = {}) {
+  const token = localStorage.getItem("token");
+  if (!options.headers) options.headers = {};
+  if (token) options.headers["Authorization"] = `Bearer ${token}`;
+  return fetch(url, options);
+}

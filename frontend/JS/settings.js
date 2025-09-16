@@ -1,6 +1,6 @@
 import { showToast } from "./utils/notification.js";
 
-const backend_URL = "https://clearflow-project.onrender.com/api"; // backend
+const backend_URL = "https://clearflow-project.onrender.com/api";
 
 // DOM elements
 const cancelEdit = document.getElementById("cancelEdit");
@@ -8,7 +8,6 @@ const UserOverviewFullname = document.getElementById("UserOverviewFullname");
 const UserOverviewUname = document.querySelectorAll("#UserOverviewUname");
 const UserOverviewEmail = document.getElementById("UserOverviewEmail");
 const UserOverviewPhone = document.getElementById("UserOverviewPhone");
-
 const uploadBox = document.getElementById("uploadBox");
 const fileInput = document.getElementById("fileInput");
 const uploadBtn = document.getElementById("UploadBtn");
@@ -19,26 +18,30 @@ const dropText = document.getElementById("dropText");
 const profilePic = document.querySelectorAll("#userProfilePic");
 const profileUpdateForm = document.getElementById("profileUpdateForm");
 
-// Simulating logged-in user (id = "1")
-const currentUserId = "1";
+// Get user from localStorage
+const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+const token = localStorage.getItem("token");
 
+// Redirect if not logged in
+if (!currentUser || !token) {
+  window.location.href = "login.html";
+}
+
+// ===== Upload preview =====
 uploadBtn.addEventListener("click", () => fileInput.click());
 fileInput.addEventListener("change", handleFile);
-
 uploadBox.addEventListener("dragover", (e) => {
   e.preventDefault();
   uploadBox.classList.add("dragover");
   uploadContent.classList.add("hidden");
   dropText.style.display = "block";
 });
-
 uploadBox.addEventListener("dragleave", (e) => {
   e.preventDefault();
   uploadBox.classList.remove("dragover");
   uploadContent.classList.remove("hidden");
   dropText.style.display = "none";
 });
-
 uploadBox.addEventListener("drop", (e) => {
   e.preventDefault();
   uploadBox.classList.remove("dragover");
@@ -46,12 +49,10 @@ uploadBox.addEventListener("drop", (e) => {
   const file = e.dataTransfer.files[0];
   if (file) showPreview(file);
 });
-
 function handleFile(e) {
   const file = e.target.files[0];
   if (file) showPreview(file);
 }
-
 function showPreview(file) {
   if (file.type === "image/png" || file.type === "image/jpeg") {
     const reader = new FileReader();
@@ -66,6 +67,16 @@ function showPreview(file) {
   }
 }
 
+// ===== Load user profile =====
+function loadUserProfile() {
+  UserOverviewFullname.textContent = `${currentUser.firstname} ${currentUser.lastname}`;
+  UserOverviewEmail.textContent = currentUser.email;
+  UserOverviewPhone.textContent = currentUser.phoneNumber || "";
+  UserOverviewUname.forEach((name) => (name.textContent = currentUser.username));
+  profilePic.forEach((pic) => (pic.src = currentUser.profilePicture || "/images/default-profile.png"));
+}
+loadUserProfile();
+
 // ===== Update Profile =====
 profileUpdateForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -78,36 +89,38 @@ profileUpdateForm.addEventListener("submit", async (e) => {
   const file = fileInput.files[0];
 
   try {
-    let profilePicUrl = null;
+    let profilePicUrl = currentUser.profilePicture || "/images/default-profile.png";
 
-    // If new picture selected → upload to backend
+    // Upload new picture if selected
     if (file) {
       const formData = new FormData();
-      formData.append("profilePic", file);
+      formData.append("profilePicture", file);
 
-      const uploadRes = await fetch(`${backend_URL}/users/profile-pic`, {
-        method: "POST",
+      const uploadRes = await fetch(`${backend_URL}/user/profile-picture`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
       const data = await uploadRes.json();
-      profilePicUrl = data.profilePicUrl;
+      if (!uploadRes.ok) throw new Error(data.message || "Failed to upload profile picture");
+      profilePicUrl = data.profilePicture || profilePicUrl;
     }
 
-    // Update user details in backend
-    await fetch(`${backend_URL}/users/${currentUserId}`, {
+    // Update user info
+    const updateRes = await fetch(`${backend_URL}/user/${currentUser.id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fname, lname, username, email, phoneNumber }),
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ firstname: fname, lastname: lname, username, email, phoneNumber }),
     });
+    const updatedUser = await updateRes.json();
+    if (!updateRes.ok) throw new Error(updatedUser.message || "Failed to update profile");
+
+    // Update localStorage
+    const newUser = { ...currentUser, ...updatedUser, profilePicture: profilePicUrl };
+    localStorage.setItem("currentUser", JSON.stringify(newUser));
 
     // Update UI
-    UserOverviewUname.forEach((name) => (name.textContent = username));
-    UserOverviewFullname.textContent = `${fname} ${lname}`;
-    UserOverviewEmail.textContent = email;
-    UserOverviewPhone.textContent = phoneNumber;
-    profilePic.forEach(
-      (pic) => (pic.src = profilePicUrl || "/images/default-profile.png")
-    );
+    loadUserProfile();
 
     showToast("Profile updated successfully!", "success");
 
@@ -117,9 +130,9 @@ profileUpdateForm.addEventListener("submit", async (e) => {
     uploadContent.classList.remove("hidden");
     dropText.style.display = "none";
     fileInput.value = "";
-  } catch (error) {
-    console.error("Error updating profile:", error);
-    showToast("Failed to update profile", "error");
+  } catch (err) {
+    console.error("Error updating profile:", err);
+    showToast(err.message || "Failed to update profile", "error");
   }
 });
 
@@ -131,24 +144,3 @@ cancelEdit.addEventListener("click", () => {
   dropText.style.display = "none";
   fileInput.value = "";
 });
-
-// ===== Load User on Login =====
-async function loadUserProfile() {
-  try {
-    const res = await fetch(`${backend_URL}/users/${currentUserId}`);
-    const user = await res.json();
-
-    UserOverviewFullname.textContent = `${user.fname} ${user.lname}`;
-    UserOverviewEmail.textContent = user.email;
-    UserOverviewPhone.textContent = user.phoneNumber;
-    UserOverviewUname.forEach((name) => (name.textContent = user.username));
-    profilePic.forEach(
-      (pic) => (pic.src = user.profilePicUrl || "/images/default-profile.png")
-    );
-  } catch (err) {
-    console.error("Error loading profile:", err);
-  }
-}
-
-// Call when user logs in
-loadUserProfile();
