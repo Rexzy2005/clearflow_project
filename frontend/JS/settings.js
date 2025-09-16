@@ -1,8 +1,9 @@
 import { showToast } from "./utils/notification.js";
 
-const cancelEdit = document.getElementById('cancelEdit');
+const backend_URL = "https://clearflow-project.onrender.com/api"; // backend
 
-// profile overview elements
+// DOM elements
+const cancelEdit = document.getElementById("cancelEdit");
 const UserOverviewFullname = document.getElementById("UserOverviewFullname");
 const UserOverviewUname = document.querySelectorAll("#UserOverviewUname");
 const UserOverviewEmail = document.getElementById("UserOverviewEmail");
@@ -16,10 +17,12 @@ const previewWrapper = document.getElementById("previewWrapper");
 const uploadContent = document.getElementById("uploadContent");
 const dropText = document.getElementById("dropText");
 const profilePic = document.querySelectorAll("#userProfilePic");
-const profileUpdateForm = document.getElementById('profileUpdateForm')
+const profileUpdateForm = document.getElementById("profileUpdateForm");
+
+// Simulating logged-in user (id = "1")
+const currentUserId = "1";
 
 uploadBtn.addEventListener("click", () => fileInput.click());
-
 fileInput.addEventListener("change", handleFile);
 
 uploadBox.addEventListener("dragover", (e) => {
@@ -39,11 +42,11 @@ uploadBox.addEventListener("dragleave", (e) => {
 uploadBox.addEventListener("drop", (e) => {
   e.preventDefault();
   uploadBox.classList.remove("dragover");
-  // uploadContent.classList.remove("hidden");
   dropText.style.display = "none";
   const file = e.dataTransfer.files[0];
   if (file) showPreview(file);
 });
+
 function handleFile(e) {
   const file = e.target.files[0];
   if (file) showPreview(file);
@@ -63,60 +66,89 @@ function showPreview(file) {
   }
 }
 
-// On submission, move image to profile pic
-profileUpdateForm.addEventListener("submit", (e) => {
+// ===== Update Profile =====
+profileUpdateForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // user personal info
   const fname = document.getElementById("fname").value.trim();
   const lname = document.getElementById("lname").value.trim();
   const username = document.getElementById("username").value.trim();
   const email = document.getElementById("email").value.trim();
   const phoneNumber = document.getElementById("phone-number").value.trim();
+  const file = fileInput.files[0];
 
-  if (preview.src) {
-    profilePic.forEach(pic => {
-      pic.src = `${preview.src}`
-    })
-    // profilePic.innerHTML = `<img src="${preview.src}" alt="Profile">`;
+  try {
+    let profilePicUrl = null;
+
+    // If new picture selected → upload to backend
+    if (file) {
+      const formData = new FormData();
+      formData.append("profilePic", file);
+
+      const uploadRes = await fetch(`${backend_URL}/users/profile-pic`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await uploadRes.json();
+      profilePicUrl = data.profilePicUrl;
+    }
+
+    // Update user details in backend
+    await fetch(`${backend_URL}/users/${currentUserId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fname, lname, username, email, phoneNumber }),
+    });
+
+    // Update UI
+    UserOverviewUname.forEach((name) => (name.textContent = username));
+    UserOverviewFullname.textContent = `${fname} ${lname}`;
+    UserOverviewEmail.textContent = email;
+    UserOverviewPhone.textContent = phoneNumber;
+    profilePic.forEach(
+      (pic) => (pic.src = profilePicUrl || "/images/default-profile.png")
+    );
+
+    showToast("Profile updated successfully!", "success");
+
+    // Reset upload box
+    preview.src = "";
+    previewWrapper.style.display = "none";
+    uploadContent.classList.remove("hidden");
+    dropText.style.display = "none";
+    fileInput.value = "";
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    showToast("Failed to update profile", "error");
   }
-  // Reset upload box
-  preview.src = "";
-  previewWrapper.style.display = "none";
-  uploadContent.classList.remove("hidden");
-  dropText.style.display = "none";
-  fileInput.value = "";
-
-  UserOverviewUname.forEach(name => {
-    name.textContent = username;
-  })
-  
-  UserOverviewFullname.textContent = `${fname} ${lname}`;
-  UserOverviewEmail.textContent = email;
-  UserOverviewPhone.textContent = phoneNumber;
-
-  fname.value = ""
-   lname.value = ""
-   username.value = ""
-   email.value = ""
-   phoneNumber.value = ""
 });
 
-
-cancelEdit.addEventListener("click", (e) => {
-  // Reset upload box
+// ===== Cancel Edit =====
+cancelEdit.addEventListener("click", () => {
   preview.src = "";
   previewWrapper.style.display = "none";
   uploadContent.classList.remove("hidden");
   dropText.style.display = "none";
   fileInput.value = "";
+});
 
-   fname.value = ""
-   lname.value = ""
-   username.value = ""
-   email.value = ""
-   phoneNumber.value = ""
-  
-})
+// ===== Load User on Login =====
+async function loadUserProfile() {
+  try {
+    const res = await fetch(`${backend_URL}/users/${currentUserId}`);
+    const user = await res.json();
 
+    UserOverviewFullname.textContent = `${user.fname} ${user.lname}`;
+    UserOverviewEmail.textContent = user.email;
+    UserOverviewPhone.textContent = user.phoneNumber;
+    UserOverviewUname.forEach((name) => (name.textContent = user.username));
+    profilePic.forEach(
+      (pic) => (pic.src = user.profilePicUrl || "/images/default-profile.png")
+    );
+  } catch (err) {
+    console.error("Error loading profile:", err);
+  }
+}
 
+// Call when user logs in
+loadUserProfile();
