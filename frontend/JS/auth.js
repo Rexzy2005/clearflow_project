@@ -350,7 +350,7 @@ if (loginForm) {
         localStorage.setItem("currentUser", JSON.stringify(data.user));
 
         localStorage.setItem("toastMessage", JSON.stringify({
-          text: `Login Successful! Welcome back, ${email}.`,
+          text: `Login Successful! Welcome back, ${data.user.username}.`,
           type: "success"
         }));
         clearFormInputs(loginForm);
