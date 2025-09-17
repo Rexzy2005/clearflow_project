@@ -151,7 +151,7 @@ function loadUserProfile() {
   //UserOverviewEmail.textContent = currentUser.email || "";
   UserOverviewEmail.forEach((Ovemail) => (Ovemail.textContent = currentUser.email || ""));
   UserOverviewPhone.textContent = currentUser.phoneNumber || "";
-  UserOverviewUname.forEach((name) => (name.textContent = currentUser.username || ""));
+  UserOverviewUname.forEach((name) => (name.textContent = `@${currentUser.username}` || ""));
   profilePic.forEach((pic) => { pic.src = currentUser.profilePicture || DEFAULT_PROFILE; pic.onerror = () => (pic.src = DEFAULT_PROFILE); });
 }
 loadUserProfile();
