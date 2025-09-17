@@ -7,7 +7,7 @@ const DEFAULT_PROFILE = "./default_profile_pic/default_user_img.png";
 const cancelEdit = document.getElementById("cancelEdit");
 const UserOverviewFullname = document.getElementById("UserOverviewFullname");
 const UserOverviewUname = document.querySelectorAll("#UserOverviewUname");
-const UserOverviewEmail = document.getElementById("UserOverviewEmail");
+const UserOverviewEmail = document.querySelectorAll("UserOverviewEmail");
 const UserOverviewPhone = document.getElementById("UserOverviewPhone");
 const uploadBox = document.getElementById("uploadBox");
 const fileInput = document.getElementById("fileInput");
@@ -148,7 +148,8 @@ function showPreview(file) {
 // ===== Load user profile =====
 function loadUserProfile() {
   UserOverviewFullname.textContent = `${currentUser.firstname || ""} ${currentUser.lastname || ""}`;
-  UserOverviewEmail.textContent = currentUser.email || "";
+  // UserOverviewEmail.textContent = currentUser.email || "";
+  UserOverviewEmail.forEach((Ovemail) => (Ovemail.textContent = currentUser.email || ""));
   UserOverviewPhone.textContent = currentUser.phoneNumber || "";
   UserOverviewUname.forEach((name) => (name.textContent = currentUser.username || ""));
   profilePic.forEach((pic) => { pic.src = currentUser.profilePicture || DEFAULT_PROFILE; pic.onerror = () => (pic.src = DEFAULT_PROFILE); });
