@@ -148,8 +148,8 @@ function showPreview(file) {
 // ===== Load user profile =====
 function loadUserProfile() {
   UserOverviewFullname.textContent = `${currentUser.firstname || ""} ${currentUser.lastname || ""}`;
-  // UserOverviewEmail.textContent = currentUser.email || "";
-  UserOverviewEmail.forEach((Ovemail) => (Ovemail.textContent = currentUser.Ovemail || ""));
+  UserOverviewEmail.textContent = currentUser.email || "";
+  //UserOverviewEmail.forEach((Ovemail) => (Ovemail.textContent = currentUser.Ovemail || ""));
   UserOverviewPhone.textContent = currentUser.phoneNumber || "";
   UserOverviewUname.forEach((name) => (name.textContent = currentUser.username || ""));
   profilePic.forEach((pic) => { pic.src = currentUser.profilePicture || DEFAULT_PROFILE; pic.onerror = () => (pic.src = DEFAULT_PROFILE); });
