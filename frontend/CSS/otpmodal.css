@@ -33,27 +33,28 @@
 
 .otp-inputs {
   display: flex;
+  gap: 10px;
   justify-content: space-between;
   margin-bottom: 1.5rem;
 }
 
 .otp-box {
-  width: 55px;
-  height: 55px;
-  font-size: 22px;
+  width: 100px;
+  height: 100px;
+  font-size: 75px;
   text-align: center;
-  border: 2px solid #007BFF;
+  border: 1px solid #007BFF;
   border-radius: 8px;
   outline: none;
   transition: 0.2s;
 }
 
 .otp-box:focus {
-  border-color: #0056b3;
+  border: 2px solid #0056b3;
   box-shadow: 0 0 6px rgba(0, 91, 187, 0.6);
 }
 
-#verify-otp-btn {
+.verify-button {
   background: var(--primary-color);
   color: white;
   border: none;
@@ -64,6 +65,6 @@
   transition: all .3s ease-in-out;
 }
 
-#verify-otp-btn:hover {
+.verify-button:hover {
   background: #0056b3;
 }

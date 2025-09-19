@@ -85,9 +85,26 @@ async function showOtpModal(message, updates) {
       if (e.key === "Backspace" && !e.target.value && idx > 0) inputs[idx - 1].focus();
     });
   });
+  // timer count
+  const countText = document.createElement("p");
+  const count = document.createElement("span");
+  countText.className = "count-text";
+  count.className = "count";
+  countText.textContent = "Remaining Time:"
+  
+  // resend
+  const resendText = document.createElement("p");
+  const resendBtn = document.createElement("span");
+  resendText.className = "resend-text";
+  resendBtn.className = "resend";
+  resendText.textContent = "didn’t get the code?";
+  resendBtn.textContent = "Resend";
+
+
 
   // Verify button
   const verifyBtn = document.createElement("button");
+  verifyBtn.className = "verify-button";
   verifyBtn.textContent = "Verify OTP";
   verifyBtn.addEventListener("click", async () => {
     const otp = inputs.map((input) => input.value).join("");
@@ -119,9 +136,12 @@ async function showOtpModal(message, updates) {
       setButtonLoading(verifyBtn, "reset");
     }
   });
-
+  countText.appendChild(count);
+  resendText.appendChild(resendBtn);
   modalBox.appendChild(msg);
   modalBox.appendChild(otpWrapper);
+  modalBox.appendChild(countText);
+  modalBox.appendChild(resendText);
   modalBox.appendChild(verifyBtn);
   overlay.appendChild(modalBox);
   document.body.appendChild(overlay);

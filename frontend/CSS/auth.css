@@ -304,10 +304,14 @@ body {
         text-align: center;
         font-weight: 400;
         outline: none;
+        &:focus{
+          border: 2px solid #2b59ff9a;
+          box-shadow: 0 10px -5px #2b59ff9a;
+        }
 
         &:valid {
-          border-color: #2b59ff9a;
-          box-shadow: 0 10px -5px #2b59ff9a;
+          border-color: #9BDE30;
+          box-shadow: 0 10px -5px #9BDE309a;
         }
       }
     }
