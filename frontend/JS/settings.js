@@ -149,51 +149,8 @@ async function showOtpModal(message, updates) {
   document.body.appendChild(overlay);
 
   inputs[0].focus();
-  startOtpTimer(60)
 }
-function startOtpTimer(initialSec = 60) {
-  const countEl = document.querySelector(".count");
-  const resendEl = document.querySelector(".resend-text");
-  const resendClick = document.querySelector(".resend");
 
-  if (!countEl || !resendEl) return;
-
-  let time = initialSec;
-  const savedTime = sessionStorage.getItem("otpTimeLeft");
-  if (savedTime) {
-    const parsed = parseInt(savedTime, 10);
-  }
-  if (!isNaN(parsed) && parsed > 0) {
-    time = parsed;
-  }
-  if (resendClick) {
-    resendClick.style.display = "none";
-  }
-  if (otpInterval) {
-    clearInterval(otpInterval);
-  }
-
-  countEl.textContent`${time}s`;
-  otpInterval = setInterval(() => {
-    time--;
-    if (time > 0) {
-      countEl.textContent = `${time}s`;
-      sessionStorage.setItem("otpTimeLeft", time);
-    } else {
-      clearInterval(otpInterval);
-      otpInterval = null;
-      countEl.textContent = "Expired";
-      if (resendEl) resendEl.style.display = "block";
-      sessionStorage.removeItem("otpTimeLeft");
-    }
-  }, 1000);
-
-  // resendClick.onclick = async (e) => {
-  //   e.preventDefault();
-  //   resendClick.disabled = true;
-  //   const email = getOtpEmail();
-  // }
-}
 
 // ===== Upload preview =====
 uploadBtn.addEventListener("click", (e) => { 
