@@ -1,4 +1,3 @@
-import { parse } from "path";
 import { showToast } from "./utils/notification.js";
 
 const backend_URL = "https://clearflow-project.onrender.com/api";
@@ -47,7 +46,6 @@ function setButtonLoading(btn, action = "set", text = "Saving...") {
 
 // ===== OTP Modal (4-Digit Inline) =====
 async function showOtpModal(message, updates) {
-  let otpInterval = null;
   // Remove existing modal
   const existingModal = document.querySelector(".custom-modal");
   if (existingModal) existingModal.remove();
@@ -87,26 +85,9 @@ async function showOtpModal(message, updates) {
       if (e.key === "Backspace" && !e.target.value && idx > 0) inputs[idx - 1].focus();
     });
   });
-  // timer count
-  const countText = document.createElement("p");
-  const count = document.createElement("span");
-  countText.className = "count-text";
-  count.className = "count";
-  countText.textContent = "Remaining Time:"
-
-  // resend
-  const resendText = document.createElement("p");
-  const resendBtn = document.createElement("span");
-  resendText.className = "resend-text";
-  resendBtn.className = "resend";
-  resendText.textContent = "didn’t get the code?";
-  resendBtn.textContent = "Resend";
-
-
 
   // Verify button
   const verifyBtn = document.createElement("button");
-  verifyBtn.className = "verify-button";
   verifyBtn.textContent = "Verify OTP";
   verifyBtn.addEventListener("click", async () => {
     const otp = inputs.map((input) => input.value).join("");
@@ -138,12 +119,9 @@ async function showOtpModal(message, updates) {
       setButtonLoading(verifyBtn, "reset");
     }
   });
-  countText.appendChild(count);
-  resendText.appendChild(resendBtn);
+
   modalBox.appendChild(msg);
   modalBox.appendChild(otpWrapper);
-  modalBox.appendChild(countText);
-  modalBox.appendChild(resendText);
   modalBox.appendChild(verifyBtn);
   overlay.appendChild(modalBox);
   document.body.appendChild(overlay);
@@ -151,47 +129,17 @@ async function showOtpModal(message, updates) {
   inputs[0].focus();
 }
 
-
 // ===== Upload preview =====
-uploadBtn.addEventListener("click", (e) => { 
-  e.preventDefault(); 
-  fileInput.click(); 
-});
+uploadBtn.addEventListener("click", (e) => { e.preventDefault(); fileInput.click(); });
 fileInput.addEventListener("change", handleFile);
-uploadBox.addEventListener("dragover", (e) => { 
-  e.preventDefault(); 
-  uploadBox.classList.add("dragover"); 
-  uploadContent.classList.add("hidden"); 
-  dropText.style.display = "block"; 
-});
-uploadBox.addEventListener("dragleave", (e) => { 
-  e.preventDefault(); 
-  uploadBox.classList.remove("dragover"); 
-  uploadContent.classList.remove("hidden"); 
-  dropText.style.display = "none"; 
-});
-uploadBox.addEventListener("drop", (e) => { 
-  e.preventDefault(); 
-  uploadBox.classList.remove("dragover"); 
-  dropText.style.display = "none"; 
-  const file = e.dataTransfer.files[0]; 
-  if (file) showPreview(file); 
-});
-function handleFile(e) { 
-  const file = e.target.files[0]; 
-  if (file) showPreview(file); 
-}
-
+uploadBox.addEventListener("dragover", (e) => { e.preventDefault(); uploadBox.classList.add("dragover"); uploadContent.classList.add("hidden"); dropText.style.display = "block"; });
+uploadBox.addEventListener("dragleave", (e) => { e.preventDefault(); uploadBox.classList.remove("dragover"); uploadContent.classList.remove("hidden"); dropText.style.display = "none"; });
+uploadBox.addEventListener("drop", (e) => { e.preventDefault(); uploadBox.classList.remove("dragover"); dropText.style.display = "none"; const file = e.dataTransfer.files[0]; if (file) showPreview(file); });
+function handleFile(e) { const file = e.target.files[0]; if (file) showPreview(file); }
 function showPreview(file) {
   const MAX_SIZE = 2 * 1024 * 1024;
-  if (!["image/png", "image/jpeg"].includes(file.type)) {
-    showToast("Only PNG and JPEG files are allowed!", "error");
-    return;
-  }
-  if (file.size > MAX_SIZE) {
-    showToast("File size must be less than 2MB!", "error");
-    return;
-  }
+  if (!["image/png", "image/jpeg"].includes(file.type)) { showToast("Only PNG and JPEG files are allowed!", "error"); return; }
+  if (file.size > MAX_SIZE) { showToast("File size must be less than 2MB!", "error"); return; }
   const reader = new FileReader();
   reader.onload = function (e) { preview.src = e.target.result; previewWrapper.style.display = "flex"; uploadContent.classList.add("hidden"); };
   reader.readAsDataURL(file);
