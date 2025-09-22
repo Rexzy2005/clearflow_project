@@ -1,4 +1,3 @@
-const backend_URL = "https://clearflow-project.onrender.com";
 // Logout function
 async function logoutUser() {
   const token = localStorage.getItem("token");
@@ -10,7 +9,7 @@ async function logoutUser() {
 
   try {
     const res = await fetch(`${backend_URL}/api/auth/logout`, {
-      method: "POST",  // Same as backend logout method
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
@@ -20,17 +19,20 @@ async function logoutUser() {
     const data = await res.json();
 
     if (res.ok) {
-      // Clear all user data
+      // Clear user data
       localStorage.removeItem("token");
       localStorage.removeItem("currentUser");
 
-      // Optional: Add logout toast message
+      // Reset section state to default (dashboard)
+      localStorage.setItem("activeSection", "dashboard");
+
+      // Optional: toast for logout
       localStorage.setItem("toastMessage", JSON.stringify({
         text: data.message || "Logged out successfully.",
         type: "success"
       }));
 
-      // Redirect to login
+      // Redirect to login page
       window.location.href = "login.html";
     } else {
       showModal("Logout Failed", data.error || "Unable to logout.");
@@ -41,7 +43,7 @@ async function logoutUser() {
   }
 }
 
-// Attach event listener
+// Attach logout to button
 const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
   logoutBtn.addEventListener("click", logoutUser);
