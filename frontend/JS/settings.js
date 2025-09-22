@@ -54,7 +54,7 @@ function setButtonLoading(btn, action = "set", text = "Saving...") {
 async function showOtpModal(message, updates) {
   // Remove existing modal and any timers
   const existingModal = document.querySelector(".custom-modal");
-  // if (existingModal) existingModal.remove();
+  if (existingModal) existingModal.remove();
 
   let countdown = 60; 
   let timerInterval = null;
@@ -83,12 +83,16 @@ async function showOtpModal(message, updates) {
 
   const resendText = document.createElement("span");
   resendText.className = "resend-text";
+  resendText.textContent = "didn’t get the code? ";
+
   const resendBtn = document.createElement("button");
   resendBtn.className = "resend-button";
-  resendText.textContent = `didn’t get the code? ${resendBtn.textContent = "Resend"}`;
+  resendBtn.textContent = "Resend";
 
   resendBtn.disabled = true;
   resendText.style.display = "none";
+
+  resendText.appendChild(resendBtn);
 
   timerRow.appendChild(timerText);
   timerRow.appendChild(resendText);
