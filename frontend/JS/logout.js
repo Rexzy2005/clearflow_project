@@ -1,9 +1,12 @@
+const backend_URL = "https://clearflow-project.onrender.com";
+import { showToast } from "./utils/notification.js";
+
 // Logout function
 async function logoutUser() {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    showModal("Logout", "You are not logged in!");
+    showToast("You are not logged in!", "warning");
     return;
   }
 
@@ -36,10 +39,12 @@ async function logoutUser() {
       window.location.href = "login.html";
     } else {
       showModal("Logout Failed", data.error || "Unable to logout.");
+      showToast(data.error || "Unable to logout.", "error");
     }
   } catch (err) {
     console.error("Logout error:", err);
     showModal("Error", "Something went wrong. Try again later.");
+    showToast("Something went wrong. Try again later.", "error");
   }
 }
 
