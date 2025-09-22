@@ -54,7 +54,7 @@ function setButtonLoading(btn, action = "set", text = "Saving...") {
 async function showOtpModal(message, updates) {
   // Remove existing modal and any timers
   const existingModal = document.querySelector(".custom-modal");
-  if (existingModal) existingModal.remove();
+  // if (existingModal) existingModal.remove();
 
   let countdown = 60; 
   let timerInterval = null;
