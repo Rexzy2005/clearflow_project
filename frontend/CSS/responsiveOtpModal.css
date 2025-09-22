@@ -1,0 +1,32 @@
+.modal-overlay {
+  padding: 0px;
+  align-items: last baseline;
+
+  & .modal-box {
+    max-width: 1000px;
+    padding: 20px;
+    border-top-right-radius: 20px;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+
+    & .otp-inputs {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+
+      & .otp-box {
+        width: 80px;
+        height: 80px;
+        font-size: 40px;
+      }
+
+      & .verify-button {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+      }
+    }
+  }
+}

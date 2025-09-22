@@ -50,98 +50,13 @@ function setButtonLoading(btn, action = "set", text = "Saving...") {
   }
 }
 
-// // ===== OTP Modal (4-Digit Inline) =====
-// async function showOtpModal(message, updates) {
-//   // Remove existing modal
-//   const existingModal = document.querySelector(".custom-modal");
-//   if (existingModal) existingModal.remove();
-
-//   // Overlay
-//   const overlay = document.createElement("div");
-//   overlay.className = "modal-overlay custom-modal";
-
-//   // Modal box
-//   const modalBox = document.createElement("div");
-//   modalBox.className = "modal-box otp-modal";
-
-//   // Message
-//   const msg = document.createElement("p");
-//   msg.textContent = message;
-
-//   // OTP input container
-//   const otpWrapper = document.createElement("div");
-//   otpWrapper.className = "otp-inputs";
-//   const inputs = [];
-//   for (let i = 0; i < 4; i++) {
-//     const input = document.createElement("input");
-//     input.type = "text";
-//     input.maxLength = 1;
-//     input.className = "otp-box";
-//     otpWrapper.appendChild(input);
-//     inputs.push(input);
-//   }
-
-//   // Auto-focus logic
-//   inputs.forEach((input, idx) => {
-//     input.addEventListener("input", (e) => {
-//       e.target.value = e.target.value.replace(/[^0-9]/g, "");
-//       if (e.target.value && idx < inputs.length - 1) inputs[idx + 1].focus();
-//     });
-//     input.addEventListener("keydown", (e) => {
-//       if (e.key === "Backspace" && !e.target.value && idx > 0) inputs[idx - 1].focus();
-//     });
-//   });
-
-//   // Verify button
-//   const verifyBtn = document.createElement("button");
-//   verifyBtn.className = "verify-button";
-//   verifyBtn.textContent = "Verify";
-//   verifyBtn.addEventListener("click", async () => {
-//     const otp = inputs.map((input) => input.value).join("");
-//     if (otp.length < 4) {
-//       showToast("Please enter all 4 digits of the OTP.", "error");
-//       return;
-//     }
-
-//     try {
-//       setButtonLoading(verifyBtn, "set", "Verifying...");
-//       const res = await fetch(`${backend_URL}/user/verify-otp`, {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-//         body: JSON.stringify({ otp }),
-//       });
-//       const data = await res.json();
-//       if (!res.ok) throw new Error(data.error || "Invalid OTP");
-
-//       // Update local user after verification
-//       currentUser = { ...currentUser, ...updates };
-//       localStorage.setItem("currentUser", JSON.stringify(currentUser));
-//       loadUserProfile();
-//       showToast("Profile updated successfully!", "success");
-//       overlay.remove();
-//     } catch (err) {
-//       console.error(err);
-//       showToast(err.message || "OTP verification failed", "error");
-//     } finally {
-//       setButtonLoading(verifyBtn, "reset");
-//     }
-//   });
-
-//   modalBox.appendChild(msg);
-//   modalBox.appendChild(otpWrapper);
-//   modalBox.appendChild(verifyBtn);
-//   overlay.appendChild(modalBox);
-//   document.body.appendChild(overlay);
-
-//   inputs[0].focus();
-// }
 // ===== OTP Modal (4-Digit Inline) with timer, resend & auto-validate =====
 async function showOtpModal(message, updates) {
   // Remove existing modal and any timers
   const existingModal = document.querySelector(".custom-modal");
   if (existingModal) existingModal.remove();
 
-  let countdown = 60; // seconds - change if you want a different timeout
+  let countdown = 60; 
   let timerInterval = null;
   let isVerifying = false;
   let isResending = false;
@@ -157,22 +72,26 @@ async function showOtpModal(message, updates) {
   // Message
   const msg = document.createElement("p");
   msg.textContent = message;
+  msg.className = "message";
 
   // Timer & resend container
   const timerRow = document.createElement("div");
   timerRow.className = "otp-timer-row";
   const timerText = document.createElement("span");
   timerText.className = "otp-timer-text";
-  timerText.textContent = `Resend available in ${formatTime(countdown)}`;
+  timerText.textContent = `Remaining Time: ${formatTime(countdown)}`;
 
+  const resendText = document.createElement("span");
+  resendText.className = "resend-text";
   const resendBtn = document.createElement("button");
   resendBtn.className = "resend-button";
-  resendBtn.textContent = "Resend";
+  resendText.textContent = `didn’t get the code? ${resendBtn.textContent = "Resend"}`;
+
   resendBtn.disabled = true;
-  resendBtn.style.display = "none"; // hidden until timer expires
+  resendText.style.display = "none";
 
   timerRow.appendChild(timerText);
-  timerRow.appendChild(resendBtn);
+  timerRow.appendChild(resendText);
 
   // OTP input container
   const otpWrapper = document.createElement("div");
@@ -343,7 +262,7 @@ async function showOtpModal(message, updates) {
       showToast(err.message || "Failed to resend OTP", "error");
       // allow user to try resend again
       resendBtn.disabled = false;
-      resendBtn.textContent = "Resend OTP";
+      resendBtn.textContent = "Resend";
     } finally {
       isResending = false;
     }
@@ -357,9 +276,9 @@ async function showOtpModal(message, updates) {
   function startTimer() {
     // reset UI
     resendBtn.disabled = true;
-    resendBtn.style.display = "none";
+    resendText.style.display = "none";
     timerText.style.display = "inline";
-    timerText.textContent = `Resend available in ${formatTime(countdown)}`;
+    timerText.textContent = `Remaining Time: ${formatTime(countdown)}`;
 
     if (timerInterval) clearInterval(timerInterval);
     timerInterval = setInterval(() => {
@@ -367,11 +286,11 @@ async function showOtpModal(message, updates) {
       if (countdown <= 0) {
         clearInterval(timerInterval);
         timerText.style.display = "none";
-        resendBtn.style.display = "inline-block";
+        resendText.style.display = "inline-block";
         resendBtn.disabled = false;
-        resendBtn.textContent = "Resend OTP";
+        resendBtn.textContent = "Resend";
       } else {
-        timerText.textContent = `Resend available in ${formatTime(countdown)}`;
+        timerText.textContent = `Remaining Time: ${formatTime(countdown)}`;
       }
     }, 1000);
   }
@@ -493,7 +412,7 @@ profileUpdateForm.addEventListener("submit", async (e) => {
       if (!res.ok) throw new Error(data.error || "Failed to update profile");
 
       if (data.otpRequired) {
-        showOtpModal("An OTP has been sent to your email/phone. Enter it below to update your profile.", updates);
+        showOtpModal("An OTP has been sent to your email. Enter it below to update your profile.", updates);
         return;
       }
 
