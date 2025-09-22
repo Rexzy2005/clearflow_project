@@ -37,10 +37,12 @@ function setButtonLoading(btn, action = "set", text = "Saving...") {
     btn.disabled = true;
     btn.classList.add("loading");
     btn.innerHTML = `<div class="spinner"></div><span>${text}</span>`;
+    btn.style.pointerEvents = "not-allowed"
   } else if (action === "reset") {
     btn.disabled = false;
     btn.classList.remove("loading");
     btn.textContent = btn.dataset.originalText || "Save";
+    btn.style.pointerEvents = "all"
   }
 }
 
