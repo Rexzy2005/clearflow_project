@@ -36,8 +36,8 @@
         </div>
         <div class="dropdown" id="dropDown">
           <p class="notification-preference"><i class="fa-regular fa-bell"></i> Notification preference</p>
-          <p class="profile-settings"><i class="fa-solid fa-gears"></i> Profile-settings</p>
-          <p class="logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</p>
+          <p class="profile-settings" data-target="settings"><i class="fa-solid fa-gears"></i> Profile-settings</p>
+          <p class="logout" id="logoutBtn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</p>
         </div>
       </div>
 
@@ -413,24 +413,24 @@
                 <h2>Add New Device</h2>
                 <p>Configure a new water System</p>
                 <!-- <div class="form-group"> -->
-                  <label for="deviceName">Name of Device</label>
-                  <input type="text" id="deviceName" name="deviceName" placeholder="e.g Borehole filter" required>
+                <label for="deviceName">Name of Device</label>
+                <input type="text" id="deviceName" name="deviceName" placeholder="e.g Borehole filter" required>
 
-                  <label for="deviceId">Device ID</label>
-                  <input type="text" id="deviceId" name="deviceId" placeholder="e.g 2345-SF-44" required>
+                <label for="deviceId">Device ID</label>
+                <input type="text" id="deviceId" name="deviceId" placeholder="e.g 2345-SF-44" required>
 
-                  <label for="location">Location</label>
-                  <input type="text" id="location" name="location" placeholder="e.g Front Yard" required>
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" placeholder="e.g Front Yard" required>
 
-                  <label for="model">Model</label>
-                  <input list="models" id="model" name="model" placeholder="Select Model" required>
-                  <datalist id="models">
-                    <option value="CLEARFLOW-lite-2025">
-                    <option value="CLEARFLOW-pro-2025">
-                    <option value="CLEARFLOW-premium-2025">
-                  </datalist>
+                <label for="model">Model</label>
+                <input list="models" id="model" name="model" placeholder="Select Model" required>
+                <datalist id="models">
+                  <option value="CLEARFLOW-lite-2025">
+                  <option value="CLEARFLOW-pro-2025">
+                  <option value="CLEARFLOW-premium-2025">
+                </datalist>
 
-                  <button type="submit">Add Device</button>
+                <button type="submit">Add Device</button>
               </form>
             </div>
           </div>
@@ -870,6 +870,7 @@
     <script src="JS/utils/profiletoggle.js"></script>
     <script type="module" src="JS/utils/toggleBtn.js"></script>
     <script type="module" src="JS/settings.js"></script>
+    <script src="JS/logout.js"></script>
 </body>
 
 </html>
