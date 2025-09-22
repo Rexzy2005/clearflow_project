@@ -17,11 +17,15 @@ a {
 
 .spinner {
   border: 2px solid #f3f3f3;
-  border-top: 2px solid #3333339f;
+  border-top: 2px solid #33333375;
   border-radius: 50%;
   width: 14px;
   height: 14px;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  gap: 10px;
   animation: spin 1s linear infinite;
 }
 

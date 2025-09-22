@@ -66,12 +66,14 @@ function setButtonLoading(btn, action = "set", text = "Processing...") {
     btn.disabled = true;
     btn.classList.add("loading");
     btn.innerHTML = `<div class="spinner"></div><span>${text}</span>`;
-    btn.style.pointerEvents = "not-allowed"
+    btn.style.cursor = "not-allowed";
+    btn.style.pointerEvents = "none";
   } else if (action === "reset") {
     btn.disabled = false;
     btn.classList.remove("loading");
     btn.textContent = btn.dataset.originalText || "Submit";
-    btn.style.pointerEvents = "all"
+    btn.style.cursor = "pointer"; 
+    btn.style.pointerEvents = "auto";
   }
 }
 

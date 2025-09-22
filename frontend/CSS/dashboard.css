@@ -2125,6 +2125,10 @@ button {
                       cursor: pointer;
                       font-size: 16px;
                       transition: all .5s ease;
+
+                      & .spinner {
+                        font-family: "Nunito", sans-serif;
+                      }
                     }
 
                     & .cancel {
