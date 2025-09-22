@@ -94,7 +94,8 @@ async function showOtpModal(message, updates) {
 
   // Verify button
   const verifyBtn = document.createElement("button");
-  verifyBtn.textContent = "Verify OTP";
+  verifyBtn.className = "verify-button";
+  verifyBtn.textContent = "Verify";
   verifyBtn.addEventListener("click", async () => {
     const otp = inputs.map((input) => input.value).join("");
     if (otp.length < 4) {

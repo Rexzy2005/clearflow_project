@@ -2127,7 +2127,9 @@ button {
                       transition: all .5s ease;
 
                       & .spinner {
-                        font-family: "Nunito", sans-serif;
+                        span{
+                          font-family: "Nunito", sans-serif;
+                        }
                       }
                     }
 
