@@ -4,10 +4,8 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const multer = require("multer");
 const protect = require("../middlewares/authMiddleware");
 const User = require("../models/User");
-const crypto = require("crypto");
-const sendEmail = require("../utils/sendEmail"); 
-const generateOTP = require('../utils/generateOTP');
-
+const sendEmail = require("../utils/sendEmail");
+const generateOTP = require("../utils/generateOTP");
 
 const router = express.Router();
 
@@ -30,7 +28,7 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage });
 
 /**
- * 📌 Upload or Change Profile Picture (Token-based)
+ * 📌 Upload or Change Profile Picture
  */
 router.put(
   "/profile-picture",
@@ -66,7 +64,7 @@ router.put(
 );
 
 /**
- * 📌 Get User Profile (ID-based)
+ * 📌 Get User Profile
  */
 router.get("/:id", protect, async (req, res) => {
   try {
@@ -83,7 +81,7 @@ router.get("/:id", protect, async (req, res) => {
 });
 
 /**
- * 📌 Update User Info (Token-based) + OTP for sensitive fields
+ * 📌 Update User Info + OTP for sensitive fields
  */
 router.put("/me", protect, async (req, res) => {
   try {
@@ -108,28 +106,21 @@ router.put("/me", protect, async (req, res) => {
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // If updating sensitive fields, require OTP verification
     if (Object.keys(sensitiveFields).length > 0) {
       const otp = generateOTP();
       user.otp = otp;
-      user.otpExpire = Date.now() + 1 * 60 * 1000; // ⏳ 1 minute expiry
+      user.otpExpire = Date.now() + 1 * 60 * 1000; // 1 minute
       user.pendingUpdates = sensitiveFields;
 
       await user.save({ validateBeforeSave: false });
 
-      // ✅ Send OTP by email using helper
-      await sendEmail(
-        user.email,
-        "Your OTP Code - ClearFlow to updated your profile",
-        otp
-      );
+      await sendEmail(user.email, "Your OTP Code - ClearFlow", otp);
 
       return res.json({ otpRequired: true, message: "OTP sent to your email" });
     }
 
-    // If only non-sensitive fields
     Object.assign(user, updateData);
-    await user.save({ validateBeforeSave: false }); // ✅ Allow partial updates
+    await user.save({ validateBeforeSave: false });
 
     res.json(user);
   } catch (error) {
@@ -139,7 +130,7 @@ router.put("/me", protect, async (req, res) => {
 });
 
 /**
- *  Verify OTP & apply sensitive updates
+ * 📌 Verify OTP
  */
 router.post("/verify-otp", protect, async (req, res) => {
   try {
@@ -156,13 +147,11 @@ router.post("/verify-otp", protect, async (req, res) => {
       return res.status(400).json({ error: "Invalid OTP" });
     }
 
-    // Apply pending sensitive updates
     if (user.pendingUpdates) {
       Object.assign(user, user.pendingUpdates);
       user.pendingUpdates = undefined;
     }
 
-    // Clear OTP
     user.otp = undefined;
     user.otpExpire = undefined;
     await user.save({ validateBeforeSave: false });
@@ -173,35 +162,32 @@ router.post("/verify-otp", protect, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 /**
- * 📌 Resend OTP (for pending updates)
+ * 📌 Resend OTP (always works)
  */
 router.post("/resend-otp", protect, async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    if (!user.pendingUpdates || Object.keys(user.pendingUpdates).length === 0) {
-      return res.status(400).json({ error: "No pending updates requiring OTP" });
-    }
-
     const otp = generateOTP();
     user.otp = otp;
-    user.otpExpire = Date.now() + 1 * 60 * 1000; // ⏳ 1 min expiry
+    user.otpExpire = Date.now() + 1 * 60 * 1000; // 1 min
+
+    if (!user.pendingUpdates) {
+      user.pendingUpdates = {};
+    }
+
     await user.save({ validateBeforeSave: false });
 
-    await sendEmail(
-      user.email,
-      "Your OTP Code - ClearFlow to updated your profile",
-      otp
-    );
+    await sendEmail(user.email, "Your OTP Code - ClearFlow (Resent)", otp);
 
     res.json({ message: "OTP resent to your email" });
   } catch (error) {
     console.error("Resend OTP error:", error);
-    res.status(500).json({ error: "Failed to resend OTP", details: error.message });
+    res.status(500).json({ error: "Failed to resend OTP" });
   }
 });
-
 
 module.exports = router;
