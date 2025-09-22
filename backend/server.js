@@ -10,9 +10,9 @@ const app = express();
 // Middleware
 // app.use(cors());
 app.use(cors({
-  origin: "https://clearflowco.netlify.app", // frontend URL
+  origin: ["https://clearflowco.netlify.app","http://127.0.0.1:5501/"],
   methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true // if you need cookies/auth headers
+  credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
