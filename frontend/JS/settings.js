@@ -50,11 +50,101 @@ function setButtonLoading(btn, action = "set", text = "Saving...") {
   }
 }
 
-// ===== OTP Modal (4-Digit Inline) =====
+// // ===== OTP Modal (4-Digit Inline) =====
+// async function showOtpModal(message, updates) {
+//   // Remove existing modal
+//   const existingModal = document.querySelector(".custom-modal");
+//   if (existingModal) existingModal.remove();
+
+//   // Overlay
+//   const overlay = document.createElement("div");
+//   overlay.className = "modal-overlay custom-modal";
+
+//   // Modal box
+//   const modalBox = document.createElement("div");
+//   modalBox.className = "modal-box otp-modal";
+
+//   // Message
+//   const msg = document.createElement("p");
+//   msg.textContent = message;
+
+//   // OTP input container
+//   const otpWrapper = document.createElement("div");
+//   otpWrapper.className = "otp-inputs";
+//   const inputs = [];
+//   for (let i = 0; i < 4; i++) {
+//     const input = document.createElement("input");
+//     input.type = "text";
+//     input.maxLength = 1;
+//     input.className = "otp-box";
+//     otpWrapper.appendChild(input);
+//     inputs.push(input);
+//   }
+
+//   // Auto-focus logic
+//   inputs.forEach((input, idx) => {
+//     input.addEventListener("input", (e) => {
+//       e.target.value = e.target.value.replace(/[^0-9]/g, "");
+//       if (e.target.value && idx < inputs.length - 1) inputs[idx + 1].focus();
+//     });
+//     input.addEventListener("keydown", (e) => {
+//       if (e.key === "Backspace" && !e.target.value && idx > 0) inputs[idx - 1].focus();
+//     });
+//   });
+
+//   // Verify button
+//   const verifyBtn = document.createElement("button");
+//   verifyBtn.className = "verify-button";
+//   verifyBtn.textContent = "Verify";
+//   verifyBtn.addEventListener("click", async () => {
+//     const otp = inputs.map((input) => input.value).join("");
+//     if (otp.length < 4) {
+//       showToast("Please enter all 4 digits of the OTP.", "error");
+//       return;
+//     }
+
+//     try {
+//       setButtonLoading(verifyBtn, "set", "Verifying...");
+//       const res = await fetch(`${backend_URL}/user/verify-otp`, {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+//         body: JSON.stringify({ otp }),
+//       });
+//       const data = await res.json();
+//       if (!res.ok) throw new Error(data.error || "Invalid OTP");
+
+//       // Update local user after verification
+//       currentUser = { ...currentUser, ...updates };
+//       localStorage.setItem("currentUser", JSON.stringify(currentUser));
+//       loadUserProfile();
+//       showToast("Profile updated successfully!", "success");
+//       overlay.remove();
+//     } catch (err) {
+//       console.error(err);
+//       showToast(err.message || "OTP verification failed", "error");
+//     } finally {
+//       setButtonLoading(verifyBtn, "reset");
+//     }
+//   });
+
+//   modalBox.appendChild(msg);
+//   modalBox.appendChild(otpWrapper);
+//   modalBox.appendChild(verifyBtn);
+//   overlay.appendChild(modalBox);
+//   document.body.appendChild(overlay);
+
+//   inputs[0].focus();
+// }
+// ===== OTP Modal (4-Digit Inline) with timer, resend & auto-validate =====
 async function showOtpModal(message, updates) {
-  // Remove existing modal
+  // Remove existing modal and any timers
   const existingModal = document.querySelector(".custom-modal");
   if (existingModal) existingModal.remove();
+
+  let countdown = 60; // seconds - change if you want a different timeout
+  let timerInterval = null;
+  let isVerifying = false;
+  let isResending = false;
 
   // Overlay
   const overlay = document.createElement("div");
@@ -68,6 +158,22 @@ async function showOtpModal(message, updates) {
   const msg = document.createElement("p");
   msg.textContent = message;
 
+  // Timer & resend container
+  const timerRow = document.createElement("div");
+  timerRow.className = "otp-timer-row";
+  const timerText = document.createElement("span");
+  timerText.className = "otp-timer-text";
+  timerText.textContent = `Resend available in ${formatTime(countdown)}`;
+
+  const resendBtn = document.createElement("button");
+  resendBtn.className = "resend-button";
+  resendBtn.textContent = "Resend";
+  resendBtn.disabled = true;
+  resendBtn.style.display = "none"; // hidden until timer expires
+
+  timerRow.appendChild(timerText);
+  timerRow.appendChild(resendBtn);
+
   // OTP input container
   const otpWrapper = document.createElement("div");
   otpWrapper.className = "otp-inputs";
@@ -75,36 +181,91 @@ async function showOtpModal(message, updates) {
   for (let i = 0; i < 4; i++) {
     const input = document.createElement("input");
     input.type = "text";
+    input.inputMode = "numeric";
+    input.pattern = "[0-9]*";
     input.maxLength = 1;
     input.className = "otp-box";
+    input.autocomplete = "one-time-code";
     otpWrapper.appendChild(input);
     inputs.push(input);
   }
 
-  // Auto-focus logic
+  // Helper: format mm:ss
+  function formatTime(s) {
+    const mm = Math.floor(s / 60).toString().padStart(2, "0");
+    const ss = (s % 60).toString().padStart(2, "0");
+    return `${mm}:${ss}`;
+  }
+
+  // Helper: set border style for inputs
+  function setInputsState(state) {
+    // state: "neutral" | "error" | "success"
+    inputs.forEach((inp) => {
+      inp.classList.remove("otp-error", "otp-success");
+      inp.style.borderColor = "";
+    });
+    if (state === "error") {
+      inputs.forEach((inp) => {
+        inp.classList.add("otp-error");
+        inp.style.borderColor = "var(--danger, #e74c3c)"; // uses CSS var if present
+      });
+    } else if (state === "success") {
+      inputs.forEach((inp) => {
+        inp.classList.add("otp-success");
+        inp.style.borderColor = "var(--success, #2ecc71)";
+      });
+    }
+  }
+
+  // Clear input styling on typing
+  function clearErrorOnTyping() {
+    inputs.forEach((input) => {
+      input.addEventListener("input", () => {
+        // remove error styling as user types again
+        if (input.classList.contains("otp-error")) setInputsState("neutral");
+      }, { once: false });
+    });
+  }
+
+  clearErrorOnTyping();
+
+  // Move focus / backspace logic + auto-trigger verify when full
   inputs.forEach((input, idx) => {
     input.addEventListener("input", (e) => {
-      e.target.value = e.target.value.replace(/[^0-9]/g, "");
-      if (e.target.value && idx < inputs.length - 1) inputs[idx + 1].focus();
+      const value = e.target.value.replace(/[^0-9]/g, "");
+      e.target.value = value;
+      if (value && idx < inputs.length - 1) inputs[idx + 1].focus();
+
+      // If all digits filled, auto-verify (but avoid firing multiple times)
+      const otp = inputs.map(i => i.value).join("");
+      if (otp.length === inputs.length) {
+        // small debounce to allow last char to render
+        setTimeout(() => autoVerifyOtp(otp), 150);
+      }
     });
+
     input.addEventListener("keydown", (e) => {
-      if (e.key === "Backspace" && !e.target.value && idx > 0) inputs[idx - 1].focus();
+      if (e.key === "Backspace" && !e.target.value && idx > 0) {
+        inputs[idx - 1].focus();
+      }
+      // If user starts typing after error, clear error
+      if (input.classList.contains("otp-error")) {
+        setInputsState("neutral");
+      }
     });
   });
 
-  // Verify button
+  // Verify button (manual)
   const verifyBtn = document.createElement("button");
   verifyBtn.className = "verify-button";
   verifyBtn.textContent = "Verify";
-  verifyBtn.addEventListener("click", async () => {
-    const otp = inputs.map((input) => input.value).join("");
-    if (otp.length < 4) {
-      showToast("Please enter all 4 digits of the OTP.", "error");
-      return;
-    }
 
+  // Shared verify function
+  async function performVerify(otp) {
+    if (isVerifying) return;
+    isVerifying = true;
+    setButtonLoading(verifyBtn, "set", "Verifying...");
     try {
-      setButtonLoading(verifyBtn, "set", "Verifying...");
       const res = await fetch(`${backend_URL}/user/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -113,27 +274,134 @@ async function showOtpModal(message, updates) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Invalid OTP");
 
-      // Update local user after verification
+      // success
+      setInputsState("success");
+      // apply the updates to currentUser and UI
       currentUser = { ...currentUser, ...updates };
       localStorage.setItem("currentUser", JSON.stringify(currentUser));
       loadUserProfile();
       showToast("Profile updated successfully!", "success");
-      overlay.remove();
+
+      cleanupAndClose();
     } catch (err) {
       console.error(err);
+      // show red border & toast
+      setInputsState("error");
       showToast(err.message || "OTP verification failed", "error");
     } finally {
       setButtonLoading(verifyBtn, "reset");
+      isVerifying = false;
+    }
+  }
+
+  // Auto-verify wrapper (prevents double-calls if verifyBtn already clicked)
+  let autoVerifyTimeout = null;
+  function autoVerifyOtp(otp) {
+    if (isVerifying) return;
+    // debounce auto verify a tiny bit
+    if (autoVerifyTimeout) clearTimeout(autoVerifyTimeout);
+    autoVerifyTimeout = setTimeout(() => performVerify(otp), 200);
+  }
+
+  verifyBtn.addEventListener("click", () => {
+    const otp = inputs.map(i => i.value).join("");
+    if (otp.length < inputs.length) {
+      showToast("Please enter all 4 digits of the OTP.", "error");
+      return;
+    }
+    performVerify(otp);
+  });
+
+  // Resend logic
+  async function resendOtp() {
+    if (isResending) return;
+    isResending = true;
+    resendBtn.disabled = true;
+    resendBtn.textContent = "Resending...";
+    try {
+      // Try to send updates to backend so it knows context if needed
+      const res = await fetch(`${backend_URL}/user/resend-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ updates }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to resend OTP");
+
+      showToast(data.message || "OTP has been resent to your email.", "success");
+
+      // reset inputs and states
+      inputs.forEach(i => i.value = "");
+      setInputsState("neutral");
+      inputs[0].focus();
+
+      // restart timer
+      countdown = 60;
+      startTimer();
+    } catch (err) {
+      console.error(err);
+      showToast(err.message || "Failed to resend OTP", "error");
+      // allow user to try resend again
+      resendBtn.disabled = false;
+      resendBtn.textContent = "Resend OTP";
+    } finally {
+      isResending = false;
+    }
+  }
+
+  resendBtn.addEventListener("click", () => {
+    resendOtp();
+  });
+
+  // Timer function
+  function startTimer() {
+    // reset UI
+    resendBtn.disabled = true;
+    resendBtn.style.display = "none";
+    timerText.style.display = "inline";
+    timerText.textContent = `Resend available in ${formatTime(countdown)}`;
+
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      countdown--;
+      if (countdown <= 0) {
+        clearInterval(timerInterval);
+        timerText.style.display = "none";
+        resendBtn.style.display = "inline-block";
+        resendBtn.disabled = false;
+        resendBtn.textContent = "Resend OTP";
+      } else {
+        timerText.textContent = `Resend available in ${formatTime(countdown)}`;
+      }
+    }, 1000);
+  }
+
+  // Cleanup
+  function cleanupAndClose() {
+    if (timerInterval) clearInterval(timerInterval);
+    overlay.remove();
+  }
+
+  // If user clicks outside modal or we want close (you may want to prevent closing by outside click if desired)
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+      // optional: prevent closing while verifying/resending
+      if (!isVerifying && !isResending) cleanupAndClose();
     }
   });
 
+  // Compose modal
   modalBox.appendChild(msg);
   modalBox.appendChild(otpWrapper);
+  modalBox.appendChild(timerRow);
   modalBox.appendChild(verifyBtn);
   overlay.appendChild(modalBox);
   document.body.appendChild(overlay);
 
+  // initial focus
   inputs[0].focus();
+  // start timer
+  startTimer();
 }
 
 // ===== Upload preview =====
