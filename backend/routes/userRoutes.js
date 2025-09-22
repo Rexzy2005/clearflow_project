@@ -120,7 +120,7 @@ router.put("/me", protect, async (req, res) => {
       // ✅ Send OTP by email using helper
       await sendEmail(
         user.email,
-        "Your OTP Code - ClearFlow",
+        "Your OTP Code - ClearFlow to updated your profile",
         otp
       );
 
@@ -139,7 +139,7 @@ router.put("/me", protect, async (req, res) => {
 });
 
 /**
- * 📌 Verify OTP & apply sensitive updates
+ *  Verify OTP & apply sensitive updates
  */
 router.post("/verify-otp", protect, async (req, res) => {
   try {
@@ -173,5 +173,35 @@ router.post("/verify-otp", protect, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+/**
+ * 📌 Resend OTP (for pending updates)
+ */
+router.post("/resend-otp", protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    if (!user.pendingUpdates || Object.keys(user.pendingUpdates).length === 0) {
+      return res.status(400).json({ error: "No pending updates requiring OTP" });
+    }
+
+    const otp = generateOTP();
+    user.otp = otp;
+    user.otpExpire = Date.now() + 1 * 60 * 1000; // ⏳ 1 min expiry
+    await user.save({ validateBeforeSave: false });
+
+    await sendEmail(
+      user.email,
+      "Your OTP Code - ClearFlow to updated your profile",
+      otp
+    );
+
+    res.json({ message: "OTP resent to your email" });
+  } catch (error) {
+    console.error("Resend OTP error:", error);
+    res.status(500).json({ error: "Failed to resend OTP", details: error.message });
+  }
+});
+
 
 module.exports = router;

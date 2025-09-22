@@ -320,7 +320,7 @@ async function showOtpModal(message, updates) {
     resendBtn.textContent = "Resending...";
     try {
       // Try to send updates to backend so it knows context if needed
-      const res = await fetch(`${backend_URL}/auth/resend-otp`, {
+      const res = await fetch(`${backend_URL}/user/resend-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ updates }),
