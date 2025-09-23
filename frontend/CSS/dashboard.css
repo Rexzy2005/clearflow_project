@@ -1537,9 +1537,17 @@ button {
                 position: absolute;
                 right: 20px;
                 top: 20px;
-
+                cursor: pointer;
+                
                 & i {
+                  padding: 8px;
+                  border-radius: 50%;
+                  cursor: pointer;
                   font-size: 12px;
+                  transition: all .3s ease-in-out;
+                  &:hover{
+                    background: #0000001a;
+                  }
                 }
               }
             }
