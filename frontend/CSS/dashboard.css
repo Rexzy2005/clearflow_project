@@ -1563,7 +1563,7 @@ button {
                 margin-bottom: 1rem;
                 background: transparent;
                 width: 100%;
-                outline: none;
+                outline-color:var(--primary-color-light);
                 font-family: "Nunito", sans-serif;
                 color: #2C2C2C;
 
@@ -1581,6 +1581,8 @@ button {
                 border: 1px solid #D9D9D9;
                 font-family: "Nunito", sans-serif;
                 padding: 10px 8px;
+                margin-bottom: 25px;
+                outline-color: var(--primary-color-light);
 
                 &::placeholder {
                   font-size: 12px;
