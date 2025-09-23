@@ -1,12 +1,12 @@
 import { showToast } from "./utils/notification.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const scheduleFormWrapper = document.getElementById('schedule-form-wrapper');
+  const scheduleFormWrapper = document.querySelector('.schedule-form-wrapper');
   const scheduleBtn = document.getElementById("schedule-btn");
   const closeFormBtn = document.getElementById('close-form-btn');
 
   // const addDeviceFormWrapper = document.getElementById("schedule-form");
-  const scheduleForm = document.getElementById('schedule-form');
+  const scheduleForm = document.querySelector('.schedule-form');
 
   // ================= ADD DEVICE FORM UI =================
   scheduleBtn.addEventListener('click', (e) => {
