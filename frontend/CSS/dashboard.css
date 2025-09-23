@@ -1517,10 +1517,9 @@ button {
             & .form-top {
               position: relative;
               text-align: center;
-              border-bottom: 1px solid rgba(0, 0, 0, 0.45);
+              border-bottom: 1px solid #E5E7EB;
               width: 100%;
               padding: 15px 20px;
-              margin-bottom: 20px;
 
 
               & h1 {
@@ -1536,15 +1535,24 @@ button {
 
               & .close-icon {
                 position: absolute;
+                right: 20px;
+                top: 20px;
+
+                & i {
+                  font-size: 12px;
+                }
               }
             }
 
             & .schedule-input-fields {
+              padding: 20px;
+
               & label {
                 font-size: 12px;
                 font-weight: 300;
                 margin-bottom: 3px;
                 display: block;
+                font-family: "Nunito", sans-serif;
                 color: var(--gray-color);
               }
 
@@ -1556,6 +1564,7 @@ button {
                 background: transparent;
                 width: 100%;
                 outline: none;
+                font-family: "Nunito", sans-serif;
                 color: #2C2C2C;
 
                 &::placeholder {
@@ -1570,6 +1579,7 @@ button {
                 height: 100px;
                 resize: none;
                 border: 1px solid #D9D9D9;
+                font-family: "Nunito", sans-serif;
                 padding: 10px 8px;
 
                 &::placeholder {
@@ -1583,10 +1593,11 @@ button {
                 padding: 12px 8px;
                 border-radius: 8px;
                 border: none;
+                font-family: "Nunito", sans-serif;
                 outline: none;
                 background: var(--primary-color);
                 color: var(--white-bg);
-                font-size: 16px;
+                font-size: 12px;
                 cursor: pointer;
                 transition: all .3s ease-in-out;
 
