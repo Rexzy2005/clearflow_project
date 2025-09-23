@@ -1538,16 +1538,19 @@ button {
                 right: 20px;
                 top: 20px;
                 cursor: pointer;
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                display: grid;
+                place-content: center;
+                cursor: pointer;
+                transition: all .3s ease-in-out;
                 
                 & i {
-                  padding: 8px;
-                  border-radius: 50%;
-                  cursor: pointer;
                   font-size: 12px;
-                  transition: all .3s ease-in-out;
-                  &:hover{
-                    background: #0000001a;
-                  }
+                }
+                &:hover{
+                  background: #0000001a;
                 }
               }
             }
