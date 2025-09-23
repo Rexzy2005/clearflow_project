@@ -1571,7 +1571,7 @@ button {
                 margin-bottom: 1rem;
                 background: transparent;
                 width: 100%;
-                outline-color:var(--primary-color-light);
+                outline-color: #2b59ff73;
                 font-family: "Nunito", sans-serif;
                 color: #2C2C2C;
 
@@ -1590,7 +1590,7 @@ button {
                 font-family: "Nunito", sans-serif;
                 padding: 10px 8px;
                 margin-bottom: 25px;
-                outline-color: var(--primary-color-light);
+                outline-color: #2b59ff73;
 
                 &::placeholder {
                   font-size: 12px;
