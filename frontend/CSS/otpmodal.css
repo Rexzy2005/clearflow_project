@@ -35,7 +35,7 @@
     & .otp-timer-row{
       & .otp-timer-text{
         color: #333;
-        & .time{
+        & span{
           color: #2B59FF;
           font-weight: 500;
           cursor: not-allowed;
