@@ -79,7 +79,7 @@ async function showOtpModal(message, updates) {
   timerRow.className = "otp-timer-row";
   const timerText = document.createElement("span");
   timerText.className = "otp-timer-text";
-  timerText.textContent = `Remaining Time: ${formatTime(countdown)}`;
+  timerText.innerHTML = `Remaining Time: <span class="time">${formatTime(countdown)}</span>`;
 
   const resendText = document.createElement("span");
   resendText.className = "resend-text";

@@ -4,7 +4,7 @@
     align-items: last baseline;
 
     & .modal-box {
-      height: 50%;
+      height: 70%;
       max-width: 1000px;
       padding: 20px;
       border-top-right-radius: 20px;
@@ -27,7 +27,6 @@
       }
 
       & .verify-button {
-        width: 100%;
         padding: 10px;
         border-radius: 8px;
       }

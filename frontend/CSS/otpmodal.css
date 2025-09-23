@@ -11,6 +11,7 @@
   z-index: 2000;
   backdrop-filter: blur(20px);
   padding: 20px;
+
   & .modal-box {
     background: linear-gradient(to top, #79A6B2, #F3FBFD);
     max-width: 500px;
@@ -22,18 +23,42 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    gap: 20px;
     text-align: center;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+
     & p {
       font-size: 16px;
       margin-bottom: 1.5rem;
       color: #333;
     }
+    & .otp-timer-row{
+      & .otp-timer-text{
+        color: #333;
+        & .time{
+          color: #2B59FF;
+          font-weight: 500;
+          cursor: not-allowed;
+        }
+      }
+
+      & .resend-text{
+        color: #333;
+        & .resend-button{
+          border: none;
+          background: transparent;
+          color: #2B59FF;
+          cursor: pointer;
+        }
+      }
+    }
+
     & .otp-inputs {
       display: flex;
       gap: 10px;
       justify-content: space-between;
       margin-bottom: 1.5rem;
+
       & .otp-box {
         width: 100px;
         height: 100px;
@@ -43,15 +68,18 @@
         border-radius: 8px;
         outline: none;
         transition: 0.2s;
+
         &:focus {
           border: 2px solid #0056b3;
           box-shadow: 0 0 6px rgba(0, 91, 187, 0.6);
         }
       }
     }
+
     & .verify-button {
       background: var(--primary-color);
       color: white;
+      width: 100%;
       border: none;
       padding: 8px 16px;
       border-radius: 10px;
@@ -64,20 +92,16 @@
       justify-content: center;
       flex-direction: row;
       gap: 10px;
-    
+
       & span {
         font-family: "Nunito", sans-serif;
         font-size: 1rem;
       }
+
       &:hover {
         background: #0056b3;
       }
     }
-    
+
   }
 }
-
-
-
-
-
