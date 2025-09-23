@@ -1513,15 +1513,32 @@ button {
             /* padding: 20px; */
             max-width: 450px;
             width: 100%;
-            & .form-top{
+
+            & .form-top {
               position: relative;
               text-align: center;
-              & .close-icon{
+              border-bottom: 1px solid rgba(0, 0, 0, 0.45);
+              width: 100%;
+              padding: 15px 20px;
+
+
+              & h1 {
+                font-family: "Nunito", sans-serif;
+                font-size: 1rem;
+              }
+
+              & p {
+                font-size: 13px;
+                font-family: "Nunito", sans-serif;
+                color: rgba(0, 0, 0, 0.45);
+              }
+
+              & .close-icon {
                 position: absolute;
               }
             }
 
-            & .schedule-input-fields{
+            & .schedule-input-fields {
               & label {
                 font-size: 14px;
                 font-weight: 300;
@@ -1529,7 +1546,7 @@ button {
                 display: block;
                 color: var(--gray-color);
               }
-  
+
               & input {
                 border: 1px solid #2C2C2C;
                 padding: 12px 16px;
@@ -1539,14 +1556,14 @@ button {
                 width: 100%;
                 outline: none;
                 color: #2C2C2C;
-  
+
                 &::placeholder {
                   font-size: 14px;
                   color: #2C2C2C;
                   opacity: .5;
                 }
               }
-  
+
               & button {
                 width: 100%;
                 padding: 12px 8px;
@@ -1558,7 +1575,7 @@ button {
                 font-size: 16px;
                 cursor: pointer;
                 transition: all .3s ease-in-out;
-  
+
                 &:hover {
                   background: #194afc;
                 }
