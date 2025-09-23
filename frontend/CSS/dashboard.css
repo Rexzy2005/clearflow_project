@@ -1520,6 +1520,7 @@ button {
               border-bottom: 1px solid rgba(0, 0, 0, 0.45);
               width: 100%;
               padding: 15px 20px;
+              margin-bottom: 20px;
 
 
               & h1 {
@@ -1540,27 +1541,40 @@ button {
 
             & .schedule-input-fields {
               & label {
-                font-size: 14px;
+                font-size: 12px;
                 font-weight: 300;
-                margin-bottom: 8px;
+                margin-bottom: 3px;
                 display: block;
                 color: var(--gray-color);
               }
 
               & input {
-                border: 1px solid #2C2C2C;
-                padding: 12px 16px;
+                border: 1px solid #D9D9D9;
+                padding: 10px 16px;
                 border-radius: 8px;
-                margin-bottom: 24px;
+                margin-bottom: 1rem;
                 background: transparent;
                 width: 100%;
                 outline: none;
                 color: #2C2C2C;
 
                 &::placeholder {
-                  font-size: 14px;
-                  color: #2C2C2C;
-                  opacity: .5;
+                  font-size: 12px;
+                  color: rgba(126, 126, 135, 0.45);
+                }
+              }
+
+              & textarea {
+                width: 100%;
+                border-radius: 8px;
+                height: 100px;
+                resize: none;
+                border: 1px solid #D9D9D9;
+                padding: 10px 8px;
+
+                &::placeholder {
+                  font-size: 12px;
+                  color: rgba(126, 126, 135, 0.45);
                 }
               }
 
