@@ -411,6 +411,7 @@
                 <div class="icon-box" id="close-btn">
                   <img src="assets/icons/dashboard/close.svg" alt="">
                 </div>
+                
                 <h2>Add New Device</h2>
                 <p>Configure a new water System</p>
                 <!-- <div class="form-group"> -->
@@ -580,8 +581,46 @@
               <h1>Maintenance & Alerts</h1>
               <p>Track component health and maintenance schedule</p>
             </div>
-            <button class="btn"><img src="assets/icons/dashboard/add.svg" alt=""> Schedule Maintenance</button>
+            <button class="btn"><i class="fa-solid fa-plus"></i> Schedule Maintenance</button>
           </div>
+          <div class="schedule-form-wrapper">
+            <form action="" class="schedule-form">
+              <div class="form-top">
+                <div class="close-icon">
+                  <i class="fa-solid fa-xmark"></i>
+                </div>
+                <h1>Schedule Maintenance</h1>
+                <p>Log maintenance for your water system.</p>
+              </div>
+              <div class="schedule-input-fields">
+                <label for="device">Device*</label>
+                <input list="devices" id="device" name="device" placeholder="Select device" required>
+                <datalist id="devices">
+                  <option value="Device 1"></option>
+                  <option value="Device 2"></option>
+                  <option value="Device 3"></option>
+                </datalist>
+
+                <label for="device-type">Maintenance Type*</label>
+                <input list="types" id="device-type" name="device-type" placeholder="Select Type" required>
+                <datalist id="types">
+                  <option value="Type 1"></option>
+                  <option value="Type 2"></option>
+                  <option value="Type 3"></option>
+                </datalist>
+
+                <label for="description">Description</label>
+                <textarea name="description" id="description"></textarea>
+
+                <div class="date-input">
+                  <input type="date" name="date" id="date" placeholder="Select date">
+                </div>
+
+                <button type="submit">Schedule Maintenance</button>
+              </div>
+            </form>
+          </div>
+
           <div class="maintenance-section-content">
             <div class="view-for">
               <p>View maintenance for:</p>
@@ -716,10 +755,6 @@
               </div> -->
             </div>
           </div>
-
-
-
-
         </div>
 
         <!-- profile-section -->
