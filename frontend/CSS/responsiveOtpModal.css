@@ -6,7 +6,7 @@
     & .modal-box {
       height: 70%;
       max-width: 1000px;
-      padding: 20px;
+      padding: 40px 20px;
       border-top-right-radius: 20px;
       border-top-left-radius: 20px;
       border-bottom-left-radius: 0px;
