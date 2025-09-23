@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ================= ADD DEVICE FORM UI =================
   scheduleBtn.addEventListener('click', (e) => {
     e.preventDefault();
+  alert("clicked")
     if (scheduleFormWrapper) scheduleFormWrapper.style.display = "flex";
   });
 
