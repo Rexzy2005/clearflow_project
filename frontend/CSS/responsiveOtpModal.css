@@ -1,33 +1,36 @@
-.modal-overlay {
-  padding: 0px;
-  align-items: last baseline;
+@media (max-width: 834px) {
+  .modal-overlay {
+    padding: 0px;
+    align-items: last baseline;
 
-  & .modal-box {
-    height: 50%;
-    max-width: 1000px;
-    padding: 20px;
-    border-top-right-radius: 20px;
-    border-top-left-radius: 20px;
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
+    & .modal-box {
+      height: 50%;
+      max-width: 1000px;
+      padding: 20px;
+      border-top-right-radius: 20px;
+      border-top-left-radius: 20px;
+      border-bottom-left-radius: 0px;
+      border-bottom-right-radius: 0px;
 
-    & .otp-inputs {
-      display: flex;
-      gap: 10px;
-      justify-content: space-between;
-      margin-bottom: 1.5rem;
+      & .otp-inputs {
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
 
-      & .otp-box {
-        width: 80px;
-        height: 80px;
-        font-size: 40px;
+        & .otp-box {
+          width: 80px;
+          height: 80px;
+          font-size: 40px;
+        }
+
       }
 
-    }
-    & .verify-button {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
+      & .verify-button {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+      }
     }
   }
 }
