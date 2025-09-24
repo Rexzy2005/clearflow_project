@@ -7,37 +7,39 @@ const generateOTP = require('../utils/generateOTP');
 const passwordSchema = require('../utils/passwordValidator');
 
 // ======================= SIGNUP =======================
-exports.signup = async (req, res) => {
+router.post("/signup", async (req, res) => {
+  const { firstname, lastname, username, email, password } = req.body;
+
   try {
-    const { firstname, lastname, username, email, password } = req.body;
-
-    if (!passwordSchema.validate(password)) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Password must be at least 8 characters long, include uppercase, lowercase, 2 numbers, and a special character.",
-      });
+    // validation here...
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return res.status(400).json({ success: false, message: "Email already registered" });
     }
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ username });
     if (existingUser) {
-      return res.status(400).json({
+      return res.status(400).json({ success: false, message: "Username already taken" });
+    }
+
+    // password validation here...
+
+    // generate OTP
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    const otpExpire = Date.now() + 10 * 60 * 1000;
+
+    // ✅ Try sending email before saving
+    try {
+      await sendEmail(email, "Your OTP Code", otp);
+    } catch (err) {
+      console.error("❌ Email sending failed:", err.message);
+      return res.status(500).json({
         success: false,
-        message: "Email already registered. Please login or use another email.",
+        message: "Failed to send OTP email. User not created.",
       });
     }
 
-    const existinUser = await User.findOne({ username });
-    if (existinUser) {
-      return res.status(400).json({
-        success: false,
-        message: "Username already exists. Please login or use another username.",
-      });
-    }
-
-    const otp = generateOTP();
-    const otpExpire = new Date(Date.now() + 1 * 60 * 1000);
-
+    // ✅ Only save if email sent successfully
     const user = new User({
       firstname,
       lastname,
@@ -49,21 +51,18 @@ exports.signup = async (req, res) => {
     });
 
     await user.save();
-    await sendEmail(email, "Your OTP Code", otp);
 
-    return res.status(201).json({
+    res.status(201).json({
       success: true,
-      message: "OTP sent to email",
-      email, // send back for frontend storage
+      message: "User registered successfully, OTP sent",
+      email,
     });
   } catch (err) {
     console.error("❌ Signup error:", err);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to sign up. Please try again.",
-    });
+    res.status(500).json({ success: false, message: "Server error", error: err.message });
   }
-};
+});
+
 
 // ======================= VERIFY OTP =======================
 exports.verifyOTP = async (req, res) => {
