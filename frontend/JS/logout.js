@@ -38,13 +38,11 @@ async function logoutUser() {
       // Redirect to login page
       window.location.href = "login.html";
     } else {
-      showModal("Logout Failed", data.error || "Unable to logout.");
       showToast(data.error || "Unable to logout.", "error");
     }
   } catch (err) {
     console.error("Logout error:", err);
-    showModal("Error", "Something went wrong. Try again later.");
-    showToast("Something went wrong. Try again later.", "error");
+    showToast("Something went wrong. Try again later.","error" );
   }
 }
 
