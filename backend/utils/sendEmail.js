@@ -1,32 +1,24 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function sendEmail(to, subject, otp) {
   try {
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
-      secure: false, // true for port 465, false for others
-      auth: {
-        user: process.env.NODE_CODE_SENDING_EMAIL_ADDRESS,
-        pass: process.env.NODE_CODE_SENDING_EMAIL_PASSWORD,
-      },
-    });
-
-    const info = await transporter.sendMail({
-      from: `"ClearFlow" <${process.env.NODE_CODE_SENDING_EMAIL_ADDRESS}>`,
+    await resend.emails.send({
+      from: "ClearFlow <onboarding@resend.dev>",
       to,
       subject,
-      text: `Your OTP is: ${otp}`,
-      html: `<h2>ClearFlow Verification</h2>
-             <p>Your OTP code is: <b>${otp}</b></p>
-             <p>This code expires in 1 minute.</p>`,
+      html: `
+        <h2>ClearFlow Verification</h2>
+        <p>Your OTP code is: <b>${otp}</b></p>
+        <p>This code expires in 1 minute.</p>
+      `,
     });
 
-    console.log("✅ Email sent:", info.messageId);
-    return info;
+    console.log(`✅ Email sent successfully to ${to}`);
   } catch (err) {
     console.error("❌ Email sending failed:", err.message);
-    throw new Error("Email failed to send"); // 👈 makes signup stop before saving
+    throw new Error("Email failed to send");
   }
 }
 
