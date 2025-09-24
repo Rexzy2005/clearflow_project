@@ -7,11 +7,10 @@ const generateOTP = require('../utils/generateOTP');
 const passwordSchema = require('../utils/passwordValidator');
 
 // ======================= SIGNUP =======================
-router.post("/signup", async (req, res) => {
+exports.signup = async (req, res) => {
   const { firstname, lastname, username, email, password } = req.body;
 
   try {
-    // validation here...
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
       return res.status(400).json({ success: false, message: "Email already registered" });
@@ -22,13 +21,16 @@ router.post("/signup", async (req, res) => {
       return res.status(400).json({ success: false, message: "Username already taken" });
     }
 
-    // password validation here...
+    if (!passwordSchema.validate(password)) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 8 characters long, include uppercase, lowercase, 2 numbers, and a special character."
+      });
+    }
 
-    // generate OTP
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
     const otpExpire = Date.now() + 10 * 60 * 1000;
 
-    // ✅ Try sending email before saving
     try {
       await sendEmail(email, "Your OTP Code", otp);
     } catch (err) {
@@ -39,7 +41,6 @@ router.post("/signup", async (req, res) => {
       });
     }
 
-    // ✅ Only save if email sent successfully
     const user = new User({
       firstname,
       lastname,
@@ -61,7 +62,7 @@ router.post("/signup", async (req, res) => {
     console.error("❌ Signup error:", err);
     res.status(500).json({ success: false, message: "Server error", error: err.message });
   }
-});
+};
 
 
 // ======================= VERIFY OTP =======================
