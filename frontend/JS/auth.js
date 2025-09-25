@@ -307,7 +307,7 @@ export async function authFetch(url, options = {}) {
   const res = await fetch(url, options);
 
   if (res.status === 401) {
-    localStorage.removeItem("token");
+    // localStorage.removeItem("token");
     localStorage.removeItem("currentUser");
     showModal("Session Expired", "Please log in again.", () => {
       window.location.href = "login.html";

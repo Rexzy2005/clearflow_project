@@ -8,8 +8,9 @@ router.post("/add", authMiddleware, deviceController.addDevice); // Add device f
 router.get("/all", authMiddleware, deviceController.getDevices); // Get all devices for logged-in user
 
 // ---------------- DEVICE DATA (ESP32) ----------------
-router.post("/data", deviceController.addDeviceData); // ESP32 sends data (no auth required for ESP32)
+router.post("/data", authMiddleware, deviceController.addDeviceData);
 router.get("/data/:deviceId", authMiddleware, deviceController.getDeviceData); // Get all readings for dashboard
+router.post("/get-device-token", authMiddleware, deviceController.getDeviceToken);
 
 // ---------------- EXISTING STATUS & ANALYTICS ----------------
 router.put("/status/:deviceId", authMiddleware, deviceController.updateStatus);

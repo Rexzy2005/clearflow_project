@@ -105,13 +105,13 @@ exports.login = async (req, res) => {
       {
         id: user._id,
         username: user.username,
+        type: "user",   // 👈 REQUIRED for authMiddleware
         passwordChangedAt: user.passwordChangedAt ? user.passwordChangedAt.getTime() : null
       },
       process.env.TOKEN_SECRET,
       { expiresIn: "1d" }
     );
 
-    // ✅ Return token + user info for frontend
     res.json({
       success: true,
       message: `Welcome ${user.username}`,
@@ -256,5 +256,22 @@ exports.logout = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: "Logout failed. Try again later.", details: err.message });
+  }
+};
+exports.generateDeviceToken = async (req, res) => {
+  try {
+    const { deviceId } = req.body;
+    const device = await Device.findOne({ deviceId });
+    if (!device) return res.status(404).json({ error: "Device not found" });
+
+    const token = jwt.sign(
+      { deviceId: device.deviceId, type: "device" },
+      process.env.TOKEN_SECRET,
+      { expiresIn: "30d" } // long-lived for IoT device
+    );
+
+    res.json({ success: true, token });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };

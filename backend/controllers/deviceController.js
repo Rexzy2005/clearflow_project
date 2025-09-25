@@ -7,29 +7,51 @@ const OpenAI = require("openai");
 // OpenAI client
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// ---------------- ADD DEVICE ----------------
-exports.addDevice = async (req, res) => {
+// ---------------- ADD DEVICE DATA (ESP32) ----------------
+exports.addDeviceData = async (req, res) => {
   try {
-    const { deviceName, deviceId, location, model } = req.body;
+    let device;
 
-    const device = await Device.create({
-      user: req.user._id,
-      deviceName,
-      deviceId,
-      location,
-      model,
+    if (req.type === "device") {
+      // ✅ Authenticated ESP32 device
+      device = req.device;
+    } else {
+      // ❌ Only device tokens allowed
+      return res.status(403).json({ error: "Only device tokens can send data" });
+    }
+
+    const {
+      tdsValue,
+      temperature,
+      humidity,
+      sourceLevel,
+      detectionChamberLevel,
+      purificationChamberLevel,
+      destBottomLevel,
+      destTopLevel,
+      waterSafe,
+    } = req.body;
+
+    const newData = await DeviceData.create({
+      user: device.user,
+      device: device._id,
+      tdsValue,
+      temperature,
+      humidity,
+      sourceLevel,
+      detectionChamberLevel,
+      purificationChamberLevel,
+      destBottomLevel,
+      destTopLevel,
+      waterSafe,
     });
 
-    const populatedDevice = await Device.findById(device._id).populate(
-      "user",
-      "username email"
-    );
-
-    res.status(201).json({ message: "Device added successfully", device: populatedDevice });
+    res.status(201).json({ message: "Device data added", data: newData });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // ---------------- LINK DEVICE TO USER ----------------
 exports.linkDeviceToUser = async (req, res) => {
