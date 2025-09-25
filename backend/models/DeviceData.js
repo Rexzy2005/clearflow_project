@@ -6,7 +6,6 @@ const deviceDataSchema = new mongoose.Schema(
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     device: { type: mongoose.Schema.Types.ObjectId, ref: "Device", required: true },
 
-    // Sensor readings
     tdsValue: { type: Number, required: true },
     temperature: { type: Number, required: true },
     humidity: { type: Number, required: true },
@@ -18,8 +17,9 @@ const deviceDataSchema = new mongoose.Schema(
     waterSafe: { type: Boolean, required: true },
   },
   {
-    timestamps: true, // Automatically adds createdAt and updatedAt
+    timestamps: true,
   }
 );
 
-module.exports = mongoose.model("DeviceData", deviceDataSchema);
+// Fix for OverwriteModelError
+module.exports = mongoose.models.DeviceData || mongoose.model("DeviceData", deviceDataSchema);
