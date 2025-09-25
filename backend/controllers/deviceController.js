@@ -26,6 +26,32 @@ exports.getDeviceToken = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+/* ---------------- ADD DEVICE ---------------- */
+exports.addDevice = async (req, res) => {
+  try {
+    const { deviceId, deviceName, location, model } = req.body;
+
+    // Check if already exists
+    let existing = await Device.findOne({ deviceId });
+    if (existing) {
+      return res.status(400).json({ error: "Device already exists" });
+    }
+
+    // Create new device linked to user
+    const device = await Device.create({
+      deviceId,
+      deviceName,
+      location,
+      model,
+      user: req.user._id
+    });
+
+    res.status(201).json({ message: "Device added successfully", device });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 /* ---------------- ADD DEVICE DATA (ESP32) ---------------- */
 exports.addDeviceData = async (req, res) => {
