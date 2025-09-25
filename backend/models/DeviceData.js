@@ -1,4 +1,3 @@
-// models/DeviceData.js
 const mongoose = require("mongoose");
 
 const deviceDataSchema = new mongoose.Schema(
@@ -16,10 +15,7 @@ const deviceDataSchema = new mongoose.Schema(
     destTopLevel: { type: Boolean, required: true },
     waterSafe: { type: Boolean, required: true },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-// Fix for OverwriteModelError
 module.exports = mongoose.models.DeviceData || mongoose.model("DeviceData", deviceDataSchema);

@@ -1,14 +1,13 @@
 const Device = require("../models/Device");
+const DeviceData = require("../models/DeviceData");
 const Status = require("../models/Status");
 const Analytics = require("../models/Analytics");
 const OpenAI = require("openai");
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// OpenAI client
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// 📌 Add a new device for the logged-in user
+// ---------------- ADD DEVICE ----------------
 exports.addDevice = async (req, res) => {
   try {
     const { deviceName, deviceId, location, model } = req.body;
@@ -32,7 +31,84 @@ exports.addDevice = async (req, res) => {
   }
 };
 
-// 📌 Update a device's status (only if it belongs to the logged-in user)
+// ---------------- LINK DEVICE TO USER ----------------
+exports.linkDeviceToUser = async (req, res) => {
+  try {
+    const { deviceId } = req.body;
+
+    const device = await Device.findOne({ deviceId });
+    if (!device) return res.status(404).json({ error: "Device not found" });
+
+    if (device.user && device.user.toString() === req.user._id.toString()) {
+      return res.status(400).json({ error: "Device already linked to your account" });
+    }
+
+    device.user = req.user._id;
+    await device.save();
+
+    res.status(200).json({ message: "Device successfully linked to your account", device });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// ---------------- ADD DEVICE DATA (ESP32) ----------------
+exports.addDeviceData = async (req, res) => {
+  try {
+    const {
+      deviceId,
+      tdsValue,
+      temperature,
+      humidity,
+      sourceLevel,
+      detectionChamberLevel,
+      purificationChamberLevel,
+      destBottomLevel,
+      destTopLevel,
+      waterSafe,
+    } = req.body;
+
+    // Find device (ESP32 token not needed)
+    const device = await Device.findOne({ deviceId });
+    if (!device) return res.status(404).json({ error: "Device not found" });
+
+    const newData = await DeviceData.create({
+      user: device.user,
+      device: device._id,
+      tdsValue,
+      temperature,
+      humidity,
+      sourceLevel,
+      detectionChamberLevel,
+      purificationChamberLevel,
+      destBottomLevel,
+      destTopLevel,
+      waterSafe,
+    });
+
+    res.status(201).json({ message: "Device data added", data: newData });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// ---------------- GET DEVICE DATA (DASHBOARD) ----------------
+exports.getDeviceData = async (req, res) => {
+  try {
+    const { deviceId } = req.params;
+
+    const device = await Device.findOne({ deviceId, user: req.user._id });
+    if (!device) return res.status(404).json({ error: "Device not found" });
+
+    const data = await DeviceData.find({ device: device._id }).sort({ createdAt: -1 });
+
+    res.json({ device, data });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// ---------------- STATUS ----------------
 exports.updateStatus = async (req, res) => {
   try {
     const { deviceId } = req.params;
@@ -43,9 +119,9 @@ exports.updateStatus = async (req, res) => {
 
     let status = await Status.findOne({ device: device._id });
     if (status) {
-      Object.assign(status, statusData); // update existing status
+      Object.assign(status, statusData);
     } else {
-      status = new Status({ device: device._id, ...statusData }); // create new if not exists
+      status = new Status({ device: device._id, ...statusData });
     }
 
     await status.save();
@@ -61,7 +137,7 @@ exports.updateStatus = async (req, res) => {
   }
 };
 
-// 📌 Add or update water analytics for a device (with AI analysis)
+// ---------------- ANALYTICS ----------------
 exports.addAnalytics = async (req, res) => {
   try {
     const { deviceId } = req.params;
@@ -70,7 +146,6 @@ exports.addAnalytics = async (req, res) => {
     const device = await Device.findOne({ deviceId, user: req.user._id });
     if (!device) return res.status(404).json({ error: "Device not found" });
 
-    // Update existing analytics or create new
     let analytics = await Analytics.findOne({ device: device._id });
     if (analytics) {
       Object.assign(analytics, { tds, turbidity, ph, temperature, flowRate });
@@ -78,7 +153,6 @@ exports.addAnalytics = async (req, res) => {
       analytics = new Analytics({ device: device._id, tds, turbidity, ph, temperature, flowRate });
     }
 
-    // AI Analysis
     const prompt = `
 You are an expert water quality analyst.
 Analyze the following water data and respond in JSON format:
@@ -130,7 +204,7 @@ Water Data:
   }
 };
 
-// 📌 Fetch all devices, statuses, and analytics for the logged-in user
+// ---------------- GET USER DATA ----------------
 exports.getUserData = async (req, res) => {
   try {
     const devices = await Device.find({ user: req.user._id });
@@ -145,7 +219,6 @@ exports.getUserData = async (req, res) => {
   }
 };
 
-// 📌 Fetch only devices for this user
 exports.getDevices = async (req, res) => {
   try {
     const devices = await Device.find({ user: req.user._id });
@@ -155,7 +228,6 @@ exports.getDevices = async (req, res) => {
   }
 };
 
-// 📌 Fetch only statuses for this user
 exports.getStatus = async (req, res) => {
   try {
     const userDevices = await Device.find({ user: req.user._id }).select("_id");
@@ -169,7 +241,6 @@ exports.getStatus = async (req, res) => {
   }
 };
 
-// 📌 Fetch only analytics for this user (latest per device)
 exports.getAnalytics = async (req, res) => {
   try {
     const userDevices = await Device.find({ user: req.user._id }).select("_id");
