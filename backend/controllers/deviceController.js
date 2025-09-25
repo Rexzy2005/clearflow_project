@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const Device = require("../models/Device");
 const DeviceData = require("../models/DeviceData");
 const Status = require("../models/Status");
@@ -7,7 +8,26 @@ const OpenAI = require("openai");
 // OpenAI client
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// ---------------- ADD DEVICE DATA (ESP32) ----------------
+/* ---------------- GET DEVICE TOKEN ---------------- */
+exports.getDeviceToken = async (req, res) => {
+  try {
+    const { deviceId } = req.body;
+    const device = await Device.findOne({ deviceId, user: req.user._id });
+    if (!device) return res.status(404).json({ error: "Device not found" });
+
+    const token = jwt.sign(
+      { deviceId: device.deviceId, type: "device" },
+      process.env.TOKEN_SECRET,
+      { expiresIn: "30d" }
+    );
+
+    res.json({ success: true, token });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+/* ---------------- ADD DEVICE DATA (ESP32) ---------------- */
 exports.addDeviceData = async (req, res) => {
   try {
     let device;
@@ -16,7 +36,6 @@ exports.addDeviceData = async (req, res) => {
       // ✅ Authenticated ESP32 device
       device = req.device;
     } else {
-      // ❌ Only device tokens allowed
       return res.status(403).json({ error: "Only device tokens can send data" });
     }
 
@@ -52,8 +71,7 @@ exports.addDeviceData = async (req, res) => {
   }
 };
 
-
-// ---------------- LINK DEVICE TO USER ----------------
+/* ---------------- LINK DEVICE TO USER ---------------- */
 exports.linkDeviceToUser = async (req, res) => {
   try {
     const { deviceId } = req.body;
@@ -68,53 +86,13 @@ exports.linkDeviceToUser = async (req, res) => {
     device.user = req.user._id;
     await device.save();
 
-    res.status(200).json({ message: "Device successfully linked to your account", device });
+    res.status(200).json({ message: "Device successfully linked", device });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// ---------------- ADD DEVICE DATA (ESP32) ----------------
-exports.addDeviceData = async (req, res) => {
-  try {
-    const {
-      deviceId,
-      tdsValue,
-      temperature,
-      humidity,
-      sourceLevel,
-      detectionChamberLevel,
-      purificationChamberLevel,
-      destBottomLevel,
-      destTopLevel,
-      waterSafe,
-    } = req.body;
-
-    // Find device (ESP32 token not needed)
-    const device = await Device.findOne({ deviceId });
-    if (!device) return res.status(404).json({ error: "Device not found" });
-
-    const newData = await DeviceData.create({
-      user: device.user,
-      device: device._id,
-      tdsValue,
-      temperature,
-      humidity,
-      sourceLevel,
-      detectionChamberLevel,
-      purificationChamberLevel,
-      destBottomLevel,
-      destTopLevel,
-      waterSafe,
-    });
-
-    res.status(201).json({ message: "Device data added", data: newData });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// ---------------- GET DEVICE DATA (DASHBOARD) ----------------
+/* ---------------- GET DEVICE DATA (DASHBOARD) ---------------- */
 exports.getDeviceData = async (req, res) => {
   try {
     const { deviceId } = req.params;
@@ -123,14 +101,13 @@ exports.getDeviceData = async (req, res) => {
     if (!device) return res.status(404).json({ error: "Device not found" });
 
     const data = await DeviceData.find({ device: device._id }).sort({ createdAt: -1 });
-
     res.json({ device, data });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// ---------------- STATUS ----------------
+/* ---------------- STATUS ---------------- */
 exports.updateStatus = async (req, res) => {
   try {
     const { deviceId } = req.params;
@@ -159,7 +136,7 @@ exports.updateStatus = async (req, res) => {
   }
 };
 
-// ---------------- ANALYTICS ----------------
+/* ---------------- ANALYTICS ---------------- */
 exports.addAnalytics = async (req, res) => {
   try {
     const { deviceId } = req.params;
@@ -226,7 +203,7 @@ Water Data:
   }
 };
 
-// ---------------- GET USER DATA ----------------
+/* ---------------- GET USER DATA ---------------- */
 exports.getUserData = async (req, res) => {
   try {
     const devices = await Device.find({ user: req.user._id });
@@ -241,6 +218,7 @@ exports.getUserData = async (req, res) => {
   }
 };
 
+/* ---------------- GET DEVICES ---------------- */
 exports.getDevices = async (req, res) => {
   try {
     const devices = await Device.find({ user: req.user._id });
@@ -250,6 +228,7 @@ exports.getDevices = async (req, res) => {
   }
 };
 
+/* ---------------- GET STATUS ---------------- */
 exports.getStatus = async (req, res) => {
   try {
     const userDevices = await Device.find({ user: req.user._id }).select("_id");
@@ -263,6 +242,7 @@ exports.getStatus = async (req, res) => {
   }
 };
 
+/* ---------------- GET ANALYTICS ---------------- */
 exports.getAnalytics = async (req, res) => {
   try {
     const userDevices = await Device.find({ user: req.user._id }).select("_id");
