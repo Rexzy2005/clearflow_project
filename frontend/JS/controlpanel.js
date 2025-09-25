@@ -1,27 +1,29 @@
 import { showToast } from "./utils/notification.js";
-import { authFetch } from "./auth.js"; // make sure authFetch is exported from auth.js
+import { authFetch } from "./auth.js"; // must be exported from auth.js
 
 document.addEventListener("DOMContentLoaded", () => {
   const BACKEND_URL = "https://clearflow-project.onrender.com/api";
 
-  const selectedDeviceWrapper = document.getElementById('selected-device');
+  // DOM elements
+  const selectedDeviceWrapper = document.getElementById("selected-device");
   const deleteDevice = document.getElementById("delete-device");
-  const backBtn = document.getElementById('detailsBackBtn');
+  const backBtn = document.getElementById("detailsBackBtn");
   const selectedDeviceName = document.querySelector(".selected-device-name");
   const selectedDeviceModel = document.querySelector(".selected-device-model");
   const switchBtn = document.querySelector(".switch-btn");
 
-  const addDeviceWrapper = document.getElementById('add-device-wrapper');
+  const addDeviceWrapper = document.getElementById("add-device-wrapper");
   const addDeviceBtn = document.querySelectorAll("#add-device-btn");
-  const closeBtn = document.getElementById('close-btn');
+  const closeBtn = document.getElementById("close-btn");
 
   const addDeviceFormWrapper = document.getElementById("add-device-form-wrapper");
-  const addDeviceForm = document.getElementById('add-device-form');
-  const deviceDetailsWrapper = document.getElementById('device-details-wrapper');
+  const addDeviceForm = document.getElementById("add-device-form");
+  const deviceDetailsWrapper = document.getElementById("device-details-wrapper");
 
   let currentDeviceCard = null;
   let currentDeviceId = null;
 
+  // ---------- Helpers ----------
   function getLastSeenText(timestamp) {
     if (!timestamp) return "Last seen: unknown";
     const diffMs = Date.now() - new Date(timestamp).getTime();
@@ -36,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function getStatus(timestamp, onlineFlag = false) {
     if (!timestamp) return "offline";
     const diffMs = Date.now() - new Date(timestamp).getTime();
-    return (onlineFlag && diffMs < 5 * 60000) ? "online" : "offline";
+    return onlineFlag && diffMs < 5 * 60000 ? "online" : "offline";
   }
 
   function toggleAddDeviceWrapper(devices) {
@@ -49,9 +51,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // ---------- Render ----------
   function renderDeviceCard(device) {
-    const deviceCard = document.createElement('div');
-    deviceCard.className = 'device-card';
+    const deviceCard = document.createElement("div");
+    deviceCard.className = "device-card";
     deviceCard.dataset.id = device.deviceId;
 
     deviceCard.innerHTML = `
@@ -95,12 +98,13 @@ document.addEventListener("DOMContentLoaded", () => {
       updateStatusUI();
     }, 60000);
 
-    deviceCard.querySelector('.viewMoreBtn').addEventListener('click', () => {
+    // ---------- View More ----------
+    deviceCard.querySelector(".viewMoreBtn").addEventListener("click", () => {
       currentDeviceCard = deviceCard;
       currentDeviceId = device.deviceId;
 
       deviceDetailsWrapper.style.display = "none";
-      selectedDeviceWrapper.style.display = 'block';
+      selectedDeviceWrapper.style.display = "block";
       selectedDeviceName.textContent = device.deviceName;
       selectedDeviceModel.textContent = `${device.location} • ${device.model}`;
 
@@ -110,11 +114,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         switchBtn.onclick = async () => {
           try {
-            await authFetch(`${BACKEND_URL}/device/status/${device.deviceId}`, {
+            const res = await authFetch(`${BACKEND_URL}/device/status/${device.deviceId}`, {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ online: !device.online })
+              body: JSON.stringify({ online: !device.online }),
             });
+            const result = await res.json();
+            if (!res.ok) throw new Error(result.error || "Failed to update status");
+
             device.online = !device.online;
             switchBtn.textContent = device.online ? "ON" : "OFF";
             switchBtn.classList.toggle("off", !device.online);
@@ -131,12 +138,15 @@ document.addEventListener("DOMContentLoaded", () => {
     deviceDetailsWrapper.appendChild(deviceCard);
   }
 
-  addDeviceBtn.forEach(btn => btn.addEventListener('click', e => {
-    e.preventDefault();
-    addDeviceFormWrapper.style.display = "flex";
-  }));
+  // ---------- Event Listeners ----------
+  addDeviceBtn.forEach((btn) =>
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      addDeviceFormWrapper.style.display = "flex";
+    })
+  );
 
-  closeBtn?.addEventListener('click', () => {
+  closeBtn?.addEventListener("click", () => {
     addDeviceFormWrapper.style.display = "none";
     addDeviceForm.reset();
   });
@@ -149,9 +159,12 @@ document.addEventListener("DOMContentLoaded", () => {
   deleteDevice?.addEventListener("click", async () => {
     if (!currentDeviceId) return;
     try {
-      await authFetch(`${BACKEND_URL}/device/delete/${currentDeviceId}`, { method: "DELETE" });
+      const res = await authFetch(`${BACKEND_URL}/device/delete/${currentDeviceId}`, { method: "DELETE" });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Failed to delete device");
+
       currentDeviceCard.remove();
-      showToast("Device deleted successfully", "error");
+      showToast("Device deleted successfully", "success");
     } catch (err) {
       console.error(err);
       showToast("Failed to delete device", "error");
@@ -161,6 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleAddDeviceWrapper([]);
   });
 
+  // ---------- Fetch Devices ----------
   async function fetchDevices() {
     try {
       const res = await authFetch(`${BACKEND_URL}/device/all`);
@@ -174,22 +188,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  addDeviceForm?.addEventListener('submit', async e => {
+  // ---------- Add Device ----------
+  addDeviceForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const submitBtn = addDeviceForm.querySelector("button[type='submit']");
     submitBtn.disabled = true;
     submitBtn.textContent = "Adding...";
 
-    const deviceName = document.getElementById('deviceName').value.trim();
-    const deviceId = document.getElementById('deviceId').value.trim();
-    const location = document.getElementById('location').value.trim();
-    const model = document.getElementById('model').value.trim();
+    const deviceName = document.getElementById("deviceName").value.trim();
+    const deviceId = document.getElementById("deviceId").value.trim();
+    const location = document.getElementById("location").value.trim();
+    const model = document.getElementById("model").value.trim();
 
     try {
       const res = await authFetch(`${BACKEND_URL}/device/add`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deviceName, deviceId, location, model })
+        body: JSON.stringify({ deviceName, deviceId, location, model }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to add device");
@@ -198,6 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast(`${deviceName} added successfully`, "success");
       addDeviceFormWrapper.style.display = "none";
       addDeviceForm.reset();
+      toggleAddDeviceWrapper([data.device]);
     } catch (err) {
       console.error(err);
       showToast(err.message || "Server error while adding device", "error");
@@ -207,9 +223,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // ---------- Init ----------
   (async () => {
     const devices = await fetchDevices();
-    devices.forEach(device => renderDeviceCard(device));
+    devices.forEach((device) => renderDeviceCard(device));
     toggleAddDeviceWrapper(devices);
   })();
 });
