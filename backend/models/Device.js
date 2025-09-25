@@ -1,13 +1,20 @@
 const mongoose = require("mongoose");
 
-const deviceSchema = new mongoose.Schema({
+const deviceDataSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
- // user: { type: String, ref: "User", required: true }, 
-  deviceName: { type: String, required: true },
-  deviceId: { type: String, required: true, unique: true },
-  model: { type: String, required: true },
-  location: { type: String, required: true },
+  device: { type: mongoose.Schema.Types.ObjectId, ref: "Device", required: true },
+
+  tdsValue: { type: Number, required: true },
+  temperature: { type: Number, required: true },
+  humidity: { type: Number, required: true },
+  sourceLevel: { type: Number, required: true },
+  detectionChamberLevel: { type: Number, required: true },
+  purificationChamberLevel: { type: Number, required: true },
+  destBottomLevel: { type: Number, required: true },
+  destTopLevel: { type: Boolean, required: true },
+  waterSafe: { type: Boolean, required: true },
+
   createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("Device", deviceSchema);
+module.exports = mongoose.model("DeviceData", deviceDataSchema);

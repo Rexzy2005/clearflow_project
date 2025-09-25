@@ -1,31 +1,14 @@
 const express = require("express");
-const { addDevice, 
-    updateStatus, 
-    addAnalytics,
-    getUserData ,
-    getDevices,
-    getStatus,
-    getAnalytics, 
-} = require("../controllers/deviceController");
-const  protect  = require("../middlewares/authMiddleware");
-
 const router = express.Router();
+const deviceController = require("../controllers/deviceController");
+const authMiddleware = require("../middlewares/authMiddleware");
 
-// 📌 Fetch all user data (devices, statuses, analytics)
-router.get("/all", protect, getUserData);
+// Device CRUD
+router.post("/add", authMiddleware, deviceController.addDevice);
+router.get("/", authMiddleware, deviceController.getDevices);
 
-
-// Device management
-router.post("/add", protect, addDevice);
-router.get("/", protect, getDevices);  
-
-// Component status
-router.post("/:deviceId/status", protect, updateStatus);
-router.get("/:deviceId/status", protect, getStatus);
-
-// Water quality analytics
-router.post("/:deviceId/analytics", protect, addAnalytics);
-router.get("/:deviceId/analytics", protect, getAnalytics);
-
+// ESP32 readings
+router.post("/data/:deviceId", authMiddleware, deviceController.addDeviceData);
+router.get("/data/:deviceId", authMiddleware, deviceController.getDeviceData);
 
 module.exports = router;

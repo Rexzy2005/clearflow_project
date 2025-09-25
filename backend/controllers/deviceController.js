@@ -15,7 +15,6 @@ exports.addDevice = async (req, res) => {
 
     const device = await Device.create({
       user: req.user._id,
-      //user: req.username,
       deviceName,
       deviceId,
       location,
@@ -44,12 +43,13 @@ exports.updateStatus = async (req, res) => {
 
     let status = await Status.findOne({ device: device._id });
     if (status) {
-      Object.assign(status, statusData);
+      Object.assign(status, statusData); // update existing status
     } else {
-      status = new Status({ device: device._id, ...statusData });
+      status = new Status({ device: device._id, ...statusData }); // create new if not exists
     }
 
     await status.save();
+
     const populatedStatus = await Status.findById(status._id).populate(
       "device",
       "deviceId deviceName location model"
@@ -61,7 +61,7 @@ exports.updateStatus = async (req, res) => {
   }
 };
 
-// 📌 Add water analytics for a device (with AI analysis) — restricted to the owner
+// 📌 Add or update water analytics for a device (with AI analysis)
 exports.addAnalytics = async (req, res) => {
   try {
     const { deviceId } = req.params;
@@ -70,15 +70,15 @@ exports.addAnalytics = async (req, res) => {
     const device = await Device.findOne({ deviceId, user: req.user._id });
     if (!device) return res.status(404).json({ error: "Device not found" });
 
-    const analytics = new Analytics({
-      device: device._id,
-      tds,
-      turbidity,
-      ph,
-      temperature,
-      flowRate,
-    });
+    // Update existing analytics or create new
+    let analytics = await Analytics.findOne({ device: device._id });
+    if (analytics) {
+      Object.assign(analytics, { tds, turbidity, ph, temperature, flowRate });
+    } else {
+      analytics = new Analytics({ device: device._id, tds, turbidity, ph, temperature, flowRate });
+    }
 
+    // AI Analysis
     const prompt = `
 You are an expert water quality analyst.
 Analyze the following water data and respond in JSON format:
@@ -115,12 +115,13 @@ Water Data:
     analytics.aiSuggestions = aiJson.suggestions || "No suggestions";
 
     await analytics.save();
+
     const populatedAnalytics = await Analytics.findById(analytics._id).populate(
       "device",
       "deviceId deviceName location model"
     );
 
-    res.status(201).json({ message: "Analytics added", analytics: populatedAnalytics });
+    res.status(201).json({ message: "Analytics added/updated", analytics: populatedAnalytics });
   } catch (error) {
     if (error.response?.status === 401) {
       return res.status(401).json({ error: "Unauthorized: Invalid OpenAI API key" });
@@ -168,7 +169,7 @@ exports.getStatus = async (req, res) => {
   }
 };
 
-// 📌 Fetch only analytics for this user
+// 📌 Fetch only analytics for this user (latest per device)
 exports.getAnalytics = async (req, res) => {
   try {
     const userDevices = await Device.find({ user: req.user._id }).select("_id");
