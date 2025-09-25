@@ -253,322 +253,6 @@
             </div>
           </div>
         </div>
-
-        <!-- water quality section -->
-        <div class="Water-quality-section section" id="water-quality">
-          <div class="Water-quality-section-top">
-            <div class="top-text">
-              <h1>Water Quality Analytics</h1>
-              <p>Input Water Analysis For all devices</p>
-            </div>
-            <button class="btn"><img src="assets/icons/dashboard/export.svg" alt=""> Export Report</button>
-          </div>
-
-          <div class="quality-section-container">
-            <div class="add-devices-wrapper">
-              <img src="assets/icons/dashboard/Vector (2).svg" alt="">
-              <h2>No Devices found</h2>
-              <p>Add your first device to get started </p>
-              <button class="btn"><i class="fa-solid fa-plus"></i> Add device</button>
-            </div>
-
-            <div class="water-quality-details">
-              <div class="filter">
-                <div class="select">
-                  <select name="deviceFilter">
-                    <option value="1">Device 1</option>
-                    <option value="2">Device 2</option>
-                    <option value="3">Device 3</option>
-                    <option value="4">Device 4</option>
-                  </select>
-                  <i class="fa-solid fa-chevron-down"></i>
-                </div>
-                <div class="select">
-                  <select name="timeFilter">
-                    <option value="1">24 Hours</option>
-                    <option value="2">4 Hours</option>
-                    <option value="3">12 Hours</option>
-                    <option value="4">1 Day</option>
-                  </select>
-                  <i class="fa-solid fa-chevron-down"></i>
-                </div>
-                <div class="select">
-                  <select name="inputFilter">
-                    <option value="1">Input</option>
-                    <option value="2">4 Hours</option>
-                    <option value="3">12 Hours</option>
-                    <option value="4">1 Day</option>
-                  </select>
-                  <i class="fa-solid fa-chevron-down"></i>
-
-                </div>
-              </div>
-
-              <div class="content-filter">
-                <button>TDS Level</button>
-                <button>Turbidity</button>
-                <button>pH Level</button>
-                <button>Temperature</button>
-                <button>Flow Rate</button>
-              </div>
-
-
-              <div class="quality-kpis">
-                <!-- row 1 -->
-                <div class="kpis-row-1">
-                  <!-- card 1 -->
-                  <div class="quality-card">
-                    <div class="card-left">
-                      <p class="card-title">TDS Level</p>
-                      <p class="reading tds">304.8 <small>ppm</small></p>
-                      <p class="range">Safe range: 0 - 150 ppm</p>
-                      <p class="attention">Attention Needed</p>
-                    </div>
-                    <div class="card-right">
-                      <img src="assets/icons/dashboard/warning.svg" alt="">
-                    </div>
-                  </div>
-                  <!-- card 2 -->
-                  <div class="quality-card">
-                    <div class="card-left">
-                      <p class="card-title">Turbidity</p>
-                      <p class="reading turbidity">1.598 <small>NTU</small></p>
-                      <p class="range">Safe range: 0 - 1 NTU</p>
-                      <p class="attention">Attention Needed</p>
-                    </div>
-                    <div class="card-right">
-                      <img src="assets/icons/dashboard/warning.svg" alt="">
-                    </div>
-                  </div>
-                  <!-- card 2 -->
-                  <div class="quality-card">
-                    <div class="card-left">
-                      <p class="card-title">pH Level</p>
-                      <p class="reading">6.7 <small>pH</small></p>
-                      <p class="range">Safe range: 6.5 - 8.5 ph</p>
-                      <p class="attention normal">Normal</p>
-                    </div>
-                    <div class="card-right">
-                      <img src="assets/icons/dashboard/warning.svg" alt="">
-                    </div>
-                  </div>
-                </div>
-                <!-- row 2 -->
-                <div class="kpis-row-2">
-                  <!-- card 4 -->
-                  <div class="quality-card">
-                    <div class="card-left">
-                      <p class="card-title">Temperature</p>
-                      <p class="reading temperature">25.4 <small>&deg;C</small></p>
-                      <p class="range">Safe range: 20 - 30 &deg;C</p>
-                      <p class="attention normal">Normal</p>
-                    </div>
-                    <div class="card-right">
-                      <img src="assets/icons/dashboard/warning.svg" alt="">
-                    </div>
-                  </div>
-                  <!-- card 5 -->
-                  <div class="quality-card">
-                    <div class="card-left">
-                      <p class="card-title">Flow Rate</p>
-                      <p class="reading flow-rate">8.4 <small>L/min</small></p>
-                      <p class="range">Safe range: 5 - 12 L/min</p>
-                      <p class="attention normal">Normal</p>
-                    </div>
-                    <div class="card-right">
-                      <img src="assets/icons/dashboard/warning.svg" alt="">
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-
-            </div>
-          </div>
-        </div>
-        <!-- maintenance section -->
-        <div class="maintenance-section section" id="maintenance">
-          <div class="maintenance-section-top">
-            <div class="top-text">
-              <h1>Maintenance & Alerts</h1>
-              <p>Track component health and maintenance schedule</p>
-            </div>
-            <button class="btn" id="schedule-btn"><i class="fa-solid fa-plus"></i> Schedule Maintenance</button>
-          </div>
-
-          <div class="schedule-form-wrapper">
-            <form action="" class="schedule-form">
-              <div class="form-top">
-                <div class="close-icon" id="close-form-btn">
-                  <i class="fa-solid fa-xmark"></i>
-                </div>
-                <h1>Schedule Maintenance</h1>
-                <p>Log maintenance for your water system.</p>
-              </div>
-              <div class="schedule-input-fields">
-                <label for="device">Device*</label>
-                <input list="devices" id="device" name="device" placeholder="Select device" required>
-                <datalist id="devices">
-                  <option value="Device 1"></option>
-                  <option value="Device 2"></option>
-                  <option value="Device 3"></option>
-                </datalist>
-
-                <label for="device-type">Maintenance Type*</label>
-                <input list="types" id="device-type" name="device-type" placeholder="Select Type" required>
-                <datalist id="types">
-                  <option value="Type 1"></option>
-                  <option value="Type 2"></option>
-                  <option value="Type 3"></option>
-                </datalist>
-
-                <label for="description">Description</label>
-                <textarea name="description" id="description" placeholder="Describe the work to be done..."></textarea>
-
-                <div class="date-input">
-                  <input type="date" name="date" id="date" placeholder="Select date">
-                </div>
-
-                <button type="submit">Schedule Maintenance</button>
-              </div>
-            </form>
-          </div>
-
-          <div class="maintenance-section-content">
-            <div class="view-for">
-              <p>View maintenance for:</p>
-              <select name="" id="">
-                <option value="">Borehole Device</option>
-                <option value="">Borehole Device</option>
-                <option value="">Borehole Device</option>
-              </select>
-            </div>
-
-            <div class="component-status-container">
-              <h2>Component Status</h2>
-
-              <!-- card 1 -->
-              <div class="component-status-card">
-                <div class="card-left">
-                  <div class="icon-box">
-                    <img src="assets/icons/dashboard/funnel-thin.svg" alt="">
-                  </div>
-                </div>
-                <div class="card-right">
-                  <div class="card-right-top">
-                    <div class="group1">
-                      <p class="card-title">Primary Filter</p>
-                      <p class="card-desc">Sediment and carbon filtration system</p>
-                      <p class="component-health">Component Health</p>
-                    </div>
-                    <div class="group2">
-                      <span class="card-attention">excellent</span>
-                      <span class="card-percent" id="pfValue">55%</span>
-                    </div>
-                  </div>
-                  <div class="card-right-bottom">
-                    <input type="range" name="" id="pfRate">
-                    <p class="due-time"><img src="assets/icons/dashboard/calendar.svg" alt="">Next due in - 185 days</p>
-                  </div>
-                </div>
-              </div>
-              <!-- card 2 -->
-              <div class="component-status-card">
-                <div class="card-left">
-                  <div class="icon-box">
-                    <img src="assets/icons/dashboard/light-bulb.svg" alt="">
-                  </div>
-                </div>
-                <div class="card-right">
-                  <div class="card-right-top">
-                    <div class="group1">
-                      <p class="card-title">UV Sterilization Lamp</p>
-                      <p class="card-desc">Ultraviolet water steriliazationsystem</p>
-                      <p class="component-health">Component Health</p>
-                    </div>
-                    <div class="group2">
-                      <span class="card-attention">attention</span>
-                      <span class="card-percent" id="uvsValue">55%</span>
-                    </div>
-                  </div>
-                  <div class="card-right-bottom">
-                    <input type="range" name="" id="uvsRate">
-                    <p class="due-time"><img src="assets/icons/dashboard/calendar.svg" alt="">Next due in - 211 days</p>
-                  </div>
-                </div>
-              </div>
-              <!-- card 3 -->
-              <div class="component-status-card">
-                <div class="card-left">
-                  <div class="icon-box">
-                    <img src="assets/icons/dashboard/droplet.svg" alt="">
-                  </div>
-                </div>
-                <div class="card-right">
-                  <div class="card-right-top">
-                    <div class="group1">
-                      <p class="card-title">Water Pump</p>
-                      <p class="card-desc">Main circulation and pressure pump</p>
-                      <p class="component-health">Component Health</p>
-                    </div>
-                    <div class="group2">
-                      <span class="card-attention">good</span>
-                      <span class="card-percent" id="wpValue">55%</span>
-                    </div>
-                  </div>
-                  <div class="card-right-bottom">
-                    <input type="range" name="" id="wpRate">
-                    <p class="due-time"><img src="assets/icons/dashboard/calendar.svg" alt="">Next due in - 110 days</p>
-                  </div>
-                </div>
-              </div>
-              <!-- card 4 -->
-              <div class="component-status-card">
-                <div class="card-left">
-                  <div class="icon-box">
-                    <img src="assets/icons/dashboard/droplet.svg" alt="">
-                  </div>
-                </div>
-                <div class="card-right">
-                  <div class="card-right-top">
-                    <div class="group1">
-                      <p class="card-title">Sensor Array</p>
-                      <p class="card-desc">TDS, pH, and quality sensors</p>
-                      <p class="component-health">Component Health</p>
-                    </div>
-                    <div class="group2">
-                      <span class="card-attention">due</span>
-                      <span class="card-percent" id="saValue">55%</span>
-                    </div>
-                  </div>
-                  <div class="card-right-bottom">
-                    <input type="range" name="" id="saRate">
-                    <p class="due-time"><img src="assets/icons/dashboard/calendar.svg" alt="">Next due in - 247 days</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- <div class="ai-prediction-container">
-                <h2>AI Predictive Maintenance</h2>
-                <div class="prediction-box">
-                  <div class="prediction-card">
-                    <div class="card-left">
-                      <p class="card-title">Primary Filter <span>medium</span></p>
-                      <p class="message">Borehole Device: Based on current usage patterns, filter replacement will be needed 8 days earlier than scheduled.</p>
-                      <div class="card-btns">
-                        <button class="schedule">Schedule Now</button>
-                        <button class="remind">Remind Me</button>
-                      </div>
-                    </div>
-                    <div class="card-right"> 
-                      <p class="days-conf">+10 days <span>conf.</span></p>
-                    </div>
-                  </div>
-                </div>
-              </div> -->
-            </div>
-          </div>
-        </div>
         <!-- control panel section -->
         <div class="control-panel-section section" id="control-panel">
           <div class="control-panel-section-top">
@@ -755,8 +439,324 @@
             </div>
           </div>
         </div>
+        <!-- water quality section -->
+        <div class="Water-quality-section section" id="water-quality">
+          <div class="Water-quality-section-top">
+            <div class="top-text">
+              <h1>Water Quality Analytics</h1>
+              <p>Input Water Analysis For all devices</p>
+            </div>
+            <button class="btn"><img src="assets/icons/dashboard/export.svg" alt=""> Export Report</button>
+          </div>
+
+          <div class="quality-section-container">
+            <div class="add-devices-wrapper">
+              <img src="assets/icons/dashboard/Vector (2).svg" alt="">
+              <h2>No Devices found</h2>
+              <p>Add your first device to get started </p>
+              <button class="btn"><i class="fa-solid fa-plus"></i> Add device</button>
+            </div>
+
+            <div class="water-quality-details">
+              <div class="filter">
+                <div class="select">
+                  <select name="deviceFilter">
+                    <option value="1">Device 1</option>
+                    <option value="2">Device 2</option>
+                    <option value="3">Device 3</option>
+                    <option value="4">Device 4</option>
+                  </select>
+                  <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="select">
+                  <select name="timeFilter">
+                    <option value="1">24 Hours</option>
+                    <option value="2">4 Hours</option>
+                    <option value="3">12 Hours</option>
+                    <option value="4">1 Day</option>
+                  </select>
+                  <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="select">
+                  <select name="inputFilter">
+                    <option value="1">Input</option>
+                    <option value="2">4 Hours</option>
+                    <option value="3">12 Hours</option>
+                    <option value="4">1 Day</option>
+                  </select>
+                  <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+              </div>
+
+              <div class="content-filter">
+                <button>TDS Level</button>
+                <button>Turbidity</button>
+                <button>pH Level</button>
+                <button>Temperature</button>
+                <button>Flow Rate</button>
+              </div>
 
 
+              <div class="quality-kpis">
+                <!-- row 1 -->
+                <div class="kpis-row-1">
+                  <!-- card 1 -->
+                  <div class="quality-card">
+                    <div class="card-left">
+                      <p class="card-title">TDS Level</p>
+                      <p class="reading tds">304.8 <small>ppm</small></p>
+                      <p class="range">Safe range: 0 - 150 ppm</p>
+                      <p class="attention">Attention Needed</p>
+                    </div>
+                    <div class="card-right">
+                      <img src="assets/icons/dashboard/warning.svg" alt="">
+                    </div>
+                  </div>
+                  <!-- card 2 -->
+                  <div class="quality-card">
+                    <div class="card-left">
+                      <p class="card-title">Turbidity</p>
+                      <p class="reading turbidity">1.598 <small>NTU</small></p>
+                      <p class="range">Safe range: 0 - 1 NTU</p>
+                      <p class="attention">Attention Needed</p>
+                    </div>
+                    <div class="card-right">
+                      <img src="assets/icons/dashboard/warning.svg" alt="">
+                    </div>
+                  </div>
+                  <!-- card 2 -->
+                  <div class="quality-card">
+                    <div class="card-left">
+                      <p class="card-title">pH Level</p>
+                      <p class="reading">6.7 <small>pH</small></p>
+                      <p class="range">Safe range: 6.5 - 8.5 ph</p>
+                      <p class="attention normal">Normal</p>
+                    </div>
+                    <div class="card-right">
+                      <img src="assets/icons/dashboard/warning.svg" alt="">
+                    </div>
+                  </div>
+                </div>
+                <!-- row 2 -->
+                <div class="kpis-row-2">
+                  <!-- card 4 -->
+                  <div class="quality-card">
+                    <div class="card-left">
+                      <p class="card-title">Temperature</p>
+                      <p class="reading temperature">25.4 <small>&deg;C</small></p>
+                      <p class="range">Safe range: 20 - 30 &deg;C</p>
+                      <p class="attention normal">Normal</p>
+                    </div>
+                    <div class="card-right">
+                      <img src="assets/icons/dashboard/warning.svg" alt="">
+                    </div>
+                  </div>
+                  <!-- card 5 -->
+                  <div class="quality-card">
+                    <div class="card-left">
+                      <p class="card-title">Flow Rate</p>
+                      <p class="reading flow-rate">8.4 <small>L/min</small></p>
+                      <p class="range">Safe range: 5 - 12 L/min</p>
+                      <p class="attention normal">Normal</p>
+                    </div>
+                    <div class="card-right">
+                      <img src="assets/icons/dashboard/warning.svg" alt="">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- maintenance section -->
+        <div class="maintenance-section section" id="maintenance">
+          <div class="maintenance-section-top">
+            <div class="top-text">
+              <h1>Maintenance & Alerts</h1>
+              <p>Track component health and maintenance schedule</p>
+            </div>
+            <button class="btn" id="schedule-btn"><i class="fa-solid fa-plus"></i> Schedule Maintenance</button>
+          </div>
+
+          <div class="schedule-form-wrapper">
+            <form action="" class="schedule-form">
+              <div class="form-top">
+                <div class="close-icon" id="close-form-btn">
+                  <i class="fa-solid fa-xmark"></i>
+                </div>
+                <h1>Schedule Maintenance</h1>
+                <p>Log maintenance for your water system.</p>
+              </div>
+              <div class="schedule-input-fields">
+                <label for="device">Device*</label>
+                <input list="devices" id="device" name="device" placeholder="Select device" required>
+                <datalist id="devices">
+                  <option value="Device 1"></option>
+                  <option value="Device 2"></option>
+                  <option value="Device 3"></option>
+                </datalist>
+
+                <label for="device-type">Maintenance Type*</label>
+                <input list="types" id="device-type" name="device-type" placeholder="Select Type" required>
+                <datalist id="types">
+                  <option value="Type 1"></option>
+                  <option value="Type 2"></option>
+                  <option value="Type 3"></option>
+                </datalist>
+
+                <label for="description">Description</label>
+                <textarea name="description" id="description" placeholder="Describe the work to be done..."></textarea>
+
+                <div class="date-input">
+                  <input type="date" name="date" id="date" placeholder="Select date">
+                </div>
+
+                <button type="submit">Schedule Maintenance</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="maintenance-section-content">
+            <div class="view-for">
+              <p>View maintenance for:</p>
+              <select name="" id="">
+                <option value="">Borehole Device</option>
+                <option value="">Borehole Device</option>
+                <option value="">Borehole Device</option>
+              </select>
+            </div>
+
+            <div class="component-status-container">
+              <h2>Component Status</h2>
+
+              <!-- card 1 -->
+              <div class="component-status-card">
+                <div class="card-left">
+                  <div class="icon-box">
+                    <img src="assets/icons/dashboard/funnel-thin.svg" alt="">
+                  </div>
+                </div>
+                <div class="card-right">
+                  <div class="card-right-top">
+                    <div class="group1">
+                      <p class="card-title">Primary Filter</p>
+                      <p class="card-desc">Sediment and carbon filtration system</p>
+                      <p class="component-health">Component Health</p>
+                    </div>
+                    <div class="group2">
+                      <span class="card-attention">excellent</span>
+                      <span class="card-percent" id="pfValue">55%</span>
+                    </div>
+                  </div>
+                  <div class="card-right-bottom">
+                    <input type="range" name="" id="pfRate">
+                    <p class="due-time"><img src="assets/icons/dashboard/calendar.svg" alt="">Next due in - 185 days</p>
+                  </div>
+                </div>
+              </div>
+              <!-- card 2 -->
+              <div class="component-status-card">
+                <div class="card-left">
+                  <div class="icon-box">
+                    <img src="assets/icons/dashboard/light-bulb.svg" alt="">
+                  </div>
+                </div>
+                <div class="card-right">
+                  <div class="card-right-top">
+                    <div class="group1">
+                      <p class="card-title">UV Sterilization Lamp</p>
+                      <p class="card-desc">Ultraviolet water steriliazationsystem</p>
+                      <p class="component-health">Component Health</p>
+                    </div>
+                    <div class="group2">
+                      <span class="card-attention">attention</span>
+                      <span class="card-percent" id="uvsValue">55%</span>
+                    </div>
+                  </div>
+                  <div class="card-right-bottom">
+                    <input type="range" name="" id="uvsRate">
+                    <p class="due-time"><img src="assets/icons/dashboard/calendar.svg" alt="">Next due in - 211 days</p>
+                  </div>
+                </div>
+              </div>
+              <!-- card 3 -->
+              <div class="component-status-card">
+                <div class="card-left">
+                  <div class="icon-box">
+                    <img src="assets/icons/dashboard/droplet.svg" alt="">
+                  </div>
+                </div>
+                <div class="card-right">
+                  <div class="card-right-top">
+                    <div class="group1">
+                      <p class="card-title">Water Pump</p>
+                      <p class="card-desc">Main circulation and pressure pump</p>
+                      <p class="component-health">Component Health</p>
+                    </div>
+                    <div class="group2">
+                      <span class="card-attention">good</span>
+                      <span class="card-percent" id="wpValue">55%</span>
+                    </div>
+                  </div>
+                  <div class="card-right-bottom">
+                    <input type="range" name="" id="wpRate">
+                    <p class="due-time"><img src="assets/icons/dashboard/calendar.svg" alt="">Next due in - 110 days</p>
+                  </div>
+                </div>
+              </div>
+              <!-- card 4 -->
+              <div class="component-status-card">
+                <div class="card-left">
+                  <div class="icon-box">
+                    <img src="assets/icons/dashboard/droplet.svg" alt="">
+                  </div>
+                </div>
+                <div class="card-right">
+                  <div class="card-right-top">
+                    <div class="group1">
+                      <p class="card-title">Sensor Array</p>
+                      <p class="card-desc">TDS, pH, and quality sensors</p>
+                      <p class="component-health">Component Health</p>
+                    </div>
+                    <div class="group2">
+                      <span class="card-attention">due</span>
+                      <span class="card-percent" id="saValue">55%</span>
+                    </div>
+                  </div>
+                  <div class="card-right-bottom">
+                    <input type="range" name="" id="saRate">
+                    <p class="due-time"><img src="assets/icons/dashboard/calendar.svg" alt="">Next due in - 247 days</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- <div class="ai-prediction-container">
+                <h2>AI Predictive Maintenance</h2>
+                <div class="prediction-box">
+                  <div class="prediction-card">
+                    <div class="card-left">
+                      <p class="card-title">Primary Filter <span>medium</span></p>
+                      <p class="message">Borehole Device: Based on current usage patterns, filter replacement will be needed 8 days earlier than scheduled.</p>
+                      <div class="card-btns">
+                        <button class="schedule">Schedule Now</button>
+                        <button class="remind">Remind Me</button>
+                      </div>
+                    </div>
+                    <div class="card-right"> 
+                      <p class="days-conf">+10 days <span>conf.</span></p>
+                    </div>
+                  </div>
+                </div>
+              </div> -->
+            </div>
+          </div>
+        </div>
 
         <!-- profile-section -->
         <div class="settings-section section" id="settings">
