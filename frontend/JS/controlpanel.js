@@ -99,10 +99,10 @@ document.addEventListener("DOMContentLoaded", () => {
       currentDeviceCard = deviceCard;
       currentDeviceId = device.deviceId;
 
-      if (deviceDetailsWrapper) deviceDetailsWrapper.style.display = "none";
-      if (selectedDeviceWrapper) selectedDeviceWrapper.style.display = 'block';
-      if (selectedDeviceName) selectedDeviceName.textContent = device.deviceName;
-      if (selectedDeviceModel) selectedDeviceModel.textContent = `${device.location} • ${device.model}`;
+      deviceDetailsWrapper.style.display = "none";
+      selectedDeviceWrapper.style.display = 'block';
+      selectedDeviceName.textContent = device.deviceName;
+      selectedDeviceModel.textContent = `${device.location} • ${device.model}`;
 
       if (switchBtn) {
         switchBtn.textContent = device.online ? "ON" : "OFF";
@@ -133,43 +133,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
   addDeviceBtn.forEach(btn => btn.addEventListener('click', e => {
     e.preventDefault();
-    if (addDeviceFormWrapper) addDeviceFormWrapper.style.display = "flex";
+    addDeviceFormWrapper.style.display = "flex";
   }));
 
-  if (closeBtn) closeBtn.addEventListener('click', () => {
-    if (addDeviceFormWrapper) addDeviceFormWrapper.style.display = "none";
-    if (addDeviceForm) addDeviceForm.reset();
+  closeBtn?.addEventListener('click', () => {
+    addDeviceFormWrapper.style.display = "none";
+    addDeviceForm.reset();
   });
 
-  if (backBtn) {
-    backBtn.addEventListener("click", () => {
-      if (selectedDeviceWrapper) selectedDeviceWrapper.style.display = "none";
-      if (deviceDetailsWrapper) deviceDetailsWrapper.style.display = "block";
-    });
-  }
+  backBtn?.addEventListener("click", () => {
+    selectedDeviceWrapper.style.display = "none";
+    deviceDetailsWrapper.style.display = "block";
+  });
 
-  if (deleteDevice) {
-    deleteDevice.addEventListener("click", async () => {
-      if (!currentDeviceId) return;
-      try {
-        await authFetch(`${BACKEND_URL}/device/delete/${currentDeviceId}`, { method: "DELETE" });
-        currentDeviceCard.remove();
-        showToast("Device deleted successfully", "error");
-      } catch (err) {
-        console.error(err);
-        showToast("Failed to delete device", "error");
-      }
-      currentDeviceCard = null;
-      currentDeviceId = null;
-      toggleAddDeviceWrapper([]);
-    });
-  }
+  deleteDevice?.addEventListener("click", async () => {
+    if (!currentDeviceId) return;
+    try {
+      await authFetch(`${BACKEND_URL}/device/delete/${currentDeviceId}`, { method: "DELETE" });
+      currentDeviceCard.remove();
+      showToast("Device deleted successfully", "error");
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to delete device", "error");
+    }
+    currentDeviceCard = null;
+    currentDeviceId = null;
+    toggleAddDeviceWrapper([]);
+  });
 
   async function fetchDevices() {
     try {
-      const devices = await authFetch(`${BACKEND_URL}/device/all`);
-      const data = await devices.json();
-      if (!devices.ok) throw new Error(data.error || "Failed to fetch devices");
+      const res = await authFetch(`${BACKEND_URL}/device/all`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to fetch devices");
       return data;
     } catch (err) {
       console.error(err);
@@ -178,40 +174,38 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  if (addDeviceForm) {
-    addDeviceForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      const submitBtn = addDeviceForm.querySelector("button[type='submit']");
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Adding...";
+  addDeviceForm?.addEventListener('submit', async e => {
+    e.preventDefault();
+    const submitBtn = addDeviceForm.querySelector("button[type='submit']");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Adding...";
 
-      const deviceName = document.getElementById('deviceName').value.trim();
-      const deviceId = document.getElementById('deviceId').value.trim();
-      const location = document.getElementById('location').value.trim();
-      const model = document.getElementById('model').value.trim();
+    const deviceName = document.getElementById('deviceName').value.trim();
+    const deviceId = document.getElementById('deviceId').value.trim();
+    const location = document.getElementById('location').value.trim();
+    const model = document.getElementById('model').value.trim();
 
-      try {
-        const res = await authFetch(`${BACKEND_URL}/device/add`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ deviceName, deviceId, location, model })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed to add device");
+    try {
+      const res = await authFetch(`${BACKEND_URL}/device/add`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ deviceName, deviceId, location, model })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to add device");
 
-        renderDeviceCard(data.device);
-        showToast(`${deviceName} added successfully`, "success");
-        addDeviceFormWrapper.style.display = "none";
-        addDeviceForm.reset();
-      } catch (err) {
-        console.error(err);
-        showToast(err.message || "Server error while adding device", "error");
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Add Device";
-      }
-    });
-  }
+      renderDeviceCard(data.device);
+      showToast(`${deviceName} added successfully`, "success");
+      addDeviceFormWrapper.style.display = "none";
+      addDeviceForm.reset();
+    } catch (err) {
+      console.error(err);
+      showToast(err.message || "Server error while adding device", "error");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Add Device";
+    }
+  });
 
   (async () => {
     const devices = await fetchDevices();

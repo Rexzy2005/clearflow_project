@@ -452,19 +452,65 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// -------------------- AUTH FETCH (token auto-expiry) --------------------
+// authFetch.js
 export async function authFetch(url, options = {}) {
-  const token = localStorage.getItem("token");
-  if (!token) { window.location.href = "login.html"; throw new Error("No token"); }
+  let token = localStorage.getItem("token");
+  if (!token) {
+    window.location.href = "login.html";
+    throw new Error("No token");
+  }
 
   options.headers = { ...(options.headers || {}), Authorization: `Bearer ${token}` };
 
-  const res = await fetch(url, options);
+  let res = await fetch(url, options);
+
   if (res.status === 401) {
-    localStorage.removeItem("token");
-    localStorage.removeItem("currentUser");
-    showModal("Session Expired", "Please log in again.", () => { window.location.href = "login.html"; });
-    throw new Error("Unauthorized");
+    // Attempt to refresh token
+    try {
+      const refreshRes = await fetch("https://clearflow-project.onrender.com/api/auth/refresh-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token })
+      });
+
+      if (!refreshRes.ok) throw new Error("Token refresh failed");
+
+      const refreshData = await refreshRes.json();
+      localStorage.setItem("token", refreshData.token);
+
+      // Retry original request with new token
+      options.headers.Authorization = `Bearer ${refreshData.token}`;
+      res = await fetch(url, options);
+      if (!res.ok) throw new Error("Unauthorized after refresh");
+      return res;
+
+    } catch (err) {
+      // Failed to refresh → log out
+      localStorage.removeItem("token");
+      localStorage.removeItem("currentUser");
+      alert("Session expired. Please log in again.");
+      window.location.href = "login.html";
+      throw new Error("Unauthorized, refresh failed");
+    }
   }
+
   return res;
 }
+
+
+// // -------------------- AUTH FETCH (token auto-expiry) --------------------
+// export async function authFetch(url, options = {}) {
+//   const token = localStorage.getItem("token");
+//   if (!token) { window.location.href = "login.html"; throw new Error("No token"); }
+
+//   options.headers = { ...(options.headers || {}), Authorization: `Bearer ${token}` };
+
+//   const res = await fetch(url, options);
+//   if (res.status === 401) {
+//     localStorage.removeItem("token");
+//     localStorage.removeItem("currentUser");
+//     showModal("Session Expired", "Please log in again.", () => { window.location.href = "login.html"; });
+//     throw new Error("Unauthorized");
+//   }
+//   return res;
+// }
