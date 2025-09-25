@@ -24,8 +24,10 @@ function setHint(id, message, success = false) {
 }
 
 function clearFormInputs(form) {
-  const inputs = form.querySelectorAll("input[type='text'],[type='email'],[type='password'], [type='number']");
-  inputs.forEach(input => {
+  const inputs = form.querySelectorAll(
+    "input[type='text'],[type='email'],[type='password'], [type='number']"
+  );
+  inputs.forEach((input) => {
     input.value = "";
     input.style.border = "";
   });
@@ -54,9 +56,13 @@ function showModal(title, message, callback) {
   modal.addEventListener("click", (e) => {
     if (e.target === modal) closeModal();
   });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeModal();
-  }, { once: true });
+  document.addEventListener(
+    "keydown",
+    (e) => {
+      if (e.key === "Escape") closeModal();
+    },
+    { once: true }
+  );
 }
 
 function setButtonLoading(btn, action = "set", text = "Processing...") {
@@ -78,11 +84,13 @@ function setButtonLoading(btn, action = "set", text = "Processing...") {
 }
 
 // -------------------- Password Eye Toggle --------------------
-document.querySelectorAll(".toggle-password").forEach(toggle => {
+document.querySelectorAll(".toggle-password").forEach((toggle) => {
   toggle.addEventListener("click", () => {
     const wrapper = toggle.closest(".password-input") || toggle.parentElement;
     if (!wrapper) return;
-    const input = wrapper.querySelector("input[type='password'], input[type='text']");
+    const input = wrapper.querySelector(
+      "input[type='password'], input[type='text']"
+    );
     if (!input) return;
 
     if (input.type === "password") {
@@ -133,37 +141,75 @@ if (signupForm) {
     const username = document.getElementById("username")?.value.trim();
     const email = document.getElementById("signupEmail")?.value.trim();
     const password = document.getElementById("signupPassword")?.value;
-    const confirmPassword = document.getElementById("signupConfirmPassword")?.value;
+    const confirmPassword = document.getElementById("signupConfirmPassword")
+      ?.value;
     const accept = document.getElementById("accept")?.checked;
 
     let valid = true;
-    if (!fname) { setHint("fname-hint", "First name required"); valid = false; }
-    if (!lname) { setHint("lname-hint", "Last name required"); valid = false; }
-    if (!username) { setHint("uname-hint", "Username required"); valid = false; }
-    if (!/^\S+@\S+\.\S+$/.test(email)) { setHint("signUpEmail-hint", "Enter a valid email"); valid = false; }
-    if (!password) { setHint("signUpPassword-hint", "Password required"); valid = false; }
-    if (!confirmPassword) { setHint("signupConfirmPassword-hint", "Confirm password"); valid = false; }
-
-    if (password && (
-      password.length < 6 ||
-      !/[A-Z]/.test(password) ||
-      !/[0-9]/.test(password) ||
-      !/[!@#$%^&*(),.?":{}|<>]/.test(password)
-    )) {
-      setHint("signUpPassword-hint", "Password must be 6+ chars, include uppercase, number & special char");
+    if (!fname) {
+      setHint("fname-hint", "First name required");
+      valid = false;
+    }
+    if (!lname) {
+      setHint("lname-hint", "Last name required");
+      valid = false;
+    }
+    if (!username) {
+      setHint("uname-hint", "Username required");
+      valid = false;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      setHint("signUpEmail-hint", "Enter a valid email");
+      valid = false;
+    }
+    if (!password) {
+      setHint("signUpPassword-hint", "Password required");
+      valid = false;
+    }
+    if (!confirmPassword) {
+      setHint("signupConfirmPassword-hint", "Confirm password");
       valid = false;
     }
 
-    if (password !== confirmPassword) { setHint("signupConfirmPassword-hint", "Passwords do not match"); valid = false; }
-    if (!accept) { setHint("accept-hint", "You must agree to terms"); valid = false; }
+    if (
+      password &&
+      (password.length < 6 ||
+        !/[A-Z]/.test(password) ||
+        !/[0-9]/.test(password) ||
+        !/[!@#$%^&*(),.?":{}|<>]/.test(password))
+    ) {
+      setHint(
+        "signUpPassword-hint",
+        "Password must be 6+ chars, include uppercase, number & special char"
+      );
+      valid = false;
+    }
 
-    if (!valid) { setButtonLoading(btn, "reset"); return; }
+    if (password !== confirmPassword) {
+      setHint("signupConfirmPassword-hint", "Passwords do not match");
+      valid = false;
+    }
+    if (!accept) {
+      setHint("accept-hint", "You must agree to terms");
+      valid = false;
+    }
+
+    if (!valid) {
+      setButtonLoading(btn, "reset");
+      return;
+    }
 
     try {
       const res = await fetch(`${backend_URL}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstname: fname, lastname: lname, username, email, password })
+        body: JSON.stringify({
+          firstname: fname,
+          lastname: lname,
+          username,
+          email,
+          password,
+        }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -183,9 +229,6 @@ if (signupForm) {
   });
 }
 
-// -------------------- OTP PAGE --------------------
-// (same as your version, unchanged for brevity)
-
 // -------------------- LOGIN --------------------
 const loginForm = document.getElementById("login");
 if (loginForm) {
@@ -197,33 +240,44 @@ if (loginForm) {
     const email = document.getElementById("lemail")?.value.trim();
     const password = document.getElementById("lpassword")?.value;
 
-    if (!/^\S+@\S+\.\S+$/.test(email)) { setHint("loginEmail-hint", "Enter a valid email"); setButtonLoading(btn, "reset"); return; }
-    if (!password) { setHint("loginPass-hint", "Password required"); setButtonLoading(btn, "reset"); return; }
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      setHint("loginEmail-hint", "Enter a valid email");
+      setButtonLoading(btn, "reset");
+      return;
+    }
+    if (!password) {
+      setHint("loginPass-hint", "Password required");
+      setButtonLoading(btn, "reset");
+      return;
+    }
 
     try {
       const res = await fetch(`${backend_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
 
       if (res.ok && data.token) {
-        // ✅ Save token and user before redirect
+        // ✅ Save token + user securely before redirect
         localStorage.setItem("token", data.token);
         localStorage.setItem("currentUser", JSON.stringify(data.user));
 
-        localStorage.setItem("toastMessage", JSON.stringify({
-          text: `Login Successful! Welcome back, ${data.user.username}.`,
-          type: "success"
-        }));
+        localStorage.setItem(
+          "toastMessage",
+          JSON.stringify({
+            text: `Login Successful! Welcome back, ${data.user.username}.`,
+            type: "success",
+          })
+        );
 
         clearFormInputs(loginForm);
 
-        // Small delay ensures storage write completes
+        // ✅ Give localStorage time to persist before redirect
         setTimeout(() => {
           window.location.href = "dashboard.html";
-        }, 100);
+        }, 300);
 
       } else {
         showModal("Login Failed", data.message || "Invalid credentials");
@@ -247,7 +301,7 @@ export async function authFetch(url, options = {}) {
   options.headers = {
     ...(options.headers || {}),
     Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
   };
 
   const res = await fetch(url, options);
