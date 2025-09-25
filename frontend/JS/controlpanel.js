@@ -1,7 +1,8 @@
 import { showToast } from "./utils/notification.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-  // ---------------- ELEMENTS ----------------
+  const BACKEND_URL = "https://clearflow-project.onrender.com/api";
+
   const selectedDeviceWrapper = document.getElementById('selected-device');
   const deleteDevice = document.getElementById("delete-device");
   const backBtn = document.getElementById('detailsBackBtn');
@@ -20,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentDeviceCard = null;
   let currentDeviceId = null;
 
-  // ---------------- HELPERS ----------------
   function getLastSeenText(timestamp) {
     if (!timestamp) return "Last seen: unknown";
     const diffMs = Date.now() - new Date(timestamp).getTime();
@@ -48,7 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ---------------- RENDER DEVICE CARD ----------------
   function renderDeviceCard(device) {
     const deviceCard = document.createElement('div');
     deviceCard.className = 'device-card';
@@ -82,12 +81,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const lastSeenEl = deviceCard.querySelector(".last-seen");
     const statusEl = deviceCard.querySelector(".device-stats");
 
-    // set initial color
     statusEl.style.color = statusEl.textContent === "online" ? "#437509" : "#BF6A29";
     statusEl.style.background = statusEl.textContent === "online" ? "#F6FDE6" : "#FFFBEB";
     statusEl.style.borderColor = statusEl.textContent === "online" ? "#E3FAB8" : "#FDEEB1";
 
-    // auto-update every minute
     setInterval(() => {
       lastSeenEl.textContent = getLastSeenText(device.lastSeen);
       statusEl.textContent = getStatus(device.lastSeen, device.online);
@@ -105,14 +102,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (selectedDeviceName) selectedDeviceName.textContent = device.deviceName;
       if (selectedDeviceModel) selectedDeviceModel.textContent = `${device.location} • ${device.model}`;
 
-      // sync ON/OFF switch
       if (switchBtn) {
         switchBtn.textContent = device.online ? "ON" : "OFF";
         switchBtn.classList.toggle("off", !device.online);
+
         switchBtn.onclick = async () => {
           try {
             const token = localStorage.getItem("token");
-            const res = await fetch(`/device/status/${device.deviceId}`, {
+            const res = await fetch(`${BACKEND_URL}/device/status/${device.deviceId}`, {
               method: "PUT",
               headers: {
                 "Content-Type": "application/json",
@@ -120,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
               },
               body: JSON.stringify({ online: !device.online })
             });
-            const updated = await res.json();
+            if (!res.ok) throw new Error("Failed to update status");
             device.online = !device.online;
             switchBtn.textContent = device.online ? "ON" : "OFF";
             switchBtn.classList.toggle("off", !device.online);
@@ -137,7 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
     deviceDetailsWrapper.appendChild(deviceCard);
   }
 
-  // ---------------- OPEN/CLOSE ADD DEVICE MODAL ----------------
   addDeviceBtn.forEach(btn => btn.addEventListener('click', e => {
     e.preventDefault();
     if (addDeviceFormWrapper) addDeviceFormWrapper.style.display = "flex";
@@ -148,7 +144,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (addDeviceForm) addDeviceForm.reset();
   });
 
-  // ---------------- BACK BUTTON ----------------
   if (backBtn) {
     backBtn.addEventListener("click", () => {
       if (selectedDeviceWrapper) selectedDeviceWrapper.style.display = "none";
@@ -156,13 +151,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---------------- DELETE DEVICE ----------------
   if (deleteDevice) {
     deleteDevice.addEventListener("click", async () => {
       if (!currentDeviceId) return;
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`/device/delete/${currentDeviceId}`, {
+        const res = await fetch(`${BACKEND_URL}/device/delete/${currentDeviceId}`, {
           method: "DELETE",
           headers: { "Authorization": `Bearer ${token}` }
         });
@@ -179,11 +173,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---------------- FETCH DEVICES FROM BACKEND ----------------
   async function fetchDevices() {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("/device/all", {
+      const res = await fetch(`${BACKEND_URL}/device/all`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const data = await res.json();
@@ -196,7 +189,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ---------------- ADD DEVICE FORM SUBMIT ----------------
   if (addDeviceForm) {
     addDeviceForm.addEventListener('submit', async e => {
       e.preventDefault();
@@ -211,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("/device/add", {
+        const res = await fetch(`${BACKEND_URL}/device/add`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -219,7 +211,6 @@ document.addEventListener("DOMContentLoaded", () => {
           },
           body: JSON.stringify({ deviceName, deviceId, location, model })
         });
-
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to add device");
 
@@ -237,11 +228,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---------------- INITIAL LOAD ----------------
   (async () => {
     const devices = await fetchDevices();
     devices.forEach(device => renderDeviceCard(device));
     toggleAddDeviceWrapper(devices);
   })();
-
 });
