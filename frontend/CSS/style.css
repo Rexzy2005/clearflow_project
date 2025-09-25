@@ -587,26 +587,6 @@ header {
   }
 
 
-
-
-
-  & .back-to-top {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #ff7b00;
-    height: 40px;
-    width: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #000;
-    font-weight: bold;
-    text-decoration: none;
-  }
-
-
   & .faq-section {
     width: 100%;
     background: #fff;
