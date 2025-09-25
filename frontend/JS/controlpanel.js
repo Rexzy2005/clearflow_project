@@ -1,4 +1,5 @@
 import { showToast } from "./utils/notification.js";
+import { authFetch } from "./auth.js"; // make sure authFetch is exported from auth.js
 
 document.addEventListener("DOMContentLoaded", () => {
   const BACKEND_URL = "https://clearflow-project.onrender.com/api";
@@ -81,16 +82,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const lastSeenEl = deviceCard.querySelector(".last-seen");
     const statusEl = deviceCard.querySelector(".device-stats");
 
-    statusEl.style.color = statusEl.textContent === "online" ? "#437509" : "#BF6A29";
-    statusEl.style.background = statusEl.textContent === "online" ? "#F6FDE6" : "#FFFBEB";
-    statusEl.style.borderColor = statusEl.textContent === "online" ? "#E3FAB8" : "#FDEEB1";
-
-    setInterval(() => {
-      lastSeenEl.textContent = getLastSeenText(device.lastSeen);
+    const updateStatusUI = () => {
       statusEl.textContent = getStatus(device.lastSeen, device.online);
       statusEl.style.color = statusEl.textContent === "online" ? "#437509" : "#BF6A29";
       statusEl.style.background = statusEl.textContent === "online" ? "#F6FDE6" : "#FFFBEB";
       statusEl.style.borderColor = statusEl.textContent === "online" ? "#E3FAB8" : "#FDEEB1";
+    };
+
+    updateStatusUI();
+    setInterval(() => {
+      lastSeenEl.textContent = getLastSeenText(device.lastSeen);
+      updateStatusUI();
     }, 60000);
 
     deviceCard.querySelector('.viewMoreBtn').addEventListener('click', () => {
@@ -108,20 +110,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         switchBtn.onclick = async () => {
           try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(`${BACKEND_URL}/device/status/${device.deviceId}`, {
+            await authFetch(`${BACKEND_URL}/device/status/${device.deviceId}`, {
               method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-              },
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ online: !device.online })
             });
-            if (!res.ok) throw new Error("Failed to update status");
             device.online = !device.online;
             switchBtn.textContent = device.online ? "ON" : "OFF";
             switchBtn.classList.toggle("off", !device.online);
-            statusEl.textContent = getStatus(new Date(), device.online);
+            updateStatusUI();
             showToast(`${device.deviceName} turned ${device.online ? "ON" : "OFF"}`, device.online ? "success" : "warning");
           } catch (err) {
             console.error(err);
@@ -155,12 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
     deleteDevice.addEventListener("click", async () => {
       if (!currentDeviceId) return;
       try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(`${BACKEND_URL}/device/delete/${currentDeviceId}`, {
-          method: "DELETE",
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (!res.ok) throw new Error("Failed to delete device");
+        await authFetch(`${BACKEND_URL}/device/delete/${currentDeviceId}`, { method: "DELETE" });
         currentDeviceCard.remove();
         showToast("Device deleted successfully", "error");
       } catch (err) {
@@ -175,12 +167,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchDevices() {
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${BACKEND_URL}/device/all`, {
-        headers: { "Authorization": `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to fetch devices");
+      const devices = await authFetch(`${BACKEND_URL}/device/all`);
+      const data = await devices.json();
+      if (!devices.ok) throw new Error(data.error || "Failed to fetch devices");
       return data;
     } catch (err) {
       console.error(err);
@@ -202,13 +191,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const model = document.getElementById('model').value.trim();
 
       try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(`${BACKEND_URL}/device/add`, {
+        const res = await authFetch(`${BACKEND_URL}/device/add`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ deviceName, deviceId, location, model })
         });
         const data = await res.json();

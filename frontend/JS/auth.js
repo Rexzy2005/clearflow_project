@@ -453,7 +453,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // -------------------- AUTH FETCH (token auto-expiry) --------------------
-async function authFetch(url, options = {}) {
+export async function authFetch(url, options = {}) {
   const token = localStorage.getItem("token");
   if (!token) { window.location.href = "login.html"; throw new Error("No token"); }
 
