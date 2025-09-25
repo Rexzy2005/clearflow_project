@@ -1,7 +1,7 @@
 // routes/deviceRoutes.js
 const express = require("express");
 const router = express.Router();
-const Device = require("../models/device");
+const Device = require("../models/Device");
 const DeviceData = require("../models/DeviceData");
 const authMiddleware = require("../middlewares/authMiddleware");
 
