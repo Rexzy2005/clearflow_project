@@ -1,11 +1,17 @@
-const { Resend } = require("resend");
+const nodemailer = require("nodemailer");
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: "gmail", // since you’re using Gmail
+  auth: {
+    user: process.env.NODE_CODE_SENDING_EMAIL_ADDRESS,
+    pass: process.env.NODE_CODE_SENDING_EMAIL_PASSWORD,
+  },
+});
 
 async function sendEmail(to, subject, otp) {
   try {
-    await resend.emails.send({
-      from: "ClearFlow <onboarding@resend.dev>",
+    await transporter.sendMail({
+      from: `"ClearFlow" <${process.env.NODE_CODE_SENDING_EMAIL_ADDRESS}>`,
       to,
       subject,
       html: `
