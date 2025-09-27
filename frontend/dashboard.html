@@ -253,6 +253,140 @@
             </div>
           </div>
         </div>
+
+        <!-- water quality section -->
+        <div class="Water-quality-section section" id="water-quality">
+          <div class="Water-quality-section-top">
+            <div class="top-text">
+              <h1>Water Quality Analytics</h1>
+              <p>Input Water Analysis For all devices</p>
+            </div>
+            <button class="btn"><img src="assets/icons/dashboard/export.svg" alt=""> Export Report</button>
+          </div>
+
+          <div class="quality-section-container">
+            <div class="add-devices-wrapper">
+              <img src="assets/icons/dashboard/Vector (2).svg" alt="">
+              <h2>No Devices found</h2>
+              <p>Add your first device to get started </p>
+              <button class="btn"><i class="fa-solid fa-plus"></i> Add device</button>
+            </div>
+
+            <div class="water-quality-details">
+              <div class="filter">
+                <div class="select">
+                  <select name="deviceFilter">
+                    <option value="1">Device 1</option>
+                    <option value="2">Device 2</option>
+                    <option value="3">Device 3</option>
+                    <option value="4">Device 4</option>
+                  </select>
+                  <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="select">
+                  <select name="timeFilter">
+                    <option value="1">24 Hours</option>
+                    <option value="2">4 Hours</option>
+                    <option value="3">12 Hours</option>
+                    <option value="4">1 Day</option>
+                  </select>
+                  <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="select">
+                  <select name="inputFilter">
+                    <option value="1">Input</option>
+                    <option value="2">4 Hours</option>
+                    <option value="3">12 Hours</option>
+                    <option value="4">1 Day</option>
+                  </select>
+                  <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+              </div>
+
+              <div class="content-filter">
+                <button>TDS Level</button>
+                <button>Turbidity</button>
+                <button>pH Level</button>
+                <button>Temperature</button>
+                <button>Flow Rate</button>
+              </div>
+
+
+              <div class="quality-kpis">
+                <!-- row 1 -->
+                <div class="kpis-row-1">
+                  <!-- card 1 -->
+                  <div class="quality-card">
+                    <div class="card-left">
+                      <p class="card-title">TDS Level</p>
+                      <p class="reading tds">304.8 <small>ppm</small></p>
+                      <p class="range">Safe range: 0 - 150 ppm</p>
+                      <p class="attention">Attention Needed</p>
+                    </div>
+                    <div class="card-right">
+                      <img src="assets/icons/dashboard/warning.svg" alt="">
+                    </div>
+                  </div>
+                  <!-- card 2 -->
+                  <div class="quality-card">
+                    <div class="card-left">
+                      <p class="card-title">Turbidity</p>
+                      <p class="reading turbidity">1.598 <small>NTU</small></p>
+                      <p class="range">Safe range: 0 - 1 NTU</p>
+                      <p class="attention">Attention Needed</p>
+                    </div>
+                    <div class="card-right">
+                      <img src="assets/icons/dashboard/warning.svg" alt="">
+                    </div>
+                  </div>
+                  <!-- card 2 -->
+                  <div class="quality-card">
+                    <div class="card-left">
+                      <p class="card-title">pH Level</p>
+                      <p class="reading">6.7 <small>pH</small></p>
+                      <p class="range">Safe range: 6.5 - 8.5 ph</p>
+                      <p class="attention normal">Normal</p>
+                    </div>
+                    <div class="card-right">
+                      <img src="assets/icons/dashboard/warning.svg" alt="">
+                    </div>
+                  </div>
+                </div>
+                <!-- row 2 -->
+                <div class="kpis-row-2">
+                  <!-- card 4 -->
+                  <div class="quality-card">
+                    <div class="card-left">
+                      <p class="card-title">Temperature</p>
+                      <p class="reading temperature">25.4 <small>&deg;C</small></p>
+                      <p class="range">Safe range: 20 - 30 &deg;C</p>
+                      <p class="attention normal">Normal</p>
+                    </div>
+                    <div class="card-right">
+                      <img src="assets/icons/dashboard/warning.svg" alt="">
+                    </div>
+                  </div>
+                  <!-- card 5 -->
+                  <div class="quality-card">
+                    <div class="card-left">
+                      <p class="card-title">Flow Rate</p>
+                      <p class="reading flow-rate">8.4 <small>L/min</small></p>
+                      <p class="range">Safe range: 5 - 12 L/min</p>
+                      <p class="attention normal">Normal</p>
+                    </div>
+                    <div class="card-right">
+                      <img src="assets/icons/dashboard/warning.svg" alt="">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+
         <!-- control panel section -->
         <div class="control-panel-section section" id="control-panel">
           <div class="control-panel-section-top">
@@ -277,10 +411,10 @@
                 <div class="icon-box" id="close-btn">
                   <img src="assets/icons/dashboard/close.svg" alt="">
                 </div>
-
+                
                 <h2>Add New Device</h2>
                 <p>Configure a new water System</p>
-                <div class="form-group">
+                <!-- <div class="form-group"> -->
                 <label for="deviceName">Name of Device</label>
                 <input type="text" id="deviceName" name="deviceName" placeholder="e.g Borehole filter" required>
 
@@ -439,140 +573,6 @@
             </div>
           </div>
         </div>
-        <!-- water quality section -->
-        <div class="Water-quality-section section" id="water-quality">
-          <div class="Water-quality-section-top">
-            <div class="top-text">
-              <h1>Water Quality Analytics</h1>
-              <p>Input Water Analysis For all devices</p>
-            </div>
-            <button class="btn"><img src="assets/icons/dashboard/export.svg" alt=""> Export Report</button>
-          </div>
-
-          <div class="quality-section-container">
-            <div class="add-devices-wrapper">
-              <img src="assets/icons/dashboard/Vector (2).svg" alt="">
-              <h2>No Devices found</h2>
-              <p>Add your first device to get started </p>
-              <button class="btn"><i class="fa-solid fa-plus"></i> Add device</button>
-            </div>
-
-            <div class="water-quality-details">
-              <div class="filter">
-                <div class="select">
-                  <select name="deviceFilter">
-                    <option value="1">Device 1</option>
-                    <option value="2">Device 2</option>
-                    <option value="3">Device 3</option>
-                    <option value="4">Device 4</option>
-                  </select>
-                  <i class="fa-solid fa-chevron-down"></i>
-                </div>
-                <div class="select">
-                  <select name="timeFilter">
-                    <option value="1">24 Hours</option>
-                    <option value="2">4 Hours</option>
-                    <option value="3">12 Hours</option>
-                    <option value="4">1 Day</option>
-                  </select>
-                  <i class="fa-solid fa-chevron-down"></i>
-                </div>
-                <div class="select">
-                  <select name="inputFilter">
-                    <option value="1">Input</option>
-                    <option value="2">4 Hours</option>
-                    <option value="3">12 Hours</option>
-                    <option value="4">1 Day</option>
-                  </select>
-                  <i class="fa-solid fa-chevron-down"></i>
-
-                </div>
-              </div>
-
-              <div class="content-filter">
-                <button>TDS Level</button>
-                <button>Turbidity</button>
-                <button>pH Level</button>
-                <button>Temperature</button>
-                <button>Flow Rate</button>
-              </div>
-
-
-              <div class="quality-kpis">
-                <!-- row 1 -->
-                <div class="kpis-row-1">
-                  <!-- card 1 -->
-                  <div class="quality-card">
-                    <div class="card-left">
-                      <p class="card-title">TDS Level</p>
-                      <p class="reading tds">304.8 <small>ppm</small></p>
-                      <p class="range">Safe range: 0 - 150 ppm</p>
-                      <p class="attention">Attention Needed</p>
-                    </div>
-                    <div class="card-right">
-                      <img src="assets/icons/dashboard/warning.svg" alt="">
-                    </div>
-                  </div>
-                  <!-- card 2 -->
-                  <div class="quality-card">
-                    <div class="card-left">
-                      <p class="card-title">Turbidity</p>
-                      <p class="reading turbidity">1.598 <small>NTU</small></p>
-                      <p class="range">Safe range: 0 - 1 NTU</p>
-                      <p class="attention">Attention Needed</p>
-                    </div>
-                    <div class="card-right">
-                      <img src="assets/icons/dashboard/warning.svg" alt="">
-                    </div>
-                  </div>
-                  <!-- card 2 -->
-                  <div class="quality-card">
-                    <div class="card-left">
-                      <p class="card-title">pH Level</p>
-                      <p class="reading">6.7 <small>pH</small></p>
-                      <p class="range">Safe range: 6.5 - 8.5 ph</p>
-                      <p class="attention normal">Normal</p>
-                    </div>
-                    <div class="card-right">
-                      <img src="assets/icons/dashboard/warning.svg" alt="">
-                    </div>
-                  </div>
-                </div>
-                <!-- row 2 -->
-                <div class="kpis-row-2">
-                  <!-- card 4 -->
-                  <div class="quality-card">
-                    <div class="card-left">
-                      <p class="card-title">Temperature</p>
-                      <p class="reading temperature">25.4 <small>&deg;C</small></p>
-                      <p class="range">Safe range: 20 - 30 &deg;C</p>
-                      <p class="attention normal">Normal</p>
-                    </div>
-                    <div class="card-right">
-                      <img src="assets/icons/dashboard/warning.svg" alt="">
-                    </div>
-                  </div>
-                  <!-- card 5 -->
-                  <div class="quality-card">
-                    <div class="card-left">
-                      <p class="card-title">Flow Rate</p>
-                      <p class="reading flow-rate">8.4 <small>L/min</small></p>
-                      <p class="range">Safe range: 5 - 12 L/min</p>
-                      <p class="attention normal">Normal</p>
-                    </div>
-                    <div class="card-right">
-                      <img src="assets/icons/dashboard/warning.svg" alt="">
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-
-            </div>
-          </div>
-        </div>
-
-
 
         <!-- maintenance section -->
         <div class="maintenance-section section" id="maintenance">
