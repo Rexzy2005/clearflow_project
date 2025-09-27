@@ -1,6 +1,6 @@
 import { showToast } from "./utils/notification.js";
 
-const backend_URL = "https://clearflow-project.onrender.com/api";
+const backend_URL = "https://clearflowproject-backend.up.railway.app/api";
 const DEFAULT_PROFILE = "./default_profile_pic/default_user_img.png";
 
 // DOM elements

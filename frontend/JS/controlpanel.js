@@ -2,7 +2,7 @@ import { showToast } from "./utils/notification.js";
 import { authFetch } from "./auth.js"; // must be exported from auth.js
 
 document.addEventListener("DOMContentLoaded", () => {
-  const BACKEND_URL = "https://clearflow-project.onrender.com/api";
+  const BACKEND_URL = "https://clearflowproject-backend.up.railway.app/api";
 
   // DOM elements
   const selectedDeviceWrapper = document.getElementById("selected-device");

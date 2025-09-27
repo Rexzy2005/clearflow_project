@@ -1,4 +1,4 @@
-const backend_URL = "https://clearflow-project.onrender.com";
+const backend_URL = "https://clearflowproject-backend.up.railway.app";
 import { showToast } from "./utils/notification.js";
 
 // Logout function
