@@ -8,9 +8,9 @@ async function sendEmail(to, otp, expiryMinutes = 1) {
       body: JSON.stringify({
         service_id: process.env.EMAILJS_SERVICE_ID,
         template_id: process.env.EMAILJS_TEMPLATE_ID,
-        publicKey: process.env.EMAILJS_PUBLIC_KEY, // ✅ Correct for EmailJS
+        user_id: process.env.EMAILJS_PUBLIC_KEY, // ✅ FIXED: must be user_id
         template_params: {
-          user_email: to,   // must match placeholders in your EmailJS template
+          user_email: to,
           otp: otp,
           expiry: expiryMinutes,
         },
@@ -32,7 +32,7 @@ async function sendEmail(to, otp, expiryMinutes = 1) {
     return data;
   } catch (err) {
     console.error("❌ Email sending failed:", err.message);
-    throw err; // keep the original error for the controller
+    throw err;
   }
 }
 
