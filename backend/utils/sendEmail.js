@@ -1,19 +1,23 @@
-const { Resend } = require("resend");
+const fetch = require("node-fetch");
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-async function sendEmail(to, subject, otp) {
+async function sendEmail(to, otp, expiryMinutes = 1) {
   try {
-    await resend.emails.send({
-      from: "ClearFlow <onboarding@resend.dev>",
-      to,
-      subject,
-      html: `
-        <h2>ClearFlow Verification</h2>
-        <p>Your OTP code is: <b>${otp}</b></p>
-        <p>This code expires in 1 minute.</p>
-      `,
+    const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        service_id: process.env.EMAILJS_SERVICE_ID,
+        template_id: process.env.EMAILJS_TEMPLATE_ID,
+        user_id: process.env.EMAILJS_PUBLIC_KEY,
+        template_params: {
+          user_email: to,
+          otp: otp,
+          expiry: expiryMinutes
+        }
+      }),
     });
+
+    if (!response.ok) throw new Error("EmailJS request failed");
 
     console.log(`✅ Email sent successfully to ${to}`);
   } catch (err) {
