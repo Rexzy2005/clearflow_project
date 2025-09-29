@@ -1,35 +1,33 @@
-const fetch = require("node-fetch");
+const nodemailer = require("nodemailer");
 
 async function sendEmail(to, otp, expiryMinutes = 1) {
   try {
-    const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        service_id: process.env.EMAILJS_SERVICE_ID,
-        template_id: process.env.EMAILJS_TEMPLATE_ID,
-        user_id: process.env.EMAILJS_PUBLIC_KEY, // ✅ FIXED: must be user_id
-        template_params: {
-          email: to,
-          otp: otp,
-          expiry: expiryMinutes,
-        },
-      }),
+    // Create transporter for Gmail SMTP
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,   // "smtp.gmail.com"
+      port: process.env.SMTP_PORT,   // 465
+      secure: true,                  // ✅ true for 465
+      auth: {
+        user: process.env.NODE_CODE_SENDING_EMAIL_ADDRESS, // your Gmail
+        pass: process.env.NODE_CODE_SENDING_EMAIL_PASSWORD, // app password
+      },
     });
 
-    const data = await response.json().catch(() => ({}));
+    const mailOptions = {
+      from: `"Clearflow Project" <${process.env.NODE_CODE_SENDING_EMAIL_ADDRESS}>`,
+      to,
+      subject: "Your OTP Code",
+      text: `Your OTP code is ${otp}. It will expire in ${expiryMinutes} minute(s).`,
+      html: `
+        <p>Your OTP code is:</p>
+        <h2>${otp}</h2>
+        <p>This code will expire in <strong>${expiryMinutes}</strong> minute(s).</p>
+      `,
+    };
 
-    if (!response.ok) {
-      console.error("❌ EmailJS request failed:", {
-        status: response.status,
-        statusText: response.statusText,
-        data,
-      });
-      throw new Error(data?.error || `EmailJS request failed with ${response.status}`);
-    }
-
-    console.log(`✅ Email sent successfully to ${to}`, data);
-    return data;
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`✅ Email sent successfully to ${to}`, info.messageId);
+    return info;
   } catch (err) {
     console.error("❌ Email sending failed:", err.message);
     throw err;
