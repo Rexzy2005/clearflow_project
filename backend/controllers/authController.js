@@ -36,12 +36,7 @@ exports.signup = async (req, res) => {
 
     // Send OTP
     try {
-      const mailInfo = await sendEmail(email, otp, 1);
-      console.log("📧 Nodemailer response (signup):", {
-        accepted: mailInfo.accepted,
-        rejected: mailInfo.rejected,
-        response: mailInfo.response,
-      });
+      await sendEmail(email, otp, 1);
     } catch (err) {
       console.error("❌ Email sending failed:", err.message);
       return res.status(500).json({
@@ -159,17 +154,7 @@ exports.resendOTP = async (req, res) => {
     user.otpExpire = Date.now() + 1 * 60 * 1000;
     await user.save();
 
-    try {
-      const mailInfo = await sendEmail(email, otp, 1);
-      console.log("📧 Nodemailer response (resendOTP):", {
-        accepted: mailInfo.accepted,
-        rejected: mailInfo.rejected,
-        response: mailInfo.response,
-      });
-    } catch (err) {
-      return res.status(500).json({ success: false, message: `Failed to resend OTP: ${err.message}` });
-    }
-
+    await sendEmail(email, otp, 1);
     res.json({ success: true, message: "OTP resent to email" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -192,17 +177,7 @@ exports.forgotPassword = async (req, res) => {
     user.otpExpire = Date.now() + 1 * 60 * 1000;
     await user.save();
 
-    try {
-      const mailInfo = await sendEmail(email, otp, 1);
-      console.log("📧 Nodemailer response (forgotPassword):", {
-        accepted: mailInfo.accepted,
-        rejected: mailInfo.rejected,
-        response: mailInfo.response,
-      });
-    } catch (err) {
-      return res.status(500).json({ success: false, message: `Failed to send reset OTP: ${err.message}` });
-    }
-
+    await sendEmail(email, otp, 1);
     res.json({ success: true, message: "OTP sent to email for password reset" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

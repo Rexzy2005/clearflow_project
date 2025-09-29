@@ -1,34 +1,35 @@
-const nodemailer = require("nodemailer");
+const fetch = require("node-fetch");
 
 async function sendEmail(to, otp, expiryMinutes = 1) {
   try {
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || "smtp.gmail.com",
-      port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 465,
-      secure: true, // ✅ 465 requires secure:true
-      auth: {
-        user: process.env.NODE_CODE_SENDING_EMAIL_ADDRESS,
-        pass: process.env.NODE_CODE_SENDING_EMAIL_PASSWORD, // must be App Password
-      },
+    const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        service_id: process.env.EMAILJS_SERVICE_ID,
+        template_id: process.env.EMAILJS_TEMPLATE_ID,
+        user_id: process.env.EMAILJS_PUBLIC_KEY, // ✅ FIXED: must be user_id
+        template_params: {
+          user_email: to,
+          otp: otp,
+          expiry: expiryMinutes,
+        },
+      }),
     });
 
-    const mailOptions = {
-      from: `"ClearFlow Auth" <${process.env.NODE_CODE_SENDING_EMAIL_ADDRESS}>`,
-      to,
-      subject: "Your OTP Code",
-      text: `Your OTP is ${otp}. It expires in ${expiryMinutes} minute(s).`,
-      html: `<p>Your OTP is <b>${otp}</b>. It expires in <b>${expiryMinutes} minute(s)</b>.</p>`,
-    };
+    const data = await response.json().catch(() => ({}));
 
-    const info = await transporter.sendMail(mailOptions);
+    if (!response.ok) {
+      console.error("❌ EmailJS request failed:", {
+        status: response.status,
+        statusText: response.statusText,
+        data,
+      });
+      throw new Error(data?.error || `EmailJS request failed with ${response.status}`);
+    }
 
-    console.log("📧 Nodemailer response:", {
-      accepted: info.accepted,
-      rejected: info.rejected,
-      response: info.response,
-    });
-
-    return info;
+    console.log(`✅ Email sent successfully to ${to}`, data);
+    return data;
   } catch (err) {
     console.error("❌ Email sending failed:", err.message);
     throw err;
