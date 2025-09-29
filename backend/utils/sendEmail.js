@@ -10,7 +10,7 @@ async function sendEmail(to, otp, expiryMinutes = 1) {
         template_id: process.env.EMAILJS_TEMPLATE_ID,
         user_id: process.env.EMAILJS_PUBLIC_KEY, // ✅ FIXED: must be user_id
         template_params: {
-          user_email: to,
+          email: to,
           otp: otp,
           expiry: expiryMinutes,
         },
