@@ -6,11 +6,12 @@ const sendEmail = require('../utils/sendEmail');
 const generateOTP = require('../utils/generateOTP');
 const passwordSchema = require('../utils/passwordValidator');
 
-// ======================= SIGNUP =======================
+// ====== SIGNUP ======
 exports.signup = async (req, res) => {
   const { firstname, lastname, username, email, password } = req.body;
 
   try {
+    // Check duplicates
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
       return res.status(400).json({ success: false, message: "Email already registered" });
@@ -21,6 +22,7 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ success: false, message: "Username already taken" });
     }
 
+    // Validate password
     if (!passwordSchema.validate(password)) {
       return res.status(400).json({
         success: false,
@@ -28,25 +30,31 @@ exports.signup = async (req, res) => {
       });
     }
 
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
-    const otpExpire = Date.now() + 10 * 60 * 1000;
+    // Generate OTP
+    const otp = generateOTP();
+    const otpExpire = Date.now() + 1 * 60 * 1000; // 1 min expiry
 
+    // Send OTP
     try {
-      await sendEmail(email, "Your OTP Code", otp);
+      await sendEmail(email, otp, 1);
     } catch (err) {
       console.error("❌ Email sending failed:", err.message);
       return res.status(500).json({
         success: false,
-        message: "Failed to send OTP email. User not created.",
+        message: `Failed to send OTP email: ${err.message}`,
       });
     }
 
+    // Hash password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Save user
     const user = new User({
       firstname,
       lastname,
       username,
       email,
-      password,
+      password: hashedPassword,
       otp,
       otpExpire,
     });
@@ -64,8 +72,7 @@ exports.signup = async (req, res) => {
   }
 };
 
-
-// ======================= VERIFY OTP =======================
+// ====== VERIFY OTP ======
 exports.verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -87,7 +94,7 @@ exports.verifyOTP = async (req, res) => {
   }
 };
 
-// ======================= LOGIN =======================
+// ====== LOGIN ======
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -105,7 +112,7 @@ exports.login = async (req, res) => {
       {
         id: user._id,
         username: user.username,
-        type: "user",   // 👈 REQUIRED for authMiddleware
+        type: "user",
         passwordChangedAt: user.passwordChangedAt ? user.passwordChangedAt.getTime() : null
       },
       process.env.TOKEN_SECRET,
@@ -122,7 +129,7 @@ exports.login = async (req, res) => {
         lastname: user.lastname,
         username: user.username,
         email: user.email,
-        phoneNumber: user.phoneNumber || "Added Phone Number",
+        phoneNumber: user.phoneNumber || null,
         profilePicture: user.profilePicture || null
       }
     });
@@ -131,7 +138,7 @@ exports.login = async (req, res) => {
   }
 };
 
-// ======================= RESEND OTP =======================
+// ====== RESEND OTP ======
 exports.resendOTP = async (req, res) => {
   try {
     const { email } = req.body;
@@ -144,17 +151,17 @@ exports.resendOTP = async (req, res) => {
 
     const otp = generateOTP();
     user.otp = otp;
-    user.otpExpire = new Date(Date.now() + 1 * 60 * 1000);
+    user.otpExpire = Date.now() + 1 * 60 * 1000;
     await user.save();
 
-    await sendEmail(email, "Your OTP Code", otp);
+    await sendEmail(email, otp, 1);
     res.json({ success: true, message: "OTP resent to email" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
-// ======================= FORGOT PASSWORD =======================
+// ====== FORGOT PASSWORD ======
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -167,17 +174,17 @@ exports.forgotPassword = async (req, res) => {
 
     const otp = generateOTP();
     user.otp = otp;
-    user.otpExpire = new Date(Date.now() + 1 * 60 * 1000);
+    user.otpExpire = Date.now() + 1 * 60 * 1000;
     await user.save();
 
-    await sendEmail(email, "Password Reset OTP", otp);
+    await sendEmail(email, otp, 1);
     res.json({ success: true, message: "OTP sent to email for password reset" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
-// ======================= RESET PASSWORD =======================
+// ====== RESET PASSWORD ======
 exports.resetPassword = async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body;
@@ -195,7 +202,8 @@ exports.resetPassword = async (req, res) => {
       });
     }
 
-    user.password = newPassword; // hashed in User model pre-save
+    // Hash before saving
+    user.password = await bcrypt.hash(newPassword, 10);
     user.otp = undefined;
     user.otpExpire = undefined;
     await user.save();
@@ -206,7 +214,7 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
-// ======================= CHANGE PASSWORD =======================
+// ====== CHANGE PASSWORD ======
 exports.changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -223,7 +231,7 @@ exports.changePassword = async (req, res) => {
       });
     }
 
-    user.password = newPassword;  // Let pre('save') handle hashing
+    user.password = await bcrypt.hash(newPassword, 10);
     user.passwordChangedAt = Date.now();
     await user.save();
 
@@ -233,7 +241,7 @@ exports.changePassword = async (req, res) => {
   }
 };
 
-// ======================= LOGOUT =======================
+// ====== LOGOUT ======
 exports.logout = async (req, res) => {
   try {
     const authHeader = req.headers['authorization'];
@@ -243,7 +251,7 @@ exports.logout = async (req, res) => {
 
     const token = authHeader.split(" ")[1];
 
-    // Store token in blacklist (upsert = prevent duplicate errors)
+    // Blacklist token
     await TokenBlacklist.findOneAndUpdate(
       { token },
       { token },
@@ -256,22 +264,5 @@ exports.logout = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: "Logout failed. Try again later.", details: err.message });
-  }
-};
-exports.generateDeviceToken = async (req, res) => {
-  try {
-    const { deviceId } = req.body;
-    const device = await Device.findOne({ deviceId });
-    if (!device) return res.status(404).json({ error: "Device not found" });
-
-    const token = jwt.sign(
-      { deviceId: device.deviceId, type: "device" },
-      process.env.TOKEN_SECRET,
-      { expiresIn: "30d" } // long-lived for IoT device
-    );
-
-    res.json({ success: true, token });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
   }
 };
